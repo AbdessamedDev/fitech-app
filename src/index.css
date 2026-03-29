@@ -1,5 +1,145 @@
 @import "tailwindcss";
 
-* {
-  font-family: 'Roboto', sans-serif;
+@theme {
+
+  /* Primary */
+  --color-primary-50: #8D70FF1A;
+  --color-primary-100: #EDE9FF;
+  --color-primary-200: #DCD6FF;
+  --color-primary-600: #6942FF;
+  --color-primary-900: #362084;
+
+  /* Secondary */
+  --color-secondary-50: #FAFAFC;
+  --color-secondary-100: #F5F5F8;
+  --color-secondary-200: #E8E8EE;
+  --color-secondary-300: #D1D1DB;
+  --color-secondary-400: #A3A3B3;
+  --color-secondary-500: #757587;
+  --color-secondary-600: #525264;
+  --color-secondary-700: #40404F;
+  --color-secondary-800: #595D62;
+  --color-secondary-900: #454652;
+
+  /* Text */
+  --color-foreground: #0F0F0F;
+  --color-foreground-secondary: #666666;
+  --color-foreground-tertiary: #999999;
+
+  /* Borders */
+  --color-border: #51565f;
+  --color-border-light: #F3F4F6;
+
+  /* Status */
+  --color-success: #336D3B;
+  --color-success-bg: #D6FBC7;
+
+  --color-error: #BF3846;
+  --color-error-bg: #FDE5E1;
+
+  --color-suspended: #6D7580;
+  --color-bg-suspended: #ECF0F3;
+
+  /* Font */
+  --font-roboto: "Roboto", sans-serif;
+  --font-sans: "Inter", sans-serif;
+}
+
+/* =========================
+   BASE
+========================= */
+@layer base {
+  html {
+    font-family: var(--font-roboto);
+    color-scheme: light;
+  }
+
+  body {
+    @apply text-secondary-700 leading-relaxed;
+  }
+
+  html, body, #root {
+    @apply w-full h-full;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-secondary-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-secondary-400 rounded-sm;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-secondary-800;
+  }
+}
+
+/* =========================
+   UTILITIES (minimal)
+========================= */
+@layer utilities {
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+
+  .text-muted {
+    @apply text-secondary-50;
+  }
+}
+
+/* =========================
+   COMPONENTS
+========================= */
+@layer components {
+
+  /* Button */
+  .btn {
+    @apply px-4 py-2 rounded-md transition-all duration-200 font-medium;
+  }
+
+  .btn-primary {
+    @apply px-4 py-2 rounded-md transition-all duration-200 font-medium bg-primary-600 text-white hover:bg-primary-600;
+  }
+
+  .btn-outline {
+    @apply px-4 py-2 rounded-md transition-all duration-200 font-medium border border-border hover:bg-primary-900;
+  }
+
+  /* Card */
+  .card {
+    @apply bg-secondary-200 border border-border-light rounded-lg p-4;
+  }
+
+  /* Input */
+  .input {
+    @apply w-full px-3 py-2 border border-border-light rounded-sm bg-white;
+  }
+
+  .input:focus {
+    @apply outline-none border-primary-600;
+  }
+
+  /* Badge */
+  .badge {
+    @apply px-2 py-1 text-xs rounded-sm font-medium text-white;
+  }
+
+  .badge-success {
+    @apply px-2 py-1 text-xs rounded-sm font-medium text-white bg-success-bg;
+  }
+
+  .badge-warning {
+    @apply px-2 py-1 text-xs rounded-sm font-medium text-white bg-error-bg;
+  }
+
+  .badge-danger {
+    @apply px-2 py-1 text-xs rounded-sm font-medium text-white bg-error-bg;
+  }
 }
