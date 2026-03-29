@@ -1,10 +1,21 @@
-import { CaretRight, Moon, Bell, Gear } from "../../icons/index"
+import { useState } from "react"
+import { CaretRight, Moon, SunDim, Bell, Gear } from "../../icons/index"
 import Logo from "../../assets/Logo.png"
 
 export function Navbar({ title = 'Dashboard', hasNotification = true }) {
 
+  // Initialize directly (no useEffect nonsense)
+  const [isDark, setIsDark] = useState(() =>
+    document.documentElement.classList.contains("dark")
+  )
+
+  const toggleDark = () => {
+    document.documentElement.classList.toggle('dark')
+    setIsDark(prev => !prev)
+  }
+
   const actions = [
-    { icon: Moon, size: 18 },
+    { icon: isDark ? SunDim : Moon, size: 18, onClick: toggleDark },
     { icon: Gear, size: 18 },
     { icon: Bell, size: 18, isBell: true },
   ]
@@ -26,6 +37,7 @@ export function Navbar({ title = 'Dashboard', hasNotification = true }) {
           return (
             <button
               key={index}
+              onClick={Item.onClick}
               className="relative bg-primary-50 p-1.5 rounded-md transition-colors cursor-pointer hover:bg-primary-200"
             >
               <Icon size={Item.size} className="text-primary-600" />

@@ -46,6 +46,49 @@
 }
 
 /* =========================
+   DARK THEME
+========================= */
+.dark {
+  /* Primary */
+  --color-primary-50: #8D70FF1A;
+  --color-primary-100: #2B244D;
+  --color-primary-200: #3C3577;
+  --color-primary-600: #6942FF;
+  --color-primary-900: #1A0F3F;
+
+  /* Secondary */
+  --color-secondary-50: #121215;
+  --color-secondary-100: #1F1F24;
+  --color-secondary-200: #3A3A42;
+  --color-secondary-300: #525264;
+  --color-secondary-400: #6B6B7D;
+  --color-secondary-500: #878799;
+  --color-secondary-600: #ADADBD;
+  --color-secondary-700: #C1C1D0;
+  --color-secondary-800: #E0E0F0;
+  --color-secondary-900: #F3F3FF;
+
+  /* Text */
+  --color-foreground: #F3F4F6;
+  --color-foreground-secondary: #CCCCCC;
+  --color-foreground-tertiary: #AAAAAA;
+
+  /* Borders */
+  --color-border: #3A3A42;
+  --color-border-light: #525264;
+
+  /* Status */
+  --color-success: #7ED957;
+  --color-success-bg: #1D381F;
+
+  --color-error: #FF6B6B;
+  --color-error-bg: #331111;
+
+  --color-suspended: #9A9A9A;
+  --color-bg-suspended: #2B2B30;
+}
+
+/* =========================
    BASE
 ========================= */
 @layer base {

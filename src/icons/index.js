@@ -13,6 +13,7 @@ import {
   
   Bell,
   Moon,
+  SunDim,
 
   MagnifyingGlass,      // Search
   SlidersHorizontal,    // Sort
@@ -46,6 +47,7 @@ export {
 
   Bell,
   Moon,
+  SunDim,
 
   MagnifyingGlass,
   SlidersHorizontal,

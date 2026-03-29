@@ -137,12 +137,12 @@ export default function Members() {
         </div>
 
         {/* Add Member Button */}
-<Button
-  className="h-10 flex items-center gap-2 px-4 py-2 rounded-xl font-normal bg-primary-600 text-secondary-50 hover:shadow-[0_4px_16px_rgba(141,112,255,0.3)] active:scale-98 transition-all"
->
-  <UserPlus size={20} weight="bold" />
-  Add Member
-</Button>
+        <Button
+          className="h-10 flex items-center gap-2 px-4 py-2 rounded-xl font-normal bg-primary-600 text-white hover:shadow-[0_4px_16px_rgba(141,112,255,0.3)] active:scale-98 transition-all"
+        >
+          <UserPlus size={20} weight="bold" />
+          Add Member
+        </Button>
       </div>
 
       {/* Table Container */}
