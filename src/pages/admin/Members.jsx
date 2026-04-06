@@ -5,6 +5,7 @@ import { Input } from '../../components/ui/Input'
 import { Button } from '../../components/ui/Button'
 import { Badge } from '../../components/ui/Badge'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../components/ui/Table'
+import AddMemberModal from '../../components/ui/AddMemberModal'
 
 const mockMembers = [
   { id: 1, name: 'Isabella Baker', email: 'i.bookader@gmail.c', phone: '+1876284232', status: 'Active', subscription: 'Basic Monthly', date: 'Nov 12, 2024' },
@@ -21,33 +22,26 @@ const mockMembers = [
 
 function getStatusVariant(status) {
   switch (status) {
-    case 'Active':
-      return 'active'
-    case 'Suspended':
-      return 'suspended'
-    case 'Pending':
-      return 'pending'
-    default:
-      return 'default'
+    case 'Active': return 'active'
+    case 'Suspended': return 'suspended'
+    case 'Pending': return 'pending'
+    default: return 'default'
   }
 }
 
 function getStatusIcon(status) {
   switch (status) {
-    case 'Active':
-      return '✓'
-    case 'Suspended':
-      return '✕'
-    case 'Pending':
-      return '⊙'
-    default:
-      return '•'
+    case 'Active': return '✓'
+    case 'Suspended': return '✕'
+    case 'Pending': return '⊙'
+    default: return '•'
   }
 }
 
 export default function Members() {
   const [search, setSearch] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
+  const [showModal, setShowModal] = useState(false)
   const itemsPerPage = 10
 
   const filteredMembers = useMemo(() => {
@@ -77,11 +71,8 @@ export default function Members() {
   const generatePageNumbers = () => {
     const pages = []
     const maxVisible = 5
-    
     if (totalPages <= maxVisible) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i)
-      }
+      for (let i = 1; i <= totalPages; i++) pages.push(i)
     } else {
       pages.push(1)
       if (currentPage > 3) pages.push('...')
@@ -91,13 +82,16 @@ export default function Members() {
       if (currentPage < totalPages - 2) pages.push('...')
       pages.push(totalPages)
     }
-    
     return pages
   }
 
   return (
     <div className='bg-secondary-100 min-h-dvh p-10'>
-      {/* Control Bar - No Border */}
+
+      {/* Add Member Modal */}
+      {showModal && <AddMemberModal onClose={() => setShowModal(false)} />}
+
+      {/* Control Bar */}
       <div className="flex items-center justify-between gap-6 mb-6">
         <div className="flex items-center" style={{ gap: '16px', flex: 1 }}>
           {/* Search */}
@@ -110,12 +104,12 @@ export default function Members() {
                 setSearch(e.target.value)
                 setCurrentPage(1)
               }}
-              className="h-10 pl-10 w-full px-4 py-2 rounded-md bg-secondary-50 "
+              className="h-10 pl-10 w-full px-4 py-2 rounded-md bg-secondary-50"
             />
           </div>
 
           {/* Sort By */}
-          <button className="h-10 flex items-center gap-2 px-4 py-2 rounded-md transition-colors bg-secondary-50 text-secondary-400 border border-secondary-300 hover:bg-secondary-100 cursor-pointer" >
+          <button className="h-10 flex items-center gap-2 px-4 py-2 rounded-md transition-colors bg-secondary-50 text-secondary-400 border border-secondary-300 hover:bg-secondary-100 cursor-pointer">
             <SlidersHorizontal size={20}/>
             <span style={{ fontSize: '14px' }}>Sort by</span>
             <ChevronDown size={16} />
@@ -137,12 +131,13 @@ export default function Members() {
         </div>
 
         {/* Add Member Button */}
-<Button
-  className="h-10 flex items-center gap-2 px-4 py-2 rounded-xl font-normal bg-primary-600 text-secondary-50 hover:shadow-[0_4px_16px_rgba(141,112,255,0.3)] active:scale-98 transition-all"
->
-  <UserPlus size={20} weight="bold" />
-  Add Member
-</Button>
+        <Button
+          onClick={() => setShowModal(true)}
+          className="h-10 flex items-center gap-2 px-4 py-2 rounded-xl font-normal bg-primary-600 text-secondary-50 hover:shadow-[0_4px_16px_rgba(141,112,255,0.3)] active:scale-98 transition-all"
+        >
+          <UserPlus size={20} weight="bold" />
+          Add Member
+        </Button>
       </div>
 
       {/* Table Container */}
@@ -154,38 +149,25 @@ export default function Members() {
                 <input type="checkbox" className="w-4 h-4 rounded" style={{ borderColor: 'var(--border)', cursor: 'pointer' }} />
               </TableHead>
               <TableHead style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--foreground-secondary)' }}>
-                <User size={16} />
-                Full Name
-                <span style={{ color: 'var(--border)' }}>|</span>
+                <User size={16} />Full Name<span style={{ color: 'var(--border)' }}>|</span>
               </TableHead>
               <TableHead style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--foreground-secondary)' }}>
-                <Mail size={16} />
-                Email
-                <span style={{ color: 'var(--border)' }}>|</span>
+                <Mail size={16} />Email<span style={{ color: 'var(--border)' }}>|</span>
               </TableHead>
               <TableHead style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--foreground-secondary)' }}>
-                <Phone size={16} />
-                Phone
-                <span style={{ color: 'var(--border)' }}>|</span>
+                <Phone size={16} />Phone<span style={{ color: 'var(--border)' }}>|</span>
               </TableHead>
               <TableHead style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--foreground-secondary)' }}>
-                <AlertCircle size={16} />
-                Status
-                <span style={{ color: 'var(--border)' }}>|</span>
+                <AlertCircle size={16} />Status<span style={{ color: 'var(--border)' }}>|</span>
               </TableHead>
               <TableHead style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--foreground-secondary)' }}>
-                <CreditCard size={16} />
-                Subscription
-                <span style={{ color: 'var(--border)' }}>|</span>
+                <CreditCard size={16} />Subscription<span style={{ color: 'var(--border)' }}>|</span>
               </TableHead>
               <TableHead style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--foreground-secondary)' }}>
-                <Calendar size={16} />
-                Expiry Date
-                <span style={{ color: 'var(--border)' }}>|</span>
+                <Calendar size={16} />Expiry Date<span style={{ color: 'var(--border)' }}>|</span>
               </TableHead>
               <TableHead style={{ padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--foreground-secondary)', width: '60px' }}>
-                <Settings size={16} />
-                Operations
+                <Settings size={16} />Operations
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -226,7 +208,7 @@ export default function Members() {
         >
           ◄
         </button>
-        
+
         {generatePageNumbers().map((page, index) => (
           page === '...' ? (
             <span key={`ellipsis-${index}`} className="px-2" style={{ color: 'var(--foreground-tertiary)' }}>...</span>
@@ -241,7 +223,7 @@ export default function Members() {
             </button>
           )
         ))}
-        
+
         <button
           onClick={handleNextPage}
           disabled={currentPage === totalPages}
