@@ -1,6 +1,6 @@
 export function Table({ children, className = '' }) {
   return (
-    <div className={`overflow-x-auto ${className}`}>
+    <div className={`overflow-x-auto bg-white rounded-lg border border-secondary-200 shadow-sm ${className}`}>
       <table className="w-full border-collapse">
         {children}
       </table>
@@ -10,7 +10,7 @@ export function Table({ children, className = '' }) {
 
 export function TableHeader({ children, className = '' }) {
   return (
-    <thead className={className} style={{ backgroundColor: 'var(--surface)', borderBottom: '1px solid', borderBottomColor: 'var(--border)' }}>
+    <thead className={`border-b border-secondary-200 ${className}`}>
       {children}
     </thead>
   )
@@ -24,17 +24,11 @@ export function TableBody({ children, className = '' }) {
   )
 }
 
-export function TableRow({ children, className = '', isHeader = false, onClick = null }) {
+export function TableRow({ children, className = '', isHeader = false, onClick = null, selected = false }) {
   return (
     <tr
-      className={`transition-colors ${onClick ? 'cursor-pointer' : ''} ${className}`}
-      style={{
-        borderBottom: '1px solid',
-        borderBottomColor: 'var(--border)'
-      }}
+      className={`transition-colors border-b border-secondary-100 last:border-b-0 ${onClick ? 'cursor-pointer' : ''} ${selected ? 'bg-primary-50 hover:bg-primary-50' : (isHeader ? 'bg-secondary-50' : 'bg-white hover:bg-secondary-50')} ${className}`}
       onClick={onClick}
-      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--surface-hover)'}
-      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
     >
       {children}
     </tr>
@@ -43,7 +37,7 @@ export function TableRow({ children, className = '', isHeader = false, onClick =
 
 export function TableHead({ children, className = '' }) {
   return (
-    <th className={`px-6 py-4 text-left text-sm font-semibold ${className}`} style={{ color: 'var(--foreground-secondary)' }}>
+    <th className={`px-4 py-2 text-left text-base font-semibold text-secondary-500 whitespace-nowrap ${className}`}>
       {children}
     </th>
   )
@@ -51,7 +45,7 @@ export function TableHead({ children, className = '' }) {
 
 export function TableCell({ children, className = '' }) {
   return (
-    <td className={`px-6 py-4 text-sm ${className}`} style={{ color: 'var(--foreground-secondary)' }}>
+    <td className={`px-4 py-2 text-sm text-secondary-500 whitespace-nowrap ${className}`}>
       {children}
     </td>
   )

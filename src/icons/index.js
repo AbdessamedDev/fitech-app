@@ -1,11 +1,11 @@
 //Centralized icon file; Here we import all icons that needed for the project
 
 import {
-  SquaresFour,      // Dashboard
+  SquaresFourIcon,      // Dashboard
   Users,                // Members
   IdentificationCard,   // Subscriptions
   Money,                // Finance
-  Barbell,              // Equipment
+  BarbellIcon,              // Equipment
   FileText,             // Reports
   ShoppingCart,         // Shop
   Gear,                 // Settings 
@@ -30,16 +30,25 @@ import {
   DotsThreeVertical,    // Operations (3 dots)
   CaretLeft,            // Pagination prev
   CaretRight,           // Pagination next
+  CaretDown,
+
+  UserCircleCheck,
+  PiggyBankIcon,
+  TrendUp,
+  TrendDown,
+  CreditCard,
+  Megaphone,
+  BoxingGloveIcon,
 
   SignOut,         //Sign Out
-} from "phosphor-react";
+} from "@phosphor-icons/react";
 
 export {
-  SquaresFour,
+  SquaresFourIcon,
   Users,
   IdentificationCard,
   Money,
-  Barbell,
+  BarbellIcon,
   FileText,
   ShoppingCart,
   Gear,
@@ -64,6 +73,15 @@ export {
   DotsThreeVertical,
   CaretLeft,
   CaretRight,
+  CaretDown,
+
+  UserCircleCheck,
+  PiggyBankIcon,
+  TrendUp,
+  TrendDown,
+  CreditCard,
+  Megaphone,
+  BoxingGloveIcon,
 
   SignOut
 };

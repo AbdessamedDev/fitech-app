@@ -2,11 +2,11 @@ import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import Logo from "../../assets/Logo.png";
 import {
-  SquaresFour,                
+  SquaresFourIcon,                
   Users,                
   IdentificationCard,           
   Money,       
-  Barbell,              
+  BarbellIcon,              
   FileText,             
   ShoppingCart,         
   Gear,
@@ -21,11 +21,11 @@ export function Sidebar() {
   const location = useLocation()
 
   const navItems = [
-    { label: 'Dashboard', path: '/admin/dashboard', icon: SquaresFour },
+    { label: 'Dashboard', path: '/admin/dashboard', icon: SquaresFourIcon },
     { label: 'Members', path: '/admin/members', icon: Users },
     { label: 'Subscriptions', path: '/admin/subscriptions', icon: IdentificationCard },
     { label: 'Finance', path: '/admin/finance', icon: Money },
-    { label: 'Equipment', path: '/admin/equipment', icon: Barbell },
+    { label: 'Equipment', path: '/admin/equipment', icon: BarbellIcon },
     { label: 'Reports', path: '/admin/reports', icon: FileText },
     { label: 'Shop', path: '/admin/shop', icon: ShoppingCart },
   ]
