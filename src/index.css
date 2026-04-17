@@ -137,6 +137,23 @@
   .text-muted {
     @apply text-secondary-50;
   }
+  
+  .mini-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  
+  .mini-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .mini-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-secondary-300 rounded-full;
+  }
+  
+  .mini-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-secondary-400;
+  }
 }
 
 /* =========================

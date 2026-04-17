@@ -1,15 +1,18 @@
 import { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   MoreVertical, User, Mail, Phone,
-  CreditCard, Calendar, Settings, ChevronDown, Download, BadgeCheck,
-  ChevronLeft, ChevronRight
+  CreditCard, Calendar, Settings, Download, BadgeCheck
 } from 'lucide-react'
-import { SlidersHorizontal, UserPlus, Funnel, MagnifyingGlass } from "../../icons/index"
-import { Input } from '../../components/ui/Input'
-import { Button } from '../../components/ui/Button'
+import { SlidersHorizontal, Funnel, UserPlus } from "../../icons/index"
 import { Badge } from '../../components/ui/Badge'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../components/ui/Table'
 import AddMemberModal from '../../components/ui/AddMemberModal'
+
+import { FilterDropdown } from '../../components/shared/FilterDropdown'
+import { Pagination } from '../../components/shared/Pagination'
+import { SearchInput } from '../../components/shared/SearchInput'
+import { PrimaryButton } from '../../components/shared/PrimaryButton'
 
 const namesAndEmails = [
   { name: 'ishaq Boukaddah', email: 'i.boukadeh@esi-sb...', phone: '+2136171813', subscription: 'Premium Monthly', date: 'Nov 12, 2026', status: 'Active' },
@@ -41,7 +44,9 @@ const TableHeaderCell = ({ icon: Icon, title, showPipe = true }) => (
 )
 
 export default function Members() {
+  const { t } = useTranslation()
   const [search, setSearch] = useState('')
+  const [sortBy, setSortBy] = useState('All')
   const [currentPage, setCurrentPage] = useState(1)
   const [showModal, setShowModal] = useState(false)
   const [selectedIds, setSelectedIds] = useState([6])
@@ -59,45 +64,17 @@ export default function Members() {
   const startIndex = (currentPage - 1) * itemsPerPage
   const paginatedMembers = filteredMembers.slice(startIndex, startIndex + itemsPerPage)
 
-  const handlePreviousPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1)
-  }
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1)
-  }
-
-  const handlePageClick = (page) => {
-    setCurrentPage(page)
-  }
-
   const handleSelect = (id) => {
     setSelectedIds(prev =>
       prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
     )
   }
 
-  const generatePageNumbers = () => {
-    const pages = []
-    const maxVisible = 5
-    if (totalPages <= maxVisible) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i)
-    } else {
-      pages.push(1)
-      if (currentPage > 3) pages.push('...')
-      
-      const start = Math.max(2, currentPage - 1)
-      const end = Math.min(totalPages - 1, currentPage + 1)
-      
-      for (let i = start; i <= end; i++) {
-        if (!pages.includes(i)) pages.push(i)
-      }
-      
-      if (currentPage < totalPages - 2) pages.push('...')
-      if (!pages.includes(totalPages)) pages.push(totalPages)
-    }
-    return pages
-  }
+  const sortOptions = [
+    { label: 'Sort by', value: 'All' },
+    { label: 'Name (A-Z)', value: 'name-asc' },
+    { label: 'Name (Z-A)', value: 'name-desc' }
+  ];
 
   return (
     <div className='bg-secondary-50 min-h-screen py-8 px-4 sm:px-8 w-full flex justify-center text-sm'>
@@ -106,49 +83,41 @@ export default function Members() {
 
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-12 w-full">
           <div className="flex flex-wrap items-center gap-4 flex-1">
-            <div className="relative w-full md:w-80 lg:w-96">
-              <MagnifyingGlass size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary-400"/>
-              <input
-                placeholder="Search"
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value)
-                  setCurrentPage(1)
-                }}
-                className="h-10 w-full pl-10 pr-4 rounded-md border border-secondary-200 bg-white focus:outline-none focus:border-primary-600 transition-colors shadow-sm text-sm"
-              />
-            </div>
+            <SearchInput
+              value={search}
+              onChange={(val) => { setSearch(val); setCurrentPage(1); }}
+              placeholder="Search members..."
+              className="w-full md:w-80 lg:w-96"
+            />
 
-            <button className="h-10 flex items-center gap-2 px-4 py-2 rounded-md transition-colors bg-white text-secondary-500 border border-secondary-200 hover:bg-secondary-50 cursor-pointer shadow-sm text-sm whitespace-nowrap">
-              <SlidersHorizontal size={18}/>
-              <span>Sort by</span>
-              <ChevronDown size={14} className="ml-1 text-secondary-400" />
-            </button>
+            <FilterDropdown
+              label="Sort by"
+              icon={SlidersHorizontal}
+              options={sortOptions}
+              value={sortBy}
+              onChange={setSortBy}
+            />
 
             <button className="h-10 flex items-center gap-2 px-4 py-2 rounded-md transition-colors bg-transparent text-primary-600 hover:bg-primary-50 active:bg-primary-100 cursor-pointer text-sm font-bold whitespace-nowrap">
               <Funnel size={18} />
-              Filter
+              {t('Filter')}
             </button>
 
             <span className="hidden sm:inline-block text-secondary-300 font-extrabold opacity-50">|</span>
 
             <button className="h-10 flex items-center gap-2 px-4 py-2 rounded-md transition-colors bg-transparent text-primary-600 hover:bg-primary-50 active:bg-primary-100 cursor-pointer text-sm font-bold whitespace-nowrap">
               <Download size={18} />
-              Import
+              {t('Import')}
             </button>
           </div>
 
-          <button
-            onClick={() => setShowModal(true)}
-            className="h-10 flex items-center gap-2 px-5 py-2 rounded-xl font-medium bg-primary-600 text-white hover:bg-primary-900 active:scale-95 transition-all shadow-[0_4px_16px_rgba(105,66,255,0.3)] text-[15px] whitespace-nowrap"
-          >
-            <UserPlus size={20} weight="bold" />
-            Add Member
-          </button>
+          <PrimaryButton icon={UserPlus} onClick={() => setShowModal(true)}>
+            {t('Add Member')}
+          </PrimaryButton>
         </div>
 
-        <Table className="rounded-xl border border-secondary-200 overflow-hidden shadow-sm w-full bg-white text-[14px]">
-          <TableHeader className="bg-secondary-50">
+        <Table className="rounded-xl border border-secondary-200 overflow-hidden shadow-sm w-full bg-secondary-50 text-[14px]">
+          <TableHeader className="bg-secondary-100">
             <TableRow isHeader={true}>
               <TableHead className="p-0 align-middle w-[60px]">
                 <div className="flex items-center justify-between h-full h-[44px]">
@@ -158,18 +127,18 @@ export default function Members() {
                   <div className="w-px h-[18px] bg-secondary-200"></div>
                 </div>
               </TableHead>
-              <TableHeaderCell icon={User} title="Full Name" />
-              <TableHeaderCell icon={Mail} title="Email" />
-              <TableHeaderCell icon={Phone} title="Phone" />
-              <TableHeaderCell icon={BadgeCheck} title="Status" />
-              <TableHeaderCell icon={CreditCard} title="Subscription" />
-              <TableHeaderCell icon={Calendar} title="Expiry Date" />
-              <TableHeaderCell icon={Settings} title="Operations" showPipe={false} />
+              <TableHeaderCell icon={User} title={t('Full Name')} />
+              <TableHeaderCell icon={Mail} title={t('Email')} />
+              <TableHeaderCell icon={Phone} title={t('Phone')} />
+              <TableHeaderCell icon={BadgeCheck} title={t('Status')} />
+              <TableHeaderCell icon={CreditCard} title={t('Subscription')} />
+              <TableHeaderCell icon={Calendar} title={t('Expiry Date')} />
+              <TableHeaderCell icon={Settings} title={t('Operations')} showPipe={false} />
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedMembers.map((member) => (
-              <TableRow key={member.id}>
+              <TableRow key={member.id} className="hover:bg-secondary-100 transition-colors">
                 <TableCell className="p-0 text-center w-[60px]">
                   <div className="flex items-center justify-center h-full">
                     <input
@@ -193,7 +162,7 @@ export default function Members() {
                 <TableCell className="text-center text-secondary-500 font-medium px-2 lg:px-4 whitespace-nowrap">{member.date}</TableCell>
                 <TableCell className="text-center px-2 lg:px-4">
                   <div className="flex justify-center">
-                    <button className="p-2 rounded-full hover:bg-secondary-100 text-secondary-500 transition-colors">
+                    <button className="p-2 rounded-full hover:bg-secondary-200 text-secondary-500 transition-colors">
                       <MoreVertical size={18} />
                     </button>
                   </div>
@@ -203,43 +172,13 @@ export default function Members() {
           </TableBody>
         </Table>
 
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-2 mt-8">
-            <button
-              onClick={handlePreviousPage}
-              disabled={currentPage === 1}
-              className="w-10 h-10 flex items-center justify-center rounded-[10px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-secondary-300 text-secondary-600 bg-white hover:bg-secondary-50 shadow-sm"
-            >
-              <ChevronLeft size={18} strokeWidth={2.5} />
-            </button>
-
-            {generatePageNumbers().map((page, index) => (
-              page === '...' ? (
-                <span key={`ellipsis-${index}`} className="px-2 text-secondary-400 font-bold">...</span>
-              ) : (
-                <button
-                  key={index}
-                  onClick={() => handlePageClick(page)}
-                  className={`w-10 h-10 flex items-center justify-center text-sm rounded-[10px] transition-all font-bold ${
-                    currentPage === page
-                      ? 'bg-primary-600 text-white shadow hover:bg-primary-900'
-                      : 'bg-transparent text-secondary-600 hover:bg-secondary-100'
-                  }`}
-                >
-                  {page}
-                </button>
-              )
-            ))}
-
-            <button
-              onClick={handleNextPage}
-              disabled={currentPage === totalPages}
-              className="w-10 h-10 flex items-center justify-center rounded-[10px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-secondary-300 text-secondary-600 bg-white hover:bg-secondary-50 shadow-sm"
-            >
-              <ChevronRight size={18} strokeWidth={2.5} />
-            </button>
-          </div>
-        )}
+        <div className="mt-8">
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={setCurrentPage} 
+          />
+        </div>
       </div>
     </div>
   )

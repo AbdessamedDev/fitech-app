@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import Logo from "../../assets/Logo.png";
+import { useTranslation } from 'react-i18next';
 import {
   SquaresFourIcon,                
   Users,                
@@ -19,6 +20,8 @@ import {
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
   const location = useLocation()
+
+  const { t } = useTranslation()
 
   const navItems = [
     { label: 'Dashboard', path: '/admin/dashboard', icon: SquaresFourIcon },
@@ -53,9 +56,9 @@ export function Sidebar() {
         <button
           onClick={() => setCollapsed(!collapsed)}
           className="p-2 rounded-md transition-colors shrink-0 cursor-pointer"
-          title={collapsed ? 'Expand' : 'Collapse'}
+          title={collapsed ? t('Expand') : t('Collapse')}
         >
-          {collapsed ? <CaretRight size={20} /> : <List size={20} />}
+          {collapsed ? <CaretRight size={20} className="rtl:rotate-180" /> : <List size={20} />}
         </button>
       </div>
 
@@ -73,10 +76,10 @@ export function Sidebar() {
                   ? 'text-primary-600 bg-primary-50 font-semibold'
                   : 'transition-colors hover:bg-opacity-0 text-secondary-600'
               }`}
-              title={collapsed ? item.label : ''}
+              title={collapsed ? t(item.label) : ''}
             >
               <Icon size={25} className="shrink-0" />
-              {!collapsed && <span>{item.label}</span>}
+              {!collapsed && <span>{t(item.label)}</span>}
             </Link>
           )
         })}
@@ -88,17 +91,17 @@ export function Sidebar() {
           to="/admin/settings"
           className={`flex items-center gap-3 px-3 py-3 rounded-md transition-all duration-300 text-base font-medium`}
           style={isActive('/admin/settings') ? { backgroundColor: '#8D70FF1A', color: '#6942FF', fontWeight: '600' } : { color: '#525264' }}
-          title={collapsed ? 'Settings' : ''}
+          title={collapsed ? t('Settings') : ''}
         >
           <Gear size={25} className="shrink-0" />
-          {!collapsed && <span>Settings</span>}
+          {!collapsed && <span>{t('Settings')}</span>}
         </Link>
         <button
           className="w-full flex items-center gap-3 px-3 py-3 transition-all duration-200 text-base font-medium cursor-pointer text-[#E46962]"
-          title={collapsed ? 'Sign Out' : ''}
+          title={collapsed ? t('Sign Out') : ''}
         >
-          <SignOut size={25} className="shrink-0" />
-          {!collapsed && <span>Sign out</span>}
+          <SignOut size={25} className="shrink-0 rtl:rotate-180" />
+          {!collapsed && <span>{t('Sign out')}</span>}
         </button>
       </div>
     </aside>

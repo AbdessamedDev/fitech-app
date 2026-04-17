@@ -1,25 +1,24 @@
-//Centralized icon file; Here we import all icons that needed for the project
+// Centralized icon file; Here we import all icons that needed for the project
 
 import {
   SquaresFourIcon,      // Dashboard
   Users,                // Members
   IdentificationCard,   // Subscriptions
   Money,                // Finance
-  BarbellIcon,              // Equipment
+  BarbellIcon,          // Equipment
   FileText,             // Reports
   ShoppingCart,         // Shop
   Gear,                 // Settings 
-  List,          
-  
+  List,
   Bell,
   Moon,
   SunDim,
 
-  MagnifyingGlass,      // Search
+  MagnifyingGlassIcon,      // Search
   SlidersHorizontal,    // Sort
   Funnel,               // Filter
   UserPlus,             // Add Member
-  FileCloud,            //Import
+  FileCloud,            // Import
 
   User,                 // Full Name
   EnvelopeSimple,       // Email
@@ -40,7 +39,31 @@ import {
   Megaphone,
   BoxingGloveIcon,
 
-  SignOut,         //Sign Out
+  // 👉 Newly added icons
+  MapPin,
+  Eye,
+  PencilSimple,
+  Trash,
+  Plus,
+  QrCode,
+  Tag,
+  PulseIcon,
+
+  SignOut,              // Sign Out
+
+  ShieldCheck,
+  BellRinging,
+  Palette,
+  Camera,
+  CheckCircle,
+  LockKey,
+  MailboxIcon,
+
+  MonitorIcon,
+  DeviceMobileCameraIcon,
+  DeviceTabletCameraIcon,
+  LaptopIcon,
+  XIcon
 } from "@phosphor-icons/react";
 
 export {
@@ -58,7 +81,7 @@ export {
   Moon,
   SunDim,
 
-  MagnifyingGlass,
+  MagnifyingGlassIcon,
   SlidersHorizontal,
   Funnel,
   UserPlus,
@@ -83,5 +106,28 @@ export {
   Megaphone,
   BoxingGloveIcon,
 
-  SignOut
+  MapPin,
+  Eye,
+  PencilSimple,
+  Trash,
+  Plus,
+  QrCode,
+  Tag,
+  PulseIcon,
+
+  SignOut,
+
+  ShieldCheck,
+  BellRinging,
+  Palette,
+  Camera,
+  CheckCircle,
+  LockKey,
+  MailboxIcon,
+
+  MonitorIcon,
+  DeviceMobileCameraIcon,
+  DeviceTabletCameraIcon,
+  LaptopIcon,
+  XIcon
 };

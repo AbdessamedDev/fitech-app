@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   AreaChart, Area, XAxis, Tooltip as RechartsTooltip, ResponsiveContainer,
   PieChart, Pie, Cell
@@ -54,6 +55,7 @@ function useEntranceAnimation() {
 }
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const isAnimated = useEntranceAnimation();
   const [currentSessionIndex, setCurrentSessionIndex] = useState(0);
 
@@ -110,7 +112,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="animate-fade-up" style={{ animationDelay: '0ms' }}>
             <MetricCard
-              title="Total Members"
+              title={t('Total Members')}
               value="1,248"
               icon={<Users size={26} weight="regular" color="#6942FF" />}
               trend="+12%"
@@ -119,7 +121,7 @@ export default function Dashboard() {
           </div>
           <div className="animate-fade-up" style={{ animationDelay: '100ms' }}>
             <MetricCard
-              title="Today's Check-ins"
+              title={t("Today's Check-ins")}
               value="156"
               icon={<UserCircleCheck size={26} weight="regular" color="#6942FF" />}
               trend="-2%"
@@ -128,7 +130,7 @@ export default function Dashboard() {
           </div>
           <div className="animate-fade-up" style={{ animationDelay: '200ms' }}>
             <MetricCard
-              title="Monthly Revenue"
+              title={t('Monthly Revenue')}
               value="$45,200"
               icon={<PiggyBankIcon size={26} weight="regular" color="#6942FF" />}
               trend="+18%"
@@ -137,7 +139,7 @@ export default function Dashboard() {
           </div>
           <div className="animate-fade-up" style={{ animationDelay: '300ms' }}>
             <MetricCard
-              title="Active Subs"
+              title={t('Active Subs')}
               value="942"
               icon={<IdentificationCard size={26} weight="regular" color="#6942FF" />}
               trend="+5%"
@@ -153,11 +155,11 @@ export default function Dashboard() {
           <div className="lg:col-span-8 bg-secondary-50 p-8 rounded-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-secondary-200 flex flex-col animate-fade-up hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-shadow duration-300" style={{ animationDelay: '400ms' }}>
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h3 className="text-xl font-bold text-secondary-900 font-sans tracking-tight">Membership Growth</h3>
-                <p className="text-[14px] font-normal text-secondary-600 mt-1">Historical performance over the last 6 months</p>
+                <h3 className="text-xl font-bold text-secondary-900 font-sans tracking-tight">{t('Membership Growth')}</h3>
+                <p className="text-[14px] font-normal text-secondary-600 mt-1">{t('Historical performance over the last 6 months')}</p>
               </div>
               <button className="flex items-center gap-2 bg-secondary-200 text-secondary-900 px-4 py-2 rounded-full text-xs font-semibold hover:bg-gray-200 transition-colors">
-                Last 6 Months <CaretDown size={14} weight="bold" />
+                {t('Last 6 Months')} <CaretDown size={14} weight="bold" />
               </button>
             </div>
             <div className="flex-1 w-full min-h-75 -ml-2">
@@ -198,22 +200,22 @@ export default function Dashboard() {
           {/* Quick Actions & Occupancy */}
           <div className="lg:col-span-4 py-4 px-12 bg-primary-50 border border-secondary-300 rounded-2xl flex flex-col gap-3 animate-fade-up" style={{ animationDelay: '500ms' }}>
             <div className="py-4 rounded-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.01)] flex-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-shadow duration-300">
-              <h3 className="text-xl font-bold text-secondary-800 mb-6 font-sans tracking-tight">Quick Actions</h3>
+              <h3 className="text-xl font-bold text-secondary-800 mb-6 font-sans tracking-tight">{t('Quick Actions')}</h3>
               <div className="grid grid-cols-2 gap-4">
-                <QuickAction icon={<UserPlus size={26} weight="regular" color="#6942FF" />} title="Add Member" />
-                <QuickAction icon={<CreditCard size={26} weight="regular" color="#6942FF" />} title="New Subscription" />
-                <QuickAction icon={<BoxingGloveIcon size={26} weight="regular" color="#6942FF" />} title="Add a Coach" />
-                <QuickAction icon={<Megaphone size={26} weight="regular" color="#6942FF" />} title="Broadcast" />
+                <QuickAction icon={<UserPlus size={26} weight="regular" color="#6942FF" />} title={t('Add Member')} />
+                <QuickAction icon={<CreditCard size={26} weight="regular" color="#6942FF" />} title={t('New Subscription')} />
+                <QuickAction icon={<BoxingGloveIcon size={26} weight="regular" color="#6942FF" />} title={t('Add a Coach')} />
+                <QuickAction icon={<Megaphone size={26} weight="regular" color="#6942FF" />} title={t('Broadcast')} />
               </div>
             </div>
             
             <div className="bg-linear-to-r from-primary-900 to-primary-600 rounded-[20px] w-full mx-auto mb-6 -mt-2 p-7 shadow-lg relative overflow-hidden flex flex-col justify-end group hover:-translate-y-1 transition-transform duration-300">
-              <BarbellIcon size={140} weight="fill" className="absolute -right-8 -bottom-6 text-white opacity-10 transform rotate-12 pointer-events-none group-hover:rotate-0 transition-transform duration-700" />
+              <BarbellIcon size={140} weight="fill" className="absolute ltr:-right-8 rtl:-left-8 -bottom-6 text-white opacity-10 transform rotate-12 pointer-events-none group-hover:rotate-0 transition-transform duration-700" />
               <div className="relative z-10">
-                <p className="text-[11px] font-bold text-secondary-50 uppercase tracking-[0.15em] mb-1.5">Gym Occupancy</p>
+                <p className="text-[11px] font-bold text-secondary-50 uppercase tracking-[0.15em] mb-1.5">{t('Gym Occupancy')}</p>
                 <div className="flex items-end gap-2 mb-4">
                   <h2 className="text-[35px] font-bold text-secondary-50 leading-none tracking-tight">68%</h2>
-                  <span className="text-secondary-50 text-[15px] font-medium mb-1">Full</span>
+                  <span className="text-secondary-50 text-[15px] font-medium mb-1">{t('Full')}</span>
                 </div>
                 <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden">
                   <div className="h-full bg-secondary-50 rounded-full relative" style={{ width: '68%', transition: 'width 1.5s cubic-bezier(0.22, 1, 0.36, 1) 0.5s' }}>
@@ -230,8 +232,8 @@ export default function Dashboard() {
           {/* Donut Chart */}
           <div className="lg:col-span-4 bg-secondary-50 p-8 rounded-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-secondary-300 flex flex-col animate-fade-up hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-300" style={{ animationDelay: '600ms' }}>
             <div className="w-full mb-8">
-              <h3 className="text-xl font-bold text-secondary-800 font-sans tracking-tight">Membership Plans</h3>
-              <p className="text-[14px] text-secondary-700 mt-1">Active distribution by tier</p>
+              <h3 className="text-xl font-bold text-secondary-800 font-sans tracking-tight">{t('Membership Plans')}</h3>
+              <p className="text-[14px] text-secondary-700 mt-1">{t('Active distribution by tier')}</p>
             </div>
             
             <div className="relative w-full h-60 flex items-center justify-center my-4 opacity-0 animate-[fadeUp_0.5s_ease-out_1s_forwards]">
@@ -266,7 +268,7 @@ export default function Dashboard() {
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-1">
                 <span className="text-[30px] font-black text-secondary-800 tracking-tight">1.1k</span>
-                <span className="text-[10px] font-bold text-secondary-700 tracking-widest mt-1">TOTAL ACTIVE</span>
+                <span className="text-[10px] font-bold text-secondary-700 tracking-widest mt-1 uppercase">{t('TOTAL ACTIVE')}</span>
               </div>
             </div>
             
@@ -287,11 +289,11 @@ export default function Dashboard() {
           <div className="lg:col-span-8 bg-secondary-50  p-8 rounded-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-secondary-300 flex flex-col animate-fade-up hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-300" style={{ animationDelay: '700ms' }}>
             <div className="flex justify-between items-start mb-8">
               <div>
-                <h3 className="text-xl font-bold text-secondary-800 font-sans tracking-tight">Course Popularity</h3>
-                <p className="text-[14px] text-secondary-600 mt-1">Enrollment trends per class type</p>
+                <h3 className="text-xl font-bold text-secondary-800 font-sans tracking-tight">{t('Course Popularity')}</h3>
+                <p className="text-[14px] text-secondary-600 mt-1">{t('Enrollment trends per class type')}</p>
               </div>
-              <button className="text-primary-800 font-bold text-[14px] pt-1 hover:text-[#563BCA] transition-colors">
-                View All Courses
+              <button className="text-primary-800 font-bold text-[14px] pt-1 hover:text-[#563BCA] transition-colors cursor-pointer">
+                {t('View All Courses')}
               </button>
             </div>
             
@@ -307,7 +309,7 @@ export default function Dashboard() {
         {/* Row 4: Sessions */}
         <div className="bg-secondary-50 p-8 rounded-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-secondary-300 animate-fade-up hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-300" style={{ animationDelay: '800ms' }}>
           <div className="flex justify-between items-center mb-8">
-            <h3 className="text-xl font-bold text-secondary-900 font-sans tracking-tight">Upcoming Sessions</h3>
+            <h3 className="text-xl font-bold text-secondary-900 font-sans tracking-tight">{t('Upcoming Sessions')}</h3>
             <div className="flex gap-2">
               <button 
                 onClick={handlePrevSession}
@@ -391,11 +393,12 @@ function QuickAction({ icon, title }) {
 }
 
 function CourseProgress({ title, percentage, delay }) {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-2.5">
       <div className="flex justify-between items-end mb-0.5">
         <span className="text-[12px] font-semibold text-secondary-600 tracking-wide font-sans">{title}</span>
-        <span className="text-[12px] font-semibold text-secondary-600">{percentage}% <span className="text-secondary-600 font-semibold ml-0.5">FULL</span></span>
+        <span className="text-[12px] font-semibold text-secondary-600">{percentage}% <span className="text-secondary-600 font-semibold ml-0.5 uppercase">{t('Full')}</span></span>
       </div>
       <div className="w-full h-3 bg-secondary-200 rounded-full overflow-hidden">
         <div 
@@ -408,6 +411,7 @@ function CourseProgress({ title, percentage, delay }) {
 }
 
 function SessionCard({ type, typeColor, typeBg, time, title, avatar, instructor, enrolled, idx }) {
+  const { t } = useTranslation();
   return (
     <div className="bg-secondary-100 border border-secondary-200 rounded-[20px] p-6 flex flex-col justify-between hover:-translate-y-1.5 hover:shadow-[0_10px_30px_rgba(0,0,0,0.05)] transition-all duration-300 opacity-0 animate-fade-up" style={{ animationDelay: `${800 + (idx * 100)}ms` }}>
       <div>
@@ -420,13 +424,13 @@ function SessionCard({ type, typeColor, typeBg, time, title, avatar, instructor,
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-3">
           <img src={avatar} alt={instructor} className="w-9 h-9 rounded-full shadow-sm" />
-          <div className="flex flex-col">
+          <div className="flex flex-col rtl:text-right">
             <span className="text-xs font-medium text-secondary-900 leading-tight block max-w-20">{instructor.split(' ')[0]}<br/>{instructor.split(' ')[1]}</span>
           </div>
         </div>
-        <div className="flex flex-col text-right">
+        <div className="flex flex-col ltr:text-right rtl:text-left">
           <span className="text-[10px] font-semibold text-secondary-600 leading-tight">{enrolled}</span>
-          <span className="text-[10px] font-semibold text-secondary-600 mt-0.5">Enrolled</span>
+          <span className="text-[10px] font-semibold text-secondary-600 mt-0.5">{t('Enrolled')}</span>
         </div>
       </div>
     </div>

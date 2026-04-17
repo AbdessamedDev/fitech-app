@@ -21,7 +21,7 @@ export default function AdminLayout() {
                           }
 
 return (
-<div className="flex h-screen bg-gray-50">
+<div className="flex h-screen bg-secondary-50">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
             <Navbar title={getPageTitle()} />
