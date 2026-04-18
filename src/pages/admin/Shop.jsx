@@ -1,27 +1,72 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
-  MagnifyingGlass, SlidersHorizontal, Funnel, Plus, CaretLeft, CaretRight, CarProfile, 
-  CaretDown, Check, Star, Eye, PencilSimple, Trash
+  MagnifyingGlass, SlidersHorizontal, Funnel, Plus, CaretLeft, CaretRight, 
+  CaretDown, Check, Star, Eye, PencilSimple, Trash, List, PulseIcon
 } from "../../icons/index";
 import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
 import StatisticBlockShop from '../../components/shared/StatisticBlockShop';
 import { StatisticBlockData } from '../../utilities/ShopUtilities';
+import { Pagination } from '../../components/shared/Pagination';
 
-// Mock Data for Products
+// Custom Animated Select Component
+function CustomSelect({ icon, options, value, onChange, placeholder, className }) {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  const handleBlur = (e) => {
+    if (!e.currentTarget.contains(e.relatedTarget)) setIsOpen(false);
+  };
+
+  return (
+    <div className={`relative ${className}`} onBlur={handleBlur} tabIndex={0}>
+      <div 
+        onClick={() => setIsOpen(!isOpen)}
+        className={`h-[46px] flex items-center justify-between px-4 border rounded-xl bg-secondary-50 cursor-pointer shadow-[0_2px_4px_rgba(0,0,0,0.02)] transition-all duration-300 ${isOpen ? 'border-primary-600 ring-2 ring-primary-50' : 'border-secondary-200 hover:border-primary-300'}`}
+      >
+        <div className="flex items-center gap-2.5">
+          {icon}
+          <span className="text-[14px] font-medium text-secondary-700 select-none">
+            {value === 'All' || value === 'Newest' ? placeholder : value}
+          </span>
+        </div>
+        <CaretDown size={14} weight="bold" className={`text-secondary-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+      </div>
+      
+      {isOpen && (
+        <div className="absolute z-[100] top-[54px] left-0 w-full bg-secondary-50 border border-border-light rounded-xl shadow-[0_12px_30px_rgba(0,0,0,0.12)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 origin-top">
+          <div className="max-h-60 overflow-y-auto py-1.5">
+            {options.map(opt => (
+               <div 
+                  key={opt}
+                  onClick={() => { onChange(opt); setIsOpen(false); }}
+                  className={`px-4 py-2.5 text-[14px] cursor-pointer transition-colors flex items-center justify-between group ${value === opt ? 'bg-primary-50/50 text-primary-600 font-bold' : 'text-secondary-600 hover:bg-secondary-100 font-medium'}`}
+               >
+                 {opt === 'All' || opt === 'Newest' ? placeholder : opt}
+                 {value === opt && <Check size={14} weight="bold" className="text-primary-600" />}
+               </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Mock Data for Products (Safely formatted without people)
+const safeImage = (text) => `https://placehold.co/600x600/F5F5F8/A3A3B3?font=montserrat&text=${text}`;
+
 const mockProducts = [
-  { id: 1, title: 'Whey Isolate 2kg - Vanilla', category: 'PROTEIN', desc: 'Premium micro-filtered whey protein isolate for optimal recovery.', price: 59.99, stock: 45, status: 'IN STOCK', rating: 4.8, image: 'https://images.unsplash.com/photo-1579722820308-d74e571900a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
-  { id: 2, title: 'Daily Vitality vitamine Pack', category: 'VITAMINS', desc: 'Complete daily multivitamin pack for general health support.', price: 34.99, stock: 45, status: 'IN STOCK', rating: 4.8, image: 'https://images.unsplash.com/photo-1628770281358-0056157121b6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
-  { id: 3, title: 'Pre workout "IGNITE"', category: 'PRE-WORKOUT', desc: 'Explosive energy and focus for intense training sessions.', price: 39.99, stock: 45, status: 'IN STOCK', rating: 4.8, image: 'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
-  { id: 4, title: 'Stainless Steel Shaker', category: 'ACCESSORIES', desc: 'Durable, odor-resistant stainless steel protein shaker bottle.', price: 19.99, stock: 45, status: 'IN STOCK', rating: 4.8, image: 'https://images.unsplash.com/photo-1585864115160-f7035eb52db5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
-  { id: 5, title: 'Creatine Monohydrate 500g', category: 'CREATINE', desc: 'Pure micronized creatine monohydrate for strength.', price: 29.99, stock: 10, status: 'LOW STOCK', rating: 4.6, image: 'https://images.unsplash.com/photo-1579722820308-d74e571900a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
-  { id: 6, title: 'BCAA Recovery Powder', category: 'AMINO ACIDS', desc: 'Intra-workout BCAA blend to reduce muscle fatigue.', price: 24.99, stock: 0, status: 'OUT OF STOCK', rating: 4.7, image: 'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
-  { id: 7, title: 'Mass Gainer 5kg - Chocolate', category: 'PROTEIN', desc: 'High-calorie mass building formula with complex carbs.', price: 79.99, stock: 22, status: 'IN STOCK', rating: 4.5, image: 'https://images.unsplash.com/photo-1579722820308-d74e571900a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
-  { id: 8, title: 'Gym Bag Duffel Medium', category: 'ACCESSORIES', desc: 'Spacious and breathable gym bag with shoe compartment.', price: 45.00, stock: 8, status: 'LOW STOCK', rating: 4.9, image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
-  { id: 9, title: 'Weightlifting Belt L', category: 'EQUIPMENT', desc: 'Genuine leather heavy-duty lifting belt for back support.', price: 49.99, stock: 15, status: 'IN STOCK', rating: 4.8, image: 'https://images.unsplash.com/photo-1582215688531-18e38d77a0fc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
-  { id: 10, title: 'Resistance Bands Set', category: 'EQUIPMENT', desc: 'Set of 5 resistance bands with varying tension levels.', price: 25.99, stock: 0, status: 'OUT OF STOCK', rating: 4.3, image: 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
-  { id: 11, title: 'Vegan Protein 1kg - Berry', category: 'PROTEIN', desc: 'Plant-based pea and rice protein blend.', price: 44.99, stock: 30, status: 'IN STOCK', rating: 4.4, image: 'https://images.unsplash.com/photo-1628770281358-0056157121b6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
-  { id: 12, title: 'Fish Oil Omega 3', category: 'VITAMINS', desc: 'High EPA/DHA omega 3 essential fatty acids.', price: 18.99, stock: 65, status: 'IN STOCK', rating: 4.7, image: 'https://images.unsplash.com/photo-1585864115160-f7035eb52db5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' }
+  { id: 1, title: 'Whey Isolate 2kg - Vanilla', category: 'PROTEIN', desc: 'Premium micro-filtered whey protein isolate for optimal recovery.', price: 59.99, stock: 45, status: 'IN STOCK', rating: 4.8, image: safeImage('WHEY+ISOLATE') },
+  { id: 2, title: 'Daily Vitality vitamine Pack', category: 'VITAMINS', desc: 'Complete daily multivitamin pack for general health support.', price: 34.99, stock: 45, status: 'IN STOCK', rating: 4.8, image: safeImage('DAILY+VITALITY') },
+  { id: 3, title: 'Pre workout "IGNITE"', category: 'PRE-WORKOUT', desc: 'Explosive energy and focus for intense training sessions.', price: 39.99, stock: 45, status: 'IN STOCK', rating: 4.8, image: safeImage('IGNITE') },
+  { id: 4, title: 'Stainless Steel Shaker', category: 'ACCESSORIES', desc: 'Durable, odor-resistant stainless steel protein shaker bottle.', price: 19.99, stock: 45, status: 'IN STOCK', rating: 4.8, image: safeImage('SHAKER') },
+  { id: 5, title: 'Creatine Monohydrate 500g', category: 'CREATINE', desc: 'Pure micronized creatine monohydrate for strength.', price: 29.99, stock: 10, status: 'LOW STOCK', rating: 4.6, image: safeImage('CREATINE') },
+  { id: 6, title: 'BCAA Recovery Powder', category: 'AMINO ACIDS', desc: 'Intra-workout BCAA blend to reduce muscle fatigue.', price: 24.99, stock: 0, status: 'OUT OF STOCK', rating: 4.7, image: safeImage('BCAA') },
+  { id: 7, title: 'Mass Gainer 5kg - Chocolate', category: 'PROTEIN', desc: 'High-calorie mass building formula with complex carbs.', price: 79.99, stock: 22, status: 'IN STOCK', rating: 4.5, image: safeImage('MASS+GAINER') },
+  { id: 8, title: 'Gym Bag Duffel Medium', category: 'ACCESSORIES', desc: 'Spacious and breathable gym bag with shoe compartment.', price: 45.00, stock: 8, status: 'LOW STOCK', rating: 4.9, image: safeImage('GYM+BAG') },
+  { id: 9, title: 'Weightlifting Belt L', category: 'EQUIPMENT', desc: 'Genuine leather heavy-duty lifting belt for back support.', price: 49.99, stock: 15, status: 'IN STOCK', rating: 4.8, image: safeImage('LIFTING+BELT') },
+  { id: 10, title: 'Resistance Bands Set', category: 'EQUIPMENT', desc: 'Set of 5 resistance bands with varying tension levels.', price: 25.99, stock: 0, status: 'OUT OF STOCK', rating: 4.3, image: safeImage('BANDS') },
+  { id: 11, title: 'Vegan Protein 1kg - Berry', category: 'PROTEIN', desc: 'Plant-based pea and rice protein blend.', price: 44.99, stock: 30, status: 'IN STOCK', rating: 4.4, image: safeImage('VEGAN+PRO') },
+  { id: 12, title: 'Fish Oil Omega 3', category: 'VITAMINS', desc: 'High EPA/DHA omega 3 essential fatty acids.', price: 18.99, stock: 65, status: 'IN STOCK', rating: 4.7, image: safeImage('FISH+OIL') }
 ];
 
 export default function Shop() {
@@ -30,7 +75,14 @@ export default function Shop() {
   const [category, setCategory] = useState('All');
   const [stockStatus, setStockStatus] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8; // Adjust to fit 4 grid items per row well
+  const [activeDescId, setActiveDescId] = useState(null);
+  const itemsPerPage = 4; // Display 1 row of 4 elements
+
+  useEffect(() => {
+    const handleClickOutside = () => setActiveDescId(null);
+    window.addEventListener('click', handleClickOutside);
+    return () => window.removeEventListener('click', handleClickOutside);
+  }, []);
 
   // Define statistic blocks based on data
   const statBlocks = [
@@ -105,11 +157,19 @@ export default function Shop() {
 
   // Pagination Logic
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage) || 1;
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
 
   const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+    if (page >= 1 && page <= totalPages && page !== currentPage) {
+      setCurrentPage(page);
+    }
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage(currentPage < totalPages ? currentPage + 1 : 1);
+  };
+
+  const handlePrevPage = () => {
+    setCurrentPage(currentPage > 1 ? currentPage - 1 : totalPages);
   };
 
   const generatePageNumbers = () => {
@@ -131,9 +191,9 @@ export default function Shop() {
 
   const getStatusBadgeStyle = (status) => {
     switch (status) {
-      case 'IN STOCK': return 'bg-success-bg text-success';
-      case 'LOW STOCK': return 'bg-[#fff4e5] text-[#ff9800]';
-      case 'OUT OF STOCK': return 'bg-error-bg text-error';
+      case 'IN STOCK': return 'bg-[#E5F9E2] text-[#336D3B]';
+      case 'LOW STOCK': return 'bg-[#FFF4E5] text-[#E65100]';
+      case 'OUT OF STOCK': return 'bg-[#FDE5E1] text-[#BF3846]';
       default: return 'bg-secondary-200 text-secondary-600';
     }
   };
@@ -141,186 +201,174 @@ export default function Shop() {
   return (
     <div className='bg-secondary-100 min-h-dvh p-8'>
       
-      {/* Search and Filters Bar */}
-      <div className="flex items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-4 flex-1">
-          {/* Search */}
-          <div className="relative w-72">
-            <MagnifyingGlass size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-400"/>
-            <input
-              placeholder="Search"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="h-10 pl-10 w-full px-4 py-2 border border-secondary-200 rounded-md bg-secondary-50 focus:outline-none focus:border-primary-600 transition-colors"
+      <div className="relative z-60 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        
+        {/* Column 1: Search */}
+        <div className="relative">
+          <MagnifyingGlass size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-secondary-400"/>
+          <input
+            id="global-search-input"
+            placeholder="Search"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="h-11.5 pl-11 w-full px-4 border border-secondary-200 rounded-xl bg-secondary-50 focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-50 transition-all shadow-[0_2px_4px_rgba(0,0,0,0.02)] text-[14px] font-medium placeholder:text-secondary-400"
+          />
+        </div>
+
+        {/* Column 2: Sort By & Category */}
+        <div className="flex gap-3">
+          <CustomSelect 
+            icon={<SlidersHorizontal size={18} className="text-secondary-400" />}
+            options={['Newest', 'Price: Low to High', 'Price: High to Low']}
+            value={sortBy}
+            onChange={(val) => { setSortBy(val); setCurrentPage(1); }}
+            placeholder="Sort by"
+            className="flex-1"
+          />
+          <CustomSelect 
+            icon={<List size={18} className="text-secondary-400" />}
+            options={['All', 'PROTEIN', 'PRE-WORKOUT', 'VITAMINS', 'EQUIPMENT', 'ACCESSORIES']}
+            value={category}
+            onChange={(val) => { setCategory(val); setCurrentPage(1); }}
+            placeholder="Category"
+            className="flex-1 z-20"
+          />
+        </div>
+
+        {/* Column 3: Stock Status & Filter */}
+        <div className="relative z-40 flex items-center gap-3">
+          <div className="flex-1">
+            <CustomSelect 
+              icon={<PulseIcon size={18} className="text-secondary-400" />}
+              options={['All', 'IN STOCK', 'LOW STOCK', 'OUT OF STOCK']}
+              value={stockStatus}
+              onChange={(val) => { setStockStatus(val); setCurrentPage(1); }}
+              placeholder="Stock Status"
+              className="w-full"
             />
           </div>
-
-          {/* Sort By Select */}
-          <div className="relative">
-            <SlidersHorizontal size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-400 pointer-events-none"/>
-            <select
-              value={sortBy}
-              onChange={(e) => { setSortBy(e.target.value); setCurrentPage(1); }}
-              className="h-10 pl-10 pr-8 py-2 appearance-none border border-secondary-200 rounded-md bg-secondary-50 text-secondary-600 text-sm focus:outline-none focus:border-primary-600 cursor-pointer"
-            >
-              <option value="Newest">Sort by</option>
-              <option value="Price: Low to High">Price: Low to High</option>
-              <option value="Price: High to Low">Price: High to Low</option>
-            </select>
-            <CaretDown size={14} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary-400 pointer-events-none"/>
-          </div>
-
-          {/* Category Select */}
-          <div className="relative">
-            <select
-              value={category}
-              onChange={(e) => { setCategory(e.target.value); setCurrentPage(1); }}
-              className="h-10 px-4 pr-8 py-2 appearance-none border border-secondary-200 rounded-md bg-secondary-50 text-secondary-600 text-sm focus:outline-none focus:border-primary-600 cursor-pointer"
-            >
-              <option value="All">Category</option>
-              <option value="PROTEIN">Protein</option>
-              <option value="PRE-WORKOUT">Pre-Workout</option>
-              <option value="VITAMINS">Vitamins</option>
-              <option value="EQUIPMENT">Equipment</option>
-              <option value="ACCESSORIES">Accessories</option>
-            </select>
-            <CaretDown size={14} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary-400 pointer-events-none"/>
-          </div>
-
-          {/* Stock Status Select */}
-          <div className="relative">
-            <select
-              value={stockStatus}
-              onChange={(e) => { setStockStatus(e.target.value); setCurrentPage(1); }}
-              className="h-10 px-4 pr-8 py-2 appearance-none border border-secondary-200 rounded-md bg-secondary-50 text-secondary-600 text-sm focus:outline-none focus:border-primary-600 cursor-pointer"
-            >
-              <option value="All">Stock Status</option>
-              <option value="IN STOCK">In Stock</option>
-              <option value="LOW STOCK">Low Stock</option>
-              <option value="OUT OF STOCK">Out of Stock</option>
-            </select>
-            <CaretDown size={14} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary-400 pointer-events-none"/>
-          </div>
-
-          {/* Filter Button */}
-          <Button className="h-10 flex items-center gap-2 px-4 py-2 rounded-md transition text-primary-600 hover:bg-secondary-200 bg-secondary-50 border border-secondary-200 cursor-pointer">
+          <Button onClick={() => document.getElementById('global-search-input')?.focus()} className="h-11.5 flex items-center gap-2 px-4 rounded-xl text-primary-600 hover:bg-secondary-200 bg-transparent font-medium border-0 shadow-none transition-colors cursor-pointer shrink-0">
             <Funnel size={18} />
             Filter
           </Button>
         </div>
 
-        {/* Add Product Button */}
-        <Button className="h-10 flex items-center gap-2 px-5 py-2 rounded-xl font-medium bg-primary-600 text-white hover:bg-primary-900 transition-colors shadow-sm">
-          <Plus size={20} weight="bold" />
-          Add Product
-        </Button>
+        {/* Column 4: Add Product */}
+        <div className="flex justify-end gap-3 relative z-30">
+          <Button className="h-11.5 px-6 whitespace-nowrap flex justify-center items-center gap-2 rounded-xl font-bold bg-primary-600 text-white hover:bg-primary-900 transition-colors shadow-[0_4px_12px_rgba(105,66,255,0.25)] ring-0 cursor-pointer active:scale-98">
+            <Plus size={20} weight="bold" />
+            Add Product
+          </Button>
+        </div>
       </div>
 
       {/* Statistic Blocks Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-7 mb-8">
         {statBlocks.map((block, index) => (
           <StatisticBlockShop key={index} data={block} />
         ))}
       </div>
 
-      {/* Product Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {paginatedProducts.map(product => (
-          <div key={product.id} className="bg-secondary-50 rounded-xl border border-border-light overflow-hidden flex flex-col group hover:shadow-lg transition-shadow duration-300">
+      {/* Product Grid Carousel */}
+      <div className="overflow-hidden w-full relative pt-1 pb-6 -mb-6 -mx-2 px-2">
+        <div 
+          className="flex transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] will-change-transform w-full"
+          style={{ transform: `translateX(-${(currentPage - 1) * 100}%)` }}
+        >
+          {Array.from({ length: totalPages }).map((_, pageIndex) => (
+            <div key={pageIndex} className="w-full shrink-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredProducts.slice(pageIndex * itemsPerPage, (pageIndex + 1) * itemsPerPage).map(product => (
+                  <div key={product.id} className="bg-secondary-50 md:rounded-2xl xl:rounded-[20px] border border-secondary-200 hover:shadow-xl transition-all duration-300 flex flex-col group cursor-pointer">
             {/* Image Box */}
-            <div className="w-full h-56 relative bg-secondary-200">
-              <img src={product.image} alt={product.title} className="w-full h-full object-cover" />
-              <div className={`absolute top-3 right-3 px-2.5 py-1 rounded font-bold text-[10px] tracking-wide ${getStatusBadgeStyle(product.status)}`}>
+            <div className="w-full h-60 relative bg-secondary-100 overflow-hidden md:rounded-t-2xl xl:rounded-t-[19px] mb-5 flex items-center justify-center shrink-0">
+              <img src={product.image} alt={product.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+              <div className={`absolute top-4 right-4 px-3 py-1.5 rounded-full font-bold text-[10px] uppercase tracking-wider shadow-sm z-10 ${getStatusBadgeStyle(product.status)}`}>
                 {product.status}
               </div>
             </div>
             
             {/* Content Box */}
-            <div className="p-5 flex-1 flex flex-col">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-primary-600 font-semibold text-xs tracking-wide">
+            <div className="flex-1 flex flex-col p-5">
+              <div className="flex justify-between items-center mb-2.5">
+                <span className="text-primary-600 font-bold md:text-[12px] lg:text-[14px] tracking-widest uppercase">
                   {product.category}
                 </span>
-                <div className="flex items-center gap-1 text-sm font-medium text-secondary-700">
-                  <Star size={14} weight="fill" className="text-yellow-400" />
+                <div className="flex items-center gap-1 md:text-[12px] lg:text-[14px] font-bold text-secondary-800">
+                  <Star size={14} weight="fill" className="text-[#FACC15] mb-0.5" />
                   {product.rating}
                 </div>
               </div>
               
-              <h4 className="text-lg font-bold text-foreground mb-1 leading-tight line-clamp-1">
+              <h4 className="md:text-[18px] lg:text-xl font-bold text-secondary-800 mb-1.5 leading-snug line-clamp-2 pr-4">
                 {product.title}
               </h4>
-              <p className="text-secondary-500 text-sm mb-4 line-clamp-2">
-                {product.desc}
-              </p>
+              <div className="relative z-20">
+                <p 
+                  className="text-secondary-500 md:text-[14px] lg:text-lg mb-5 line-clamp-1 cursor-pointer hover:text-primary-600 transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveDescId(activeDescId === product.id ? null : product.id);
+                  }}
+                >
+                  {product.desc}
+                </p>
+                {activeDescId === product.id && (
+                  <div className="absolute left-0 bottom-full mb-2 w-[110%] md:w-[120%] bg-primary-600 text-white p-4 rounded-2xl shadow-[0_12px_30px_rgba(105,66,255,0.4)] z-50 text-sm font-medium animate-in fade-in zoom-in-95 slide-in-from-bottom-2 duration-300 cursor-default" onClick={(e) => e.stopPropagation()}>
+                    <div className="max-h-32 overflow-y-auto pr-2">
+                      {product.desc}
+                    </div>
+                    {/* Arrow tail */}
+                    <div className="absolute left-6 -bottom-1.5 w-3 h-3 bg-primary-600 rotate-45"></div>
+                  </div>
+                )}
+              </div>
               
               <div className="mt-auto">
-                <div className="flex justify-between items-end border-t border-border-light pt-4 mb-4">
-                  <div className="text-2xl font-bold text-foreground">
+                <div className="flex justify-between items-end border-t border-secondary-200 pt-5 mb-5">
+                  <div className="md:text-2xl lg:text-[28px] leading-tight font-bold text-secondary-800">
                     ${product.price}
                   </div>
-                  <div className="text-right">
-                    <div className="text-[10px] text-secondary-400 font-semibold mb-0.5">STOCK AVAILABLE</div>
-                    <div className="text-sm font-bold text-foreground">{product.stock} units</div>
+                  <div className="text-right pb-1">
+                    <div className="text-[10px] text-secondary-500 font-bold uppercase tracking-wider mb-0.5">Stock Available</div>
+                    <div className="text-[14px] font-bold text-secondary-800">{product.stock} units</div>
                   </div>
                 </div>
                 
-                <div className="flex gap-2">
-                  <button className="flex-1 flex justify-center items-center h-9 rounded-md bg-secondary-100 text-secondary-600 hover:bg-secondary-200 transition-colors">
-                    <Eye size={18} />
-                  </button>
-                  <button className="flex-1 flex justify-center items-center h-9 rounded-md bg-secondary-100 text-secondary-600 hover:bg-secondary-200 transition-colors">
-                    <PencilSimple size={18} />
-                  </button>
-                  <button className="flex-1 flex justify-center items-center h-9 rounded-md bg-[#fff4f4] text-error hover:bg-error hover:text-white transition-colors">
-                    <Trash size={18} />
+                <div className="flex justify-between w-full">
+                  <div className="flex gap-2">
+                    <button className="w-11 h-11 flex justify-center items-center rounded-xl bg-bg-suspended text-suspended hover:bg-suspended hover:text-bg-suspended transition-all group/btn cursor-pointer active:scale-98">
+                      <Eye size={20} className="group-hover/btn:scale-110 transition-transform duration-200" />
+                    </button>
+                    <button className="w-11 h-11 flex justify-center items-center rounded-xl bg-bg-suspended text-suspended hover:bg-suspended hover:text-bg-suspended transition-all group/btn cursor-pointer active:scale-98">
+                      <PencilSimple size={20} className="group-hover/btn:scale-110 transition-transform duration-200" />
+                    </button>
+                  </div>
+                  <button className="w-11 h-11 flex justify-center items-center rounded-xl bg-error-bg text-error hover:bg-error hover:text-error-bg transition-all group/btn cursor-pointer active:scale-98">
+                    <Trash size={20} className="group-hover/btn:scale-110 transition-transform duration-200" />
                   </button>
                 </div>
               </div>
             </div>
           </div>
         ))}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-8">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="w-10 h-10 flex items-center justify-center border border-border-light rounded-md bg-secondary-50 text-secondary-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:bg-secondary-100"
-          >
-            <CaretLeft size={16} />
-          </button>
-
-          {generatePageNumbers().map((page, index) => (
-            page === '...' ? (
-              <span key={`ellipsis-${index}`} className="px-2 text-secondary-400">...</span>
-            ) : (
-              <button
-                key={page}
-                onClick={() => handlePageChange(page)}
-                className={`w-10 h-10 flex items-center justify-center rounded-md font-medium text-sm transition-colors ${
-                  currentPage === page 
-                    ? 'bg-primary-600 text-white' 
-                    : 'border border-border-light bg-secondary-50 text-secondary-600 hover:bg-secondary-100'
-                }`}
-              >
-                {page}
-              </button>
-            )
-          ))}
-
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className="w-10 h-10 flex items-center justify-center border border-border-light rounded-md bg-secondary-50 text-secondary-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:bg-secondary-100"
-          >
-            <CaretRight size={16} />
-          </button>
+        <div className="mt-10 mb-4 animate-in fade-in duration-500 delay-300">
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={handlePageChange} 
+          />
         </div>
       )}
 

@@ -70,6 +70,8 @@ import {
   Laptop as LaptopIcon,
   X as XIcon,
 
+  ChatCircleText,
+
   Star,
   ImageSquare,
   Check,
@@ -77,7 +79,8 @@ import {
   // Expose as original names for compatibility
   MagnifyingGlass,
   SquaresFour,
-  Barbell
+  Barbell,
+  CarProfileIcon
 } from "@phosphor-icons/react";
 
 export {
@@ -150,11 +153,14 @@ export {
   LaptopIcon,
   XIcon,
 
+  ChatCircleText,
+
   Star,
   ImageSquare,
   Check,
   
   MagnifyingGlass,
   SquaresFour,
-  Barbell
+  Barbell,
+  CarProfileIcon
 };

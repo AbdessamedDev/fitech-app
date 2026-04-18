@@ -9,11 +9,11 @@ export default function StatisticBlockShop({ data }) {
   const getBadgeStyle = (type) => {
     switch (type) {
       case 'action':
-        return 'bg-error-bg text-error font-medium px-2 py-1 rounded-md text-xs';
+        return 'bg-error-bg text-error font-bold md:px-2 lg:px-3 xl:px-4 md:py-1 rounded-md text-[14px]';
       case 'urgent':
-        return 'bg-error-bg text-error font-medium px-2 py-1 rounded-md text-xs';
+        return 'bg-error-bg text-error font-bold md:px-2 lg:px-3 xl:px-4 md:py-1 rounded-md text-[14px]';
       case 'positive':
-        return 'bg-transparent text-primary-600 font-medium text-xs'; // Like +12% vs LY, purple text
+        return 'bg-transparent text-primary-700 font-bold text-[14px]'; // Like +12% vs LY, purple text
       default:
         return 'hidden';
     }
@@ -21,14 +21,14 @@ export default function StatisticBlockShop({ data }) {
 
   return (
     <div 
-      className={`relative overflow-hidden rounded-xl p-5 border border-border-light group cursor-default transition-all duration-300 hover:shadow-md ${data.bgColor}`}
+      className={`relative overflow-hidden rounded-[20px] p-6 border group cursor-default transition-all duration-300 hover:shadow-lg ${data.bgColor === 'bg-secondary-50' ? 'bg-secondary-50 border-secondary-200' : data.bgColor + ' border-transparent'}`}
     >
       <div className="relative z-10 flex flex-col h-full justify-between">
-        <h3 className={`text-sm font-medium mb-3 ${data.textColor === 'text-white' ? 'text-white/90' : 'text-secondary-500'}`}>
+        <h3 className={`text-[15px] font-medium md:mb-1 lg:mb-2 xl:mb-3 2xl:mb-4 ${data.textColor === 'text-white' ? 'text-primary-100' : 'text-secondary-500'}`}>
           {data.title}
         </h3>
         <div className="flex items-end justify-between">
-          <div className={`text-3xl font-bold ${data.textColor}`}>
+          <div className={`lg:text-[30px] 2xl:text-[38px] leading-none font-extrabold ${data.textColor}`}>
             {data.value}
           </div>
           {data.badgeText && (
@@ -40,8 +40,8 @@ export default function StatisticBlockShop({ data }) {
       </div>
       
       {data.hasBgIcon && (
-        <div className="absolute right-[-10px] bottom-[-20px] opacity-20 pointer-events-none group-hover:rotate-6 group-hover:scale-105 transition-all duration-300">
-          <IconComponent size={120} weight="fill" className={data.iconColor} />
+        <div className="absolute -right-2.5 -bottom-5 opacity-20 pointer-events-none group-hover:rotate-6 group-hover:scale-105 transition-all duration-500">
+          <IconComponent size={140} weight="fill" className={data.iconColor} />
         </div>
       )}
     </div>

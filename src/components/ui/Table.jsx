@@ -1,6 +1,6 @@
 export function Table({ children, className = '' }) {
   return (
-    <div className={`overflow-x-auto bg-white rounded-lg border border-secondary-200 shadow-sm ${className}`}>
+    <div className={`overflow-x-auto bg-secondary-50 rounded-lg border border-secondary-200 shadow-sm ${className}`}>
       <table className="w-full border-collapse">
         {children}
       </table>
@@ -27,7 +27,7 @@ export function TableBody({ children, className = '' }) {
 export function TableRow({ children, className = '', isHeader = false, onClick = null, selected = false }) {
   return (
     <tr
-      className={`transition-colors border-b border-secondary-100 last:border-b-0 ${onClick ? 'cursor-pointer' : ''} ${selected ? 'bg-primary-50 hover:bg-primary-50' : (isHeader ? 'bg-secondary-50' : 'bg-white hover:bg-secondary-50')} ${className}`}
+      className={`transition-colors border-b border-secondary-100 last:border-b-0 ${onClick ? 'cursor-pointer' : ''} ${selected ? 'bg-primary-50 hover:bg-primary-50' : (isHeader ? 'bg-secondary-50' : 'bg-secondary-50 hover:bg-secondary-100')} ${className}`}
       onClick={onClick}
     >
       {children}

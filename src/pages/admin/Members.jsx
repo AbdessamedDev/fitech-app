@@ -98,7 +98,7 @@ export default function Members() {
               onChange={setSortBy}
             />
 
-            <button className="h-10 flex items-center gap-2 px-4 py-2 rounded-md transition-colors bg-transparent text-primary-600 hover:bg-primary-50 active:bg-primary-100 cursor-pointer text-sm font-bold whitespace-nowrap">
+            <button onClick={() => document.getElementById('global-search-input')?.focus()} className="h-10 flex items-center gap-2 px-4 py-2 rounded-md transition-colors bg-transparent text-primary-600 hover:bg-primary-50 active:bg-primary-100 cursor-pointer text-sm font-bold whitespace-nowrap">
               <Funnel size={18} />
               {t('Filter')}
             </button>

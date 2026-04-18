@@ -7,6 +7,7 @@ export function SearchInput({ value, onChange, placeholder = "Search...", classN
     <div className={`relative ${className}`}>
       <MagnifyingGlassIcon size={18} className="absolute ltr:left-3.5 rtl:right-3.5 top-1/2 -translate-y-1/2 text-secondary-400" />
       <input
+        id="global-search-input"
         placeholder={t(placeholder)}
         value={value}
         onChange={(e) => onChange(e.target.value)}
