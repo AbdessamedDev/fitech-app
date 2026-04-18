@@ -1,11 +1,11 @@
 // Centralized icon file; Here we import all icons that needed for the project
 
 import {
-  SquaresFourIcon,      // Dashboard
+  SquaresFour as SquaresFourIcon,      // Dashboard
   Users,                // Members
   IdentificationCard,   // Subscriptions
   Money,                // Finance
-  BarbellIcon,          // Equipment
+  Barbell as BarbellIcon,          // Equipment
   FileText,             // Reports
   ShoppingCart,         // Shop
   Gear,                 // Settings 
@@ -14,7 +14,7 @@ import {
   Moon,
   SunDim,
 
-  MagnifyingGlassIcon,      // Search
+  MagnifyingGlass as MagnifyingGlassIcon,      // Search
   SlidersHorizontal,    // Sort
   Funnel,               // Filter
   UserPlus,             // Add Member
@@ -32,24 +32,29 @@ import {
   CaretDown,
 
   UserCircleCheck,
-  PiggyBankIcon,
+  PiggyBank as PiggyBankIcon,
   TrendUp,
   TrendDown,
   CreditCard,
   Megaphone,
-  BoxingGloveIcon,
+  BoxingGlove as BoxingGloveIcon,
 
-  // 👉 Newly added icons
   MapPin,
+  
+  SignOut,         //Sign Out
+
+  // Shop specific icons
+  ClipboardText,
+  Warning,
+  Package,
   Eye,
   PencilSimple,
   Trash,
   Plus,
+
   QrCode,
   Tag,
-  PulseIcon,
-
-  SignOut,              // Sign Out
+  Pulse as PulseIcon,
 
   ShieldCheck,
   BellRinging,
@@ -57,13 +62,22 @@ import {
   Camera,
   CheckCircle,
   LockKey,
-  MailboxIcon,
+  Mailbox as MailboxIcon,
 
-  MonitorIcon,
-  DeviceMobileCameraIcon,
-  DeviceTabletCameraIcon,
-  LaptopIcon,
-  XIcon
+  Monitor as MonitorIcon,
+  DeviceMobileCamera as DeviceMobileCameraIcon,
+  DeviceTabletCamera as DeviceTabletCameraIcon,
+  Laptop as LaptopIcon,
+  X as XIcon,
+
+  Star,
+  ImageSquare,
+  Check,
+  
+  // Expose as original names for compatibility
+  MagnifyingGlass,
+  SquaresFour,
+  Barbell
 } from "@phosphor-icons/react";
 
 export {
@@ -107,15 +121,20 @@ export {
   BoxingGloveIcon,
 
   MapPin,
+
+  SignOut,
+
+  ClipboardText,
+  Warning,
+  Package,
   Eye,
   PencilSimple,
   Trash,
   Plus,
+
   QrCode,
   Tag,
   PulseIcon,
-
-  SignOut,
 
   ShieldCheck,
   BellRinging,
@@ -129,5 +148,13 @@ export {
   DeviceMobileCameraIcon,
   DeviceTabletCameraIcon,
   LaptopIcon,
-  XIcon
+  XIcon,
+
+  Star,
+  ImageSquare,
+  Check,
+  
+  MagnifyingGlass,
+  SquaresFour,
+  Barbell
 };
