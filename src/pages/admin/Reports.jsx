@@ -4,7 +4,7 @@ import {
   BarChart, Bar, XAxis, Tooltip as RechartsTooltip, ResponsiveContainer,
   PieChart, Pie, Cell
 } from 'recharts';
-import { Download, Eye, Copy, Trash2 } from 'lucide-react';
+import { Download, Eye, Copy, Trash2, ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
 import { FileText, SlidersHorizontal, Funnel } from '../../icons/index';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../components/ui/Table';
 import { Pagination } from '../../components/shared/Pagination';
@@ -12,6 +12,7 @@ import { SearchInput } from '../../components/shared/SearchInput';
 import { FilterDropdown } from '../../components/shared/FilterDropdown';
 import { PrimaryButton } from '../../components/shared/PrimaryButton';
 
+// Chart Data
 const revenueData = [
   { name: 'JAN', value: 2400 },
   { name: 'FEB', value: 2800 },
@@ -28,22 +29,113 @@ const paymentChannelsData = [
   { name: 'Other', value: 12, color: '#E2E8F0' },
 ];
 
-const topProgramsData = [
-  { id: 1, name: 'Elite HIT 3D', icon: '💪', revenue: '$42.8k', subscribers: '342 ATTENDEES' },
-  { id: 2, name: 'Zen Flow Yoga', icon: '🧘', revenue: '$28.2k', subscribers: '156 ATTENDEES' },
-  { id: 3, name: 'Power Lifting', icon: '🏋️', revenue: '$31.5k', subscribers: '205 ATTENDEES' },
-];
+// Program Badge Config with colors and icons
+const programBadgeConfig = {
+  'Elite HIT 3D': { 
+    badgeColor: '#10B981', 
+    badgeBg: 'bg-emerald-50',
+    icon: '💪',
+    attendees: 342
+  },
+  'Zen Flow Yoga': { 
+    badgeColor: '#8B5CF6', 
+    badgeBg: 'bg-purple-50',
+    icon: '🧘',
+    attendees: 156
+  },
+  'Power Lifting': { 
+    badgeColor: '#EF4444', 
+    badgeBg: 'bg-rose-50',
+    icon: '🏋️',
+    attendees: 205
+  },
+  'Strength Training': { 
+    badgeColor: '#06B6D4', 
+    badgeBg: 'bg-cyan-50',
+    icon: '🦾',
+    attendees: 189
+  },
+  'Cardio Blast': { 
+    badgeColor: '#F59E0B', 
+    badgeBg: 'bg-amber-50',
+    icon: '🏃',
+    attendees: 267
+  },
+  'Pilates Core': { 
+    badgeColor: '#EC4899', 
+    badgeBg: 'bg-pink-50',
+    icon: '🧘‍♀️',
+    attendees: 143
+  },
+  'Boxing Fitness': { 
+    badgeColor: '#D946EF', 
+    badgeBg: 'bg-fuchsia-50',
+    icon: '🥊',
+    attendees: 198
+  },
+  'Dance Moves': { 
+    badgeColor: '#14B8A6', 
+    badgeBg: 'bg-teal-50',
+    icon: '💃',
+    attendees: 221
+  },
+  'HIIT Sessions': { 
+    badgeColor: '#F97316', 
+    badgeBg: 'bg-orange-50',
+    icon: '⚡',
+    attendees: 312
+  },
+};
 
-const mockReports = [
-  { id: 1, name: 'Q2 Financial Summary', type: 'Revenue', status: 'READY', date: 'Nov 12, 2026', dateRange: 'Nov 12, 2026 - Nov 15, 2026', time: '12:45 PM' },
-  { id: 2, name: 'Q3 Financial Summary', type: 'Revenue', status: 'READY', date: 'Feb 15, 2027', dateRange: 'Feb 15, 2027 - Feb 18, 2027', time: '10:30 AM' },
-  { id: 3, name: 'Q4 Financial Summary', type: 'Revenue', status: 'PROCESSING', date: 'May 10, 2027', dateRange: 'May 10, 2027 - May 16, 2027', time: '2:00 PM' },
-  { id: 4, name: 'Q1 Financial Summary', type: 'Revenue', status: 'FAILED', date: 'Aug 15, 2027', dateRange: 'Aug 15, 2027 - Aug 15, 2027', time: '11:00 AM' },
-  { id: 5, name: 'Q2 Financial Summary', type: 'Revenue', status: 'FAILED', date: 'Nov 12, 2027', dateRange: 'Nov 12, 2027 - Aug 15, 2027', time: '12:00 PM' },
-  { id: 6, name: 'Q3 Financial Summary', type: 'Revenue', status: 'FAILED', date: 'Feb 20, 2028', dateRange: 'Feb 20, 2028 - Aug 15, 2027', time: '1:30 PM' },
-  { id: 7, name: 'Q4 Financial Summary', type: 'Revenue', status: 'READY', date: 'May 28, 2028', dateRange: 'May 28, 2028 - May 31, 2028', time: '3:15 PM' },
-  { id: 8, name: 'Q4 Financial Summary', type: 'Revenue', status: 'READY', date: 'May 28, 2028', dateRange: 'May 28, 2028 - May 31, 2028', time: '3:15 PM' },
-];
+const topProgramsData = Object.entries(programBadgeConfig).map(([name, config], idx) => ({
+  id: idx + 1,
+  name,
+  icon: config.icon,
+  revenue: `$${(Math.random() * 50 + 20).toFixed(1)}k`,
+  subscribers: `${config.attendees} ATTENDEES`,
+  attendees: config.attendees,
+  badgeColor: config.badgeColor,
+  badgeBg: config.badgeBg,
+})).sort((a, b) => b.attendees - a.attendees);
+
+// Generate 50+ mock reports for pagination testing
+const generateMockReports = () => {
+  const statuses = ['READY', 'PROCESSING', 'FAILED'];
+  const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
+  const types = ['Revenue', 'Members', 'Subscriptions', 'Attendance'];
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  
+  const reports = [];
+  for (let i = 1; i <= 52; i++) {
+    const month = months[Math.floor(Math.random() * 12)];
+    const year = 2026 + Math.floor(i / 13);
+    const quarter = quarters[Math.floor(Math.random() * 4)];
+    const status = statuses[Math.floor(Math.random() * 3)];
+    const type = types[Math.floor(Math.random() * 4)];
+    const day = Math.floor(Math.random() * 28) + 1;
+    const endDay = Math.floor(Math.random() * 5) + day + 1;
+    
+    reports.push({
+      id: i,
+      name: `${quarter} Financial Summary`,
+      type,
+      status,
+      date: `${month} ${day}, ${year}`,
+      dateRange: `${month} ${day}, ${year} - ${month} ${endDay}, ${year}`,
+      time: `${Math.floor(Math.random() * 12) + 1}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')} ${Math.random() > 0.5 ? 'AM' : 'PM'}`,
+    });
+  }
+  return reports;
+};
+
+const mockReports = generateMockReports();
+
+// Utility function to determine retention status badge
+const getRetentionStatus = (percentage) => {
+  if (percentage >= 80) return { label: 'GOOD', color: '#10B981' };
+  if (percentage >= 60) return { label: 'AVERAGE', color: '#F59E0B' };
+  return { label: 'BAD', color: '#EF4444' };
+};
 
 const ReportStatusBadge = ({ status }) => {
   const statusStyles = {
@@ -80,7 +172,30 @@ export default function Reports() {
   const [sortBy, setSortBy] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
+  const [carouselMode, setCarouselMode] = useState(false);
+  const [carouselIndex, setCarouselIndex] = useState(0);
   const itemsPerPage = 8;
+
+  // Retention status badge
+  const retentionPercentage = 84.2;
+  const retentionStatus = getRetentionStatus(retentionPercentage);
+
+  // Top 3 programs by attendance (for default view)
+  const topThreePrograms = topProgramsData.slice(0, 3);
+
+  // Carousel handlers
+  const handleCarouselNext = () => {
+    setCarouselIndex((prev) => (prev + 1) % topProgramsData.length);
+  };
+
+  const handleCarouselPrev = () => {
+    setCarouselIndex((prev) => (prev - 1 + topProgramsData.length) % topProgramsData.length);
+  };
+
+  const handleBackToDefault = () => {
+    setCarouselMode(false);
+    setCarouselIndex(0);
+  };
 
   const filteredReports = useMemo(() => {
     let reports = mockReports.filter(report => {
@@ -114,6 +229,8 @@ export default function Reports() {
     { label: 'PROCESSING', value: 'PROCESSING' },
     { label: 'FAILED', value: 'FAILED' },
   ];
+
+  const currentCarouselProgram = topProgramsData[carouselIndex];
 
   return (
     <div className="bg-secondary-50 min-h-screen py-8 px-4 sm:px-8 w-full flex justify-center text-sm font-sans">
@@ -201,7 +318,7 @@ export default function Reports() {
                 <div key={channel.name} className="flex justify-between items-center text-[14px]">
                   <div className="flex items-center gap-3">
                     <div className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: channel.color }}></div>
-                    <span className="text-[14px] text-secondary-800 font-medium">{channel.name}</span>
+                    <span className="text-[14px] text-secondary-800 font-medium">{t(channel.name)}</span>
                   </div>
                   <span className="font-bold text-secondary-800 text-[14px]">{channel.value}%</span>
                 </div>
@@ -212,12 +329,15 @@ export default function Reports() {
 
         {/* Member Retention & Top Programs */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Member Retention Card */}
           <div className="lg:col-span-4 bg-secondary-50 p-8 rounded-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-secondary-200 flex flex-col hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-shadow duration-300">
-            <h3 className="text-xl font-bold text-secondary-800 font-sans tracking-tight mb-6">{t('Member Retention')}</h3>
+            <h3 className="text-xl font-bold text-secondary-800 font-sans tracking-tight mb-8">{t('Member Retention')}</h3>
             
-            <div className="text-center mb-8">
-              <p className="text-[48px] font-black text-secondary-800 leading-none tracking-tight">84.2%</p>
-              <p className="text-success text-[12px] font-bold mt-2">+2.5%</p>
+            <div className="flex items-center gap-4 mb-8">
+              <p className="text-[48px] font-black text-secondary-800 leading-none tracking-tight">{retentionPercentage}%</p>
+              <div className="px-4 py-2 rounded-full text-xs font-bold" style={{ backgroundColor: retentionStatus.color + '20', color: retentionStatus.color, border: `1px solid ${retentionStatus.color}40` }}>
+                {retentionStatus.label}
+              </div>
             </div>
 
             <div className="flex flex-col gap-5">
@@ -243,29 +363,104 @@ export default function Reports() {
             </div>
           </div>
 
+          {/* Top Programs Section */}
           <div className="lg:col-span-8 bg-secondary-50 p-8 rounded-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-secondary-200 flex flex-col hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-shadow duration-300">
             <div className="flex justify-between items-start mb-8">
               <h3 className="text-xl font-bold text-secondary-800 font-sans tracking-tight">{t('Top Programs Performance')}</h3>
-              <button className="text-success font-bold text-[14px] hover:opacity-80 transition-opacity">
-                {t('View All Programs')}
-              </button>
+              
+              {!carouselMode && (
+                <button 
+                  onClick={() => setCarouselMode(true)}
+                  className="text-success font-bold text-[14px] hover:opacity-80 transition-opacity"
+                >
+                  {t('View All Programs')}
+                </button>
+              )}
+              
+              {carouselMode && (
+                <button 
+                  onClick={handleBackToDefault}
+                  className="flex items-center gap-2 px-4 py-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors font-bold text-[14px]"
+                >
+                  <RotateCcw size={18} />
+                  Back
+                </button>
+              )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {topProgramsData.map(program => (
-                <div key={program.id} className="bg-secondary-100 p-6 rounded-[16px] border border-secondary-200 hover:border-primary-600 transition-colors">
-                  <div className="flex items-start justify-between mb-4">
-                    <span className="text-3xl">{program.icon}</span>
-                    <span className="text-xs font-bold text-secondary-500">★ {program.id}</span>
+            {!carouselMode ? (
+              // Default View: Top 3 Programs
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 transition-all duration-300">
+                {topThreePrograms.map(program => (
+                  <div 
+                    key={program.id} 
+                    className="bg-secondary-100 p-6 rounded-[16px] border border-secondary-200 hover:border-primary-600 transition-colors"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center text-2xl" style={{ backgroundColor: program.badgeColor + '20' }}>
+                        {program.icon}
+                      </div>
+                      <span className="px-2 py-1 rounded text-xs font-bold text-white" style={{ backgroundColor: program.badgeColor }}>
+                        #{program.id}
+                      </span>
+                    </div>
+                    <h4 className="text-[14px] font-bold text-secondary-800 mb-4">{program.name}</h4>
+                    <div className="flex flex-col gap-2">
+                      <p className="text-[13px] text-secondary-600 font-bold">{program.revenue}</p>
+                      <p className="text-[11px] font-bold text-secondary-500 uppercase tracking-wide">{program.subscribers}</p>
+                    </div>
                   </div>
-                  <h4 className="text-[14px] font-bold text-secondary-800 mb-4">{program.name}</h4>
-                  <div className="flex flex-col gap-2">
-                    <p className="text-[13px] text-secondary-600">{program.revenue}</p>
-                    <p className="text-[11px] font-bold text-secondary-500 uppercase tracking-wide">{program.subscribers}</p>
+                ))}
+              </div>
+            ) : (
+              // Carousel View: One program at a time
+              <div className="flex flex-col items-center justify-center gap-6 transition-all duration-300 py-8">
+                <div className="w-full max-w-sm bg-secondary-100 p-8 rounded-[16px] border border-secondary-200">
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="w-14 h-14 rounded-lg flex items-center justify-center text-4xl" style={{ backgroundColor: currentCarouselProgram.badgeColor + '20' }}>
+                      {currentCarouselProgram.icon}
+                    </div>
+                    <span className="px-3 py-1.5 rounded text-sm font-bold text-white" style={{ backgroundColor: currentCarouselProgram.badgeColor }}>
+                      #{currentCarouselProgram.id}
+                    </span>
+                  </div>
+                  <h4 className="text-[18px] font-bold text-secondary-800 mb-6">{currentCarouselProgram.name}</h4>
+                  <div className="flex flex-col gap-3">
+                    <div>
+                      <p className="text-[12px] text-secondary-600 uppercase tracking-wide mb-1">Revenue</p>
+                      <p className="text-[20px] font-black text-secondary-800">{currentCarouselProgram.revenue}</p>
+                    </div>
+                    <div>
+                      <p className="text-[12px] text-secondary-600 uppercase tracking-wide mb-1">Attendees</p>
+                      <p className="text-[16px] font-bold text-secondary-800">{currentCarouselProgram.subscribers}</p>
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
+
+                {/* Carousel Controls */}
+                <div className="flex items-center gap-4">
+                  <button 
+                    onClick={handleCarouselPrev}
+                    className="p-2 rounded-lg border border-secondary-200 hover:bg-secondary-100 transition-colors text-secondary-700"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+                  
+                  <div className="text-center">
+                    <p className="text-sm font-bold text-secondary-700">
+                      {carouselIndex + 1} / {topProgramsData.length}
+                    </p>
+                  </div>
+                  
+                  <button 
+                    onClick={handleCarouselNext}
+                    className="p-2 rounded-lg border border-secondary-200 hover:bg-secondary-100 transition-colors text-secondary-700"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -276,7 +471,7 @@ export default function Reports() {
               value={search}
               onChange={(val) => { setSearch(val); setCurrentPage(1); }}
               placeholder={t('Search reports...')}
-              className="w-full md:w-64"
+              className="flex-1 md:flex-initial"
             />
 
             <FilterDropdown

@@ -106,7 +106,25 @@ const resources = {
       "Other": "Other",
       "Inactive": "Inactive",
       "Retention Rate": "Retention Rate",
-      "Import": "Import"
+      "Import": "Import",
+      "Elite HIT 3D": "Elite HIT 3D",
+      "Zen Flow Yoga": "Zen Flow Yoga",
+      "Power Lifting": "Power Lifting",
+      "Strength Training": "Strength Training",
+      "Cardio Blast": "Cardio Blast",
+      "Pilates Core": "Pilates Core",
+      "Boxing Fitness": "Boxing Fitness",
+      "Dance Moves": "Dance Moves",
+      "HIIT Sessions": "HIIT Sessions",
+      "Attendees": "Attendees",
+      "GOOD": "GOOD",
+      "AVERAGE": "AVERAGE",
+      "BAD": "BAD",
+      "Back": "Back",
+      "Revenue": "Revenue",
+      "Members": "Members",
+      "Subscriptions": "Subscriptions",
+      "Attendance": "Attendance"
     }
   },
   ar: {
@@ -222,7 +240,25 @@ const resources = {
       "Other": "آخر",
       "Inactive": "غير نشط",
       "Retention Rate": "معدل الاحتفاظ",
-      "Import": "استيراد"
+      "Import": "استيراد",
+      "Elite HIT 3D": "Elite HIT 3D",
+      "Zen Flow Yoga": "Zen Flow Yoga",
+      "Power Lifting": "Power Lifting",
+      "Strength Training": "تدريب القوة",
+      "Cardio Blast": "كارديو بلاست",
+      "Pilates Core": "بيلاتس كور",
+      "Boxing Fitness": "لياقة الملاكمة",
+      "Dance Moves": "حركات الرقص",
+      "HIIT Sessions": "جلسات HIIT",
+      "Attendees": "الحاضرون",
+      "GOOD": "جيد",
+      "AVERAGE": "متوسط",
+      "BAD": "سيء",
+      "Back": "رجوع",
+      "Revenue": "الإيرادات",
+      "Members": "الأعضاء",
+      "Subscriptions": "الاشتراكات",
+      "Attendance": "الحضور"
     }
   },
   fr: {
@@ -338,7 +374,25 @@ const resources = {
       "Other": "Autre",
       "Inactive": "Inactif",
       "Retention Rate": "Taux de rétention",
-      "Import": "Importer"
+      "Import": "Importer",
+      "Elite HIT 3D": "Elite HIT 3D",
+      "Zen Flow Yoga": "Zen Flow Yoga",
+      "Power Lifting": "Power Lifting",
+      "Strength Training": "Entraînement de force",
+      "Cardio Blast": "Cardio Blast",
+      "Pilates Core": "Pilates Core",
+      "Boxing Fitness": "Boxe Fitness",
+      "Dance Moves": "Mouvements de danse",
+      "HIIT Sessions": "Séances HIIT",
+      "Attendees": "Participants",
+      "GOOD": "BON",
+      "AVERAGE": "MOYEN",
+      "BAD": "MAUVAIS",
+      "Back": "Retour",
+      "Revenue": "Chiffre d'affaires",
+      "Members": "Membres",
+      "Subscriptions": "Abonnements",
+      "Attendance": "Assiduité"
     }
   },
   es: {
@@ -454,7 +508,25 @@ const resources = {
       "Other": "Otro",
       "Inactive": "Inactivo",
       "Retention Rate": "Tasa de retención",
-      "Import": "Importar"
+      "Import": "Importar",
+      "Elite HIT 3D": "Elite HIT 3D",
+      "Zen Flow Yoga": "Zen Flow Yoga",
+      "Power Lifting": "Power Lifting",
+      "Strength Training": "Entrenamiento de fuerza",
+      "Cardio Blast": "Cardio Blast",
+      "Pilates Core": "Pilates Core",
+      "Boxing Fitness": "Boxeo Fitness",
+      "Dance Moves": "Movimientos de danza",
+      "HIIT Sessions": "Sesiones HIIT",
+      "Attendees": "Asistentes",
+      "GOOD": "BUENO",
+      "AVERAGE": "PROMEDIO",
+      "BAD": "MALO",
+      "Back": "Atrás",
+      "Revenue": "Ingresos",
+      "Members": "Miembros",
+      "Subscriptions": "Suscripciones",
+      "Attendance": "Asistencia"
     }
   }
 };
