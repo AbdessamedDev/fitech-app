@@ -89,7 +89,6 @@ export default function Reports() {
       return matchesSearch && matchesStatus;
     });
 
-    // Apply sorting
     if (sortBy === 'newest') {
       reports.sort((a, b) => new Date(b.date) - new Date(a.date));
     } else if (sortBy === 'oldest') {
@@ -271,8 +270,8 @@ export default function Reports() {
         </div>
 
         {/* Controls */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4 w-full">
-          <div className="flex flex-wrap items-center gap-3 flex-1">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-12 w-full">
+          <div className="flex flex-wrap items-center gap-4 flex-1">
             <SearchInput
               value={search}
               onChange={(val) => { setSearch(val); setCurrentPage(1); }}
@@ -295,6 +294,13 @@ export default function Reports() {
               value={statusFilter}
               onChange={setStatusFilter}
             />
+
+            <span className="hidden sm:inline-block text-secondary-300 font-extrabold opacity-50">|</span>
+
+            <button className="h-10 flex items-center gap-2 px-4 py-2 rounded-md transition-colors bg-transparent text-primary-600 hover:bg-primary-50 active:bg-primary-100 cursor-pointer text-sm font-bold whitespace-nowrap">
+              <Download size={18} />
+              {t('Import')}
+            </button>
           </div>
 
           <PrimaryButton>
@@ -303,7 +309,7 @@ export default function Reports() {
         </div>
 
         {/* Table */}
-        <Table className="w-full text-[14px]">
+        <Table className="rounded-xl border border-secondary-200 overflow-hidden shadow-sm w-full bg-secondary-50 text-[14px]">
           <TableHeader className="bg-secondary-100">
             <TableRow isHeader={true}>
               <TableHeaderCell icon={FileText} title="Report Name" />
