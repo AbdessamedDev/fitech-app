@@ -31,17 +31,20 @@ const mockMembers = Array.from({ length: 260 }).map((_, i) => ({
   ...namesAndEmails[i % namesAndEmails.length]
 }));
 
-const TableHeaderCell = ({ icon: Icon, title, showPipe = true }) => (
-  <TableHead className="p-0 align-middle">
-    <div className="flex items-center justify-between h-10">
-      <div className="flex flex-1 items-center justify-center gap-2 px-3 lg:px-4 text-secondary-500 font-semibold text-[13px]">
-        {Icon && <Icon size={16} strokeWidth={2}/>}
-        {title && <span>{title}</span>}
+const TableHeaderCell = ({ icon: Icon, title, showPipe = true }) => {
+  const { t } = useTranslation()
+  return (
+    <TableHead className="p-0 align-middle">
+      <div className="flex items-center justify-between h-10">
+        <div className="flex flex-1 items-center justify-center gap-2 px-3 lg:px-4 text-secondary-500 font-semibold text-[13px]">
+          {Icon && <Icon size={16} strokeWidth={2}/>}
+          {title && <span>{t(title)}</span>}
+        </div>
+        {showPipe && <div className="w-px h-[18px] bg-secondary-200"></div>}
       </div>
-      {showPipe && <div className="w-px h-[18px] bg-secondary-200"></div>}
-    </div>
-  </TableHead>
-)
+    </TableHead>
+  )
+}
 
 export default function Members() {
   const { t } = useTranslation()
