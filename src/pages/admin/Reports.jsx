@@ -35,7 +35,7 @@ const topProgramsData = [
 ];
 
 const mockReports = [
-  { id: 1, name: 'Q1 Financial Summary', type: 'Revenue', status: 'READY', date: 'Nov 12, 2026', dateRange: 'Nov 12, 2026 - Nov 15, 2026', time: '12:45 PM' },
+  { id: 1, name: 'Q2 Financial Summary', type: 'Revenue', status: 'READY', date: 'Nov 12, 2026', dateRange: 'Nov 12, 2026 - Nov 15, 2026', time: '12:45 PM' },
   { id: 2, name: 'Q3 Financial Summary', type: 'Revenue', status: 'READY', date: 'Feb 15, 2027', dateRange: 'Feb 15, 2027 - Feb 18, 2027', time: '10:30 AM' },
   { id: 3, name: 'Q4 Financial Summary', type: 'Revenue', status: 'PROCESSING', date: 'May 10, 2027', dateRange: 'May 10, 2027 - May 16, 2027', time: '2:00 PM' },
   { id: 4, name: 'Q1 Financial Summary', type: 'Revenue', status: 'FAILED', date: 'Aug 15, 2027', dateRange: 'Aug 15, 2027 - Aug 15, 2027', time: '11:00 AM' },
@@ -83,12 +83,21 @@ export default function Reports() {
   const itemsPerPage = 8;
 
   const filteredReports = useMemo(() => {
-    return mockReports.filter(report => {
+    let reports = mockReports.filter(report => {
       const matchesSearch = report.name.toLowerCase().includes(search.toLowerCase());
       const matchesStatus = statusFilter === 'All' || report.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
-  }, [search, statusFilter]);
+
+    // Apply sorting
+    if (sortBy === 'newest') {
+      reports.sort((a, b) => new Date(b.date) - new Date(a.date));
+    } else if (sortBy === 'oldest') {
+      reports.sort((a, b) => new Date(a.date) - new Date(b.date));
+    }
+
+    return reports;
+  }, [search, statusFilter, sortBy]);
 
   const totalPages = Math.ceil(filteredReports.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -111,9 +120,8 @@ export default function Reports() {
     <div className="bg-secondary-50 min-h-screen py-8 px-4 sm:px-8 w-full flex justify-center text-sm font-sans">
       <div className="w-full max-w-350 flex flex-col gap-8">
         
-        {/* Top Charts Section */}
+        {/* Revenue Trend Chart */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Revenue Trend Chart */}
           <div className="lg:col-span-8 bg-secondary-50 p-8 rounded-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-secondary-200 flex flex-col hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-shadow duration-300">
             <div className="flex justify-between items-start mb-6">
               <div>
@@ -205,7 +213,6 @@ export default function Reports() {
 
         {/* Member Retention & Top Programs */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Member Retention */}
           <div className="lg:col-span-4 bg-secondary-50 p-8 rounded-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-secondary-200 flex flex-col hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-shadow duration-300">
             <h3 className="text-xl font-bold text-secondary-800 font-sans tracking-tight mb-6">{t('Member Retention')}</h3>
             
@@ -237,12 +244,9 @@ export default function Reports() {
             </div>
           </div>
 
-          {/* Top Programs Performance */}
           <div className="lg:col-span-8 bg-secondary-50 p-8 rounded-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-secondary-200 flex flex-col hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-shadow duration-300">
             <div className="flex justify-between items-start mb-8">
-              <div>
-                <h3 className="text-xl font-bold text-secondary-800 font-sans tracking-tight">{t('Top Programs Performance')}</h3>
-              </div>
+              <h3 className="text-xl font-bold text-secondary-800 font-sans tracking-tight">{t('Top Programs Performance')}</h3>
               <button className="text-success font-bold text-[14px] hover:opacity-80 transition-opacity">
                 {t('View All Programs')}
               </button>
@@ -266,101 +270,97 @@ export default function Reports() {
           </div>
         </div>
 
-        {/* Reports Table Section */}
-        <div className="bg-secondary-50 p-8 rounded-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-secondary-200 flex flex-col hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-shadow duration-300">
-          
-          {/* Controls */}
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 w-full">
-            <div className="flex flex-wrap items-center gap-3 flex-1">
-              <SearchInput
-                value={search}
-                onChange={(val) => { setSearch(val); setCurrentPage(1); }}
-                placeholder="Search reports..."
-                className="w-full md:w-64"
-              />
+        {/* Controls */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4 w-full">
+          <div className="flex flex-wrap items-center gap-3 flex-1">
+            <SearchInput
+              value={search}
+              onChange={(val) => { setSearch(val); setCurrentPage(1); }}
+              placeholder={t('Search reports...')}
+              className="w-full md:w-64"
+            />
 
-              <FilterDropdown
-                label="Sort by"
-                icon={SlidersHorizontal}
-                options={sortOptions}
-                value={sortBy}
-                onChange={setSortBy}
-              />
+            <FilterDropdown
+              label={t('Sort by')}
+              icon={SlidersHorizontal}
+              options={sortOptions}
+              value={sortBy}
+              onChange={setSortBy}
+            />
 
-              <FilterDropdown
-                label="Status"
-                icon={Funnel}
-                options={statusOptions}
-                value={statusFilter}
-                onChange={setStatusFilter}
-              />
-            </div>
-
-            <PrimaryButton>
-              {t('Generate Report')}
-            </PrimaryButton>
-          </div>
-
-          {/* Table */}
-          <Table className="rounded-xl border border-secondary-200 overflow-hidden shadow-sm w-full bg-secondary-50 text-[14px]">
-            <TableHeader className="bg-secondary-100">
-              <TableRow isHeader={true}>
-                <TableHeaderCell icon={FileText} title="Report Name" />
-                <TableHeaderCell title="Type" />
-                <TableHeaderCell title="Status" />
-                <TableHeaderCell title="Date" />
-                <TableHeaderCell title="Date Range" />
-                <TableHeaderCell title="Time" />
-                <TableHeaderCell title="Operations" showPipe={false} />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedReports.map((report) => (
-                <TableRow key={report.id} className="hover:bg-secondary-100 transition-colors">
-                  <TableCell className="text-center font-medium text-secondary-700 px-2 lg:px-4">
-                    <div className="flex items-center gap-2 justify-center">
-                      <FileText size={16} className="text-secondary-500" />
-                      <span>{report.name}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center text-secondary-600 font-medium px-2 lg:px-4">{t(report.type)}</TableCell>
-                  <TableCell className="text-center px-2 lg:px-4">
-                    <div className="flex justify-center">
-                      <ReportStatusBadge status={report.status} />
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center text-secondary-600 font-medium px-2 lg:px-4">{report.date}</TableCell>
-                  <TableCell className="text-center text-secondary-600 font-medium px-2 lg:px-4 whitespace-nowrap text-xs">{report.dateRange}</TableCell>
-                  <TableCell className="text-center text-secondary-600 font-medium px-2 lg:px-4">{report.time}</TableCell>
-                  <TableCell className="text-center px-2 lg:px-4">
-                    <div className="flex justify-center gap-1">
-                      <button className="p-2 rounded-full hover:bg-secondary-200 text-secondary-500 transition-colors" title="View">
-                        <Eye size={16} />
-                      </button>
-                      <button className="p-2 rounded-full hover:bg-secondary-200 text-secondary-500 transition-colors" title="Download">
-                        <Download size={16} />
-                      </button>
-                      <button className="p-2 rounded-full hover:bg-secondary-200 text-secondary-500 transition-colors" title="Copy">
-                        <Copy size={16} />
-                      </button>
-                      <button className="p-2 rounded-full hover:bg-error-bg text-secondary-500 transition-colors" title="Delete">
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-
-          {/* Pagination */}
-          <div className="mt-8">
-            <Pagination 
-              currentPage={currentPage} 
-              totalPages={totalPages} 
-              onPageChange={setCurrentPage} 
+            <FilterDropdown
+              label={t('Filter')}
+              icon={Funnel}
+              options={statusOptions}
+              value={statusFilter}
+              onChange={setStatusFilter}
             />
           </div>
+
+          <PrimaryButton>
+            {t('Generate Report')}
+          </PrimaryButton>
+        </div>
+
+        {/* Table */}
+        <Table className="w-full text-[14px]">
+          <TableHeader className="bg-secondary-100">
+            <TableRow isHeader={true}>
+              <TableHeaderCell icon={FileText} title="Report Name" />
+              <TableHeaderCell title="Type" />
+              <TableHeaderCell title="Status" />
+              <TableHeaderCell title="Date" />
+              <TableHeaderCell title="Date Range" />
+              <TableHeaderCell title="Time" />
+              <TableHeaderCell title="Operations" showPipe={false} />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {paginatedReports.map((report) => (
+              <TableRow key={report.id} className="hover:bg-secondary-100 transition-colors">
+                <TableCell className="text-center font-medium text-secondary-700 px-2 lg:px-4">
+                  <div className="flex items-center gap-2 justify-center">
+                    <FileText size={16} className="text-secondary-500" />
+                    <span>{report.name}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-center text-secondary-600 font-medium px-2 lg:px-4">{t(report.type)}</TableCell>
+                <TableCell className="text-center px-2 lg:px-4">
+                  <div className="flex justify-center">
+                    <ReportStatusBadge status={report.status} />
+                  </div>
+                </TableCell>
+                <TableCell className="text-center text-secondary-600 font-medium px-2 lg:px-4">{report.date}</TableCell>
+                <TableCell className="text-center text-secondary-600 font-medium px-2 lg:px-4 whitespace-nowrap text-xs">{report.dateRange}</TableCell>
+                <TableCell className="text-center text-secondary-600 font-medium px-2 lg:px-4">{report.time}</TableCell>
+                <TableCell className="text-center px-2 lg:px-4">
+                  <div className="flex justify-center gap-1">
+                    <button className="p-2 rounded-full hover:bg-secondary-200 text-secondary-500 transition-colors" title="View">
+                      <Eye size={16} />
+                    </button>
+                    <button className="p-2 rounded-full hover:bg-secondary-200 text-secondary-500 transition-colors" title="Download">
+                      <Download size={16} />
+                    </button>
+                    <button className="p-2 rounded-full hover:bg-secondary-200 text-secondary-500 transition-colors" title="Copy">
+                      <Copy size={16} />
+                    </button>
+                    <button className="p-2 rounded-full hover:bg-error-bg text-secondary-500 transition-colors" title="Delete">
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+
+        {/* Pagination */}
+        <div className="mt-8">
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={setCurrentPage} 
+          />
         </div>
       </div>
     </div>

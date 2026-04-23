@@ -105,7 +105,8 @@ const resources = {
       "Manually": "Manually",
       "Other": "Other",
       "Inactive": "Inactive",
-      "Retention Rate": "Retention Rate"
+      "Retention Rate": "Retention Rate",
+      "Import": "Import"
     }
   },
   ar: {
@@ -220,7 +221,8 @@ const resources = {
       "Manually": "يدويًا",
       "Other": "آخر",
       "Inactive": "غير نشط",
-      "Retention Rate": "معدل الاحتفاظ"
+      "Retention Rate": "معدل الاحتفاظ",
+      "Import": "استيراد"
     }
   },
   fr: {
@@ -335,7 +337,8 @@ const resources = {
       "Manually": "Manuellement",
       "Other": "Autre",
       "Inactive": "Inactif",
-      "Retention Rate": "Taux de rétention"
+      "Retention Rate": "Taux de rétention",
+      "Import": "Importer"
     }
   },
   es: {
@@ -450,7 +453,8 @@ const resources = {
       "Manually": "Manualmente",
       "Other": "Otro",
       "Inactive": "Inactivo",
-      "Retention Rate": "Tasa de retención"
+      "Retention Rate": "Tasa de retención",
+      "Import": "Importar"
     }
   }
 };
