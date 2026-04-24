@@ -7,6 +7,8 @@
   --color-primary-100: #EDE9FF;
   --color-primary-200: #DCD6FF;
   --color-primary-600: #6942FF;
+  --color-primary-700: #5837D6;
+  --color-primary-800: #472CAD;
   --color-primary-900: #362084;
 
   /* Secondary */
@@ -18,8 +20,8 @@
   --color-secondary-500: #757587;
   --color-secondary-600: #525264;
   --color-secondary-700: #40404F;
-  --color-secondary-800: #595D62;
-  --color-secondary-900: #454652;
+  --color-secondary-800: #262630;
+  --color-secondary-900: #121219;
 
   /* Text */
   --color-foreground: #0F0F0F;
@@ -43,6 +45,50 @@
   /* Font */
   --font-roboto: "Roboto", sans-serif;
   --font-sans: "Inter", sans-serif;
+}
+
+/* =========================
+   DARK THEME
+========================= */
+.dark {
+  /* Primary */
+  --color-primary-50: #8D70FF1A;
+  --color-primary-100: #2B244D;
+  --color-primary-200: #3C3577;
+  --color-primary-600: #6942FF;
+  --color-primary-800: #472CAD;
+  --color-primary-900: #362084;
+
+  /* Secondary */
+  --color-secondary-50: #121215;
+  --color-secondary-100: #1F1F24;
+  --color-secondary-200: #3A3A42;
+  --color-secondary-300: #525264;
+  --color-secondary-400: #6B6B7D;
+  --color-secondary-500: #878799;
+  --color-secondary-600: #ADADBD;
+  --color-secondary-700: #C1C1D0;
+  --color-secondary-800: #E8E8EF;
+  --color-secondary-900: #F3F3FF;
+
+  /* Text */
+  --color-foreground: #F3F4F6;
+  --color-foreground-secondary: #CCCCCC;
+  --color-foreground-tertiary: #AAAAAA;
+
+  /* Borders */
+  --color-border: #3A3A42;
+  --color-border-light: #525264;
+
+  /* Status */
+  --color-success: #4CAF63;
+  --color-success-bg: #1F3A24;
+
+  --color-error: #E05260;
+  --color-error-bg: #3A1F22;
+
+  --color-suspended: #A5ADB8;
+  --color-bg-suspended: #1E2428;
 }
 
 /* =========================
@@ -91,6 +137,23 @@
 
   .text-muted {
     @apply text-secondary-50;
+  }
+  
+  .mini-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  
+  .mini-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .mini-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-secondary-300 rounded-full;
+  }
+  
+  .mini-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-secondary-400;
   }
 }
 

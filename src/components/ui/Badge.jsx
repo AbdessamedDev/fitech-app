@@ -1,34 +1,39 @@
-export function Badge({ children, variant = 'default', className = '' }) {
-  const getVariantStyle = (variant) => {
-    switch(variant) {
+import { Check, X, Clock } from 'lucide-react'
+
+export function Badge({ status, variant, className = '' }) {
+  const currentStatus = status || variant || 'default'
+  
+  const getVariantStyles = (v) => {
+    switch(v?.toLowerCase()) {
       case 'active':
         return {
-          backgroundColor: '#D1FAE5',
-          color: '#065F46'
+          classes: 'bg-success-bg text-success border-success/40',
+          Icon: Check
         }
       case 'pending':
         return {
-          backgroundColor: '#FEF3C7',
-          color: '#92400E'
+          classes: 'bg-secondary-200 text-secondary-600 border-secondary-300',
+          Icon: Clock
         }
       case 'suspended':
         return {
-          backgroundColor: '#FEE2E2',
-          color: '#991B1B'
+          classes: 'bg-error-bg text-error border-error/40',
+          Icon: X
         }
       default:
         return {
-          backgroundColor: 'var(--surface)',
-          color: 'var(--foreground-secondary)'
+          classes: 'bg-secondary-100 text-secondary-600 border-secondary-200',
+          Icon: Clock
         }
     }
   }
 
-  const style = getVariantStyle(variant)
+  const { classes, Icon } = getVariantStyles(currentStatus)
 
   return (
-    <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium ${className}`} style={style}>
-      {children}
+    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${classes} ${className}`}>
+      <Icon size={12} strokeWidth={3} />
+      {currentStatus}
     </span>
   )
 }
