@@ -19,7 +19,6 @@ import { Pagination } from '../../components/shared/Pagination';
 import { SearchInput } from '../../components/shared/SearchInput';
 import { PrimaryButton } from '../../components/shared/PrimaryButton';
 
-// --- MOCK DATA ---
 const equipmentTypes = [
   { name: 'Treadmill Pro X1', category: 'Cardio', series: 'Series 5', image: 'https://images.unsplash.com/photo-1571008887538-b36bb32f4571?auto=format&fit=crop&q=80&w=800' },
   { name: 'Smith Machine Elite', category: 'Strength', series: 'Series 3', image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=800' },
@@ -42,10 +41,9 @@ const mockEquipments = Array.from({ length: 260 }).map((_, i) => {
     location: `Room A${(i % 5) + 1} • Level ${(i % 3) + 1}`,
     status: (i % 7 === 3) ? 'Maintenance' : 'Available',
     image: type.image
-  }
+  };
 });
 
-// --- FILTER CONFIG ---
 const sortOptions = [
   { label: 'Newest First', value: 'newest' },
   { label: 'Name (A-Z)', value: 'name-asc' },
@@ -119,10 +117,9 @@ const EquipmentCard = ({ equipment }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-// --- MAIN PAGE ---
 export default function EquipmentPage() {
   const { t } = useTranslation();
   const [search, setSearch] = useState('');
@@ -130,7 +127,7 @@ export default function EquipmentPage() {
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8; // 8 items perfectly fit 2 rows in a 4-col layout
+  const itemsPerPage = 8;
 
   const filteredEquipments = useMemo(() => {
     let result = mockEquipments;
@@ -164,7 +161,6 @@ export default function EquipmentPage() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedEquipments = filteredEquipments.slice(startIndex, startIndex + itemsPerPage);
 
-  // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [search, categoryFilter, statusFilter, sortBy]);
@@ -173,20 +169,16 @@ export default function EquipmentPage() {
     <div className='bg-secondary-100 min-h-screen p-4 sm:p-6 lg:p-8 w-full font-sans transition-all duration-300'>
       <div className="max-w-375 mx-auto w-full">
 
-        {/* Controls Section */}
         <div className="flex flex-wrap items-center w-full gap-6 mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
-          {/* Search */}
-          <SearchInput 
-            value={search} 
-            onChange={setSearch} 
+          <SearchInput
+            value={search}
+            onChange={setSearch}
             placeholder="Search equipment by name or ID..."
-            className="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] shrink-0" 
+            className="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] shrink-0"
           />
 
-          {/* Other Controls */}
           <div className="flex flex-1 flex-wrap items-center justify-between gap-4 min-w-[280px]">
             <div className="flex items-center flex-wrap gap-3">
-              {/* Dropdown Filters */}
               <FilterDropdown
                 label="Sort by"
                 icon={SlidersHorizontal}
@@ -194,7 +186,6 @@ export default function EquipmentPage() {
                 value={sortBy}
                 onChange={setSortBy}
               />
-
               <div className="hidden sm:block">
                 <FilterDropdown
                   label="Category"
@@ -204,7 +195,6 @@ export default function EquipmentPage() {
                   onChange={setCategoryFilter}
                 />
               </div>
-
               <div className="hidden md:block">
                 <FilterDropdown
                   label="Status"
@@ -214,9 +204,10 @@ export default function EquipmentPage() {
                   onChange={setStatusFilter}
                 />
               </div>
-
-              {/* General Filter Button */}
-              <button onClick={() => document.getElementById('global-search-input')?.focus()} className="h-10 flex items-center gap-2 px-4 py-2 rounded-md transition-colors bg-transparent text-primary-600 hover:bg-primary-50 active:bg-primary-100 cursor-pointer text-sm font-bold whitespace-nowrap">
+              <button
+                onClick={() => document.getElementById('global-search-input')?.focus()}
+                className="h-10 flex items-center gap-2 px-4 py-2 rounded-md transition-colors bg-transparent text-primary-600 hover:bg-primary-50 active:bg-primary-100 cursor-pointer text-sm font-bold whitespace-nowrap"
+              >
                 <Funnel size={18} />
                 {t('Filter')}
               </button>
@@ -228,9 +219,8 @@ export default function EquipmentPage() {
           </div>
         </div>
 
-        {/* Grid Layout */}
         {paginatedEquipments.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in fade-in zoom-in-95 duration-500 stagger-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in fade-in zoom-in-95 duration-500">
             {paginatedEquipments.map((equipment, index) => (
               <div key={equipment.id} style={{ animationDelay: `${index * 50}ms` }} className="animate-in fade-in slide-in-from-bottom-4 fill-mode-both h-full">
                 <EquipmentCard equipment={equipment} />
@@ -253,16 +243,15 @@ export default function EquipmentPage() {
           </div>
         )}
 
-        {/* Pagination */}
         <div className="mt-10 pb-8 animate-in fade-in duration-500 delay-300">
-          <Pagination 
-            currentPage={currentPage} 
-            totalPages={totalPages} 
-            onPageChange={setCurrentPage} 
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
           />
         </div>
 
       </div>
     </div>
-  )
+  );
 }
