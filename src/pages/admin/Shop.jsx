@@ -7,6 +7,7 @@ import { Button } from '../../components/ui/Button';
 import StatisticBlockShop from '../../components/shared/StatisticBlockShop';
 import { StatisticBlockData } from '../../utilities/ShopUtilities';
 import { Pagination } from '../../components/shared/Pagination';
+import AddProductModal from '../../components/ui/AddProductModal';
 
 function CustomSelect({ icon, options, value, onChange, placeholder, className }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -74,6 +75,7 @@ export default function Shop() {
   const [stockStatus, setStockStatus] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
   const [activeDescId, setActiveDescId] = useState(null);
+  const [showAddProductModal, setShowAddProductModal] = useState(false);
   const itemsPerPage = 4;
 
   useEffect(() => {
@@ -116,6 +118,10 @@ export default function Shop() {
 
   return (
     <div className='bg-secondary-100 min-h-dvh p-8 max-w-420 mx-auto font-sans transition-all duration-300'>
+      {showAddProductModal && (
+        <AddProductModal onClose={() => setShowAddProductModal(false)} />
+      )}
+
       <div className="relative z-60 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="relative">
           <MagnifyingGlass size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-secondary-400" />
@@ -144,7 +150,10 @@ export default function Shop() {
         </div>
 
         <div className="flex justify-end gap-3 relative z-30">
-          <Button className="h-11.5 px-6 whitespace-nowrap flex justify-center items-center gap-2 rounded-xl font-bold bg-primary-600 text-white hover:bg-primary-900 transition-colors shadow-[0_4px_12px_rgba(105,66,255,0.25)] ring-0 cursor-pointer active:scale-98">
+          <Button
+            onClick={() => setShowAddProductModal(true)}
+            className="h-11.5 px-6 whitespace-nowrap flex justify-center items-center gap-2 rounded-xl font-bold bg-primary-600 text-white hover:bg-primary-900 transition-colors shadow-[0_4px_12px_rgba(105,66,255,0.25)] ring-0 cursor-pointer active:scale-98"
+          >
             <Plus size={20} weight="bold" />
             Add Product
           </Button>

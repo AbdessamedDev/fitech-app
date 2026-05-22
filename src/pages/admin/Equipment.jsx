@@ -18,6 +18,7 @@ import { FilterDropdown } from '../../components/shared/FilterDropdown';
 import { Pagination } from '../../components/shared/Pagination';
 import { SearchInput } from '../../components/shared/SearchInput';
 import { PrimaryButton } from '../../components/shared/PrimaryButton';
+import AddEquipmentModal from '../../components/ui/AddEquipmentModal';
 
 const equipmentTypes = [
   { name: 'Treadmill Pro X1', category: 'Cardio', series: 'Series 5', image: 'https://images.unsplash.com/photo-1571008887538-b36bb32f4571?auto=format&fit=crop&q=80&w=800' },
@@ -127,6 +128,7 @@ export default function EquipmentPage() {
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
+  const [showAddEquipmentModal, setShowAddEquipmentModal] = useState(false);
   const itemsPerPage = 8;
 
   const filteredEquipments = useMemo(() => {
@@ -168,6 +170,9 @@ export default function EquipmentPage() {
   return (
     <div className='bg-secondary-100 min-h-screen p-4 sm:p-6 lg:p-8 w-full font-sans transition-all duration-300'>
       <div className="max-w-380 mx-auto w-full">
+        {showAddEquipmentModal && (
+          <AddEquipmentModal onClose={() => setShowAddEquipmentModal(false)} />
+        )}
 
         <div className="flex flex-wrap items-center w-full gap-6 mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
           <SearchInput
@@ -213,7 +218,7 @@ export default function EquipmentPage() {
               </button>
             </div>
 
-            <PrimaryButton icon={Plus}>
+            <PrimaryButton icon={Plus} onClick={() => setShowAddEquipmentModal(true)}>
               {t('Add Equipment')}
             </PrimaryButton>
           </div>
