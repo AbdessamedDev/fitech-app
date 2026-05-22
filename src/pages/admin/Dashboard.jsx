@@ -355,9 +355,9 @@ export default function Dashboard() {
 
 function MetricCard({ title, value, icon, trend, isPositive }) {
   return (
-    <div className="bg-secondary-50 p-6 rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.03)] border border-secondary-200 flex flex-col gap-5 hover:-translate-y-1.5 hover:shadow-[0_12px_40px_rgba(0,0,0,0.06)] transition-all duration-300 cursor-pointer">
+    <div className="group bg-secondary-50 p-6 rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.03)] border border-secondary-200 flex flex-col gap-5 hover:-translate-y-1.5 hover:border-primary-200 hover:shadow-[0_18px_42px_rgba(105,66,255,0.14)] transition-all duration-500 ease-out cursor-pointer">
       <div className="flex justify-between items-start">
-        <div className="w-14 h-14 rounded-full bg-primary-100 flex items-center justify-center">
+        <div className="w-14 h-14 rounded-full bg-primary-100 flex items-center justify-center transition-transform duration-500 ease-out group-hover:scale-110 group-hover:rotate-3">
           {icon}
         </div>
         <div className={`px-2.5 py-1.5 rounded-full text-[12px] font-bold flex items-center gap-1 ${isPositive ? 'bg-success-bg text-success' : 'bg-error-bg text-error'}`}>

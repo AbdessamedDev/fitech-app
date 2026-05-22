@@ -77,8 +77,8 @@ export default function Members() {
   ];
 
   return (
-    <div className='bg-secondary-50 min-h-screen py-8 px-4 sm:px-8 w-full flex justify-center text-sm'>
-      <div className="w-full max-w-420">
+    <div className='bg-secondary-100 min-h-screen py-8 px-4 sm:px-8 w-full flex justify-center text-sm'>
+      <div className="w-full max-w-380">
         {showModal && <AddMemberModal onClose={() => setShowModal(false)} />}
 
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-12 w-full">

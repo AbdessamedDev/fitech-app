@@ -8,7 +8,7 @@ import { ProTip } from '../../components/settings/ProTip';
 export default function Settings() {
   return (
     <div className="bg-secondary-100 min-h-screen p-4 sm:p-6 lg:p-8 w-full font-sans transition-all duration-300">
-      <div className="max-w-350 mx-auto w-full">
+      <div className="max-w-380 mx-auto w-full">
         <div className="flex flex-col xl:flex-row gap-6 items-stretch animate-in fade-in zoom-in-95 duration-500">
 
           {/* LEFT COLUMN */}

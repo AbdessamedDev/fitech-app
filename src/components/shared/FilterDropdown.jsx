@@ -35,7 +35,7 @@ export function FilterDropdown({ label, icon: Icon, options, value, onChange, cl
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-1 w-full bg-secondary-50 border border-secondary-300 rounded-md shadow-lg z-50 py-1 overflow-hidden min-w-max transform opacity-100 scale-100 origin-top transition-all animate-in fade-in zoom-in-95 duration-100">
+        <div className="absolute top-full right-0 mt-1 w-full bg-secondary-50 border border-secondary-300 rounded-md shadow-lg z-50 py-1 overflow-hidden transform opacity-100 scale-100 origin-top transition-all animate-in fade-in zoom-in-95 duration-100">
           {options.map((opt) => (
             <button
               key={opt.value}

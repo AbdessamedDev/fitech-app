@@ -199,7 +199,7 @@ export default function Shop() {
   };
 
   return (
-    <div className='bg-secondary-100 min-h-dvh p-8'>
+    <div className='bg-secondary-100 min-h-dvh p-8 max-w-420 mx-auto font-sans transition-all duration-300'>
       
       <div className="relative z-60 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         
@@ -266,21 +266,21 @@ export default function Shop() {
       </div>
 
       {/* Statistic Blocks Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-7 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
         {statBlocks.map((block, index) => (
           <StatisticBlockShop key={index} data={block} />
         ))}
       </div>
 
       {/* Product Grid Carousel */}
-      <div className="overflow-hidden w-full relative pt-1 pb-6 -mb-6 -mx-2 px-2">
+      <div className="overflow-hidden w-full relative pt-1 pb-6 -mb-6">
         <div 
           className="flex transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] will-change-transform w-full"
           style={{ transform: `translateX(-${(currentPage - 1) * 100}%)` }}
         >
           {Array.from({ length: totalPages }).map((_, pageIndex) => (
             <div key={pageIndex} className="w-full shrink-0">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 {filteredProducts.slice(pageIndex * itemsPerPage, (pageIndex + 1) * itemsPerPage).map(product => (
                   <div key={product.id} className="bg-secondary-50 md:rounded-2xl xl:rounded-[20px] border border-secondary-200 hover:shadow-xl transition-all duration-300 flex flex-col group cursor-pointer">
             {/* Image Box */}

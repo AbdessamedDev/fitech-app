@@ -45,6 +45,10 @@
   /* Font */
   --font-roboto: "Roboto", sans-serif;
   --font-sans: "Inter", sans-serif;
+
+  /* Icon bubble (Finance stat cards) */
+  --color-icon-bubble-bg: #E6DCFF;
+  --color-icon-bubble-fg: #6942FF;
 }
 
 /* =========================
@@ -89,6 +93,10 @@
 
   --color-suspended: #A5ADB8;
   --color-bg-suspended: #1E2428;
+
+  /* Icon bubble (Finance stat cards) — inverted */
+  --color-icon-bubble-bg: #6942FF;
+  --color-icon-bubble-fg: #E6DCFF;
 }
 
 /* =========================

@@ -30,6 +30,13 @@ import {
   CaretLeft,            // Pagination prev
   CaretRight,           // Pagination next
   CaretDown,
+  Stack,
+  Wallet,
+  PlusCircle,
+  ChartLineUp,
+  CalendarBlank,
+  Clock,
+  Pulse,
 
   UserCircleCheck,
   PiggyBank as PiggyBankIcon,
@@ -40,7 +47,7 @@ import {
   BoxingGlove as BoxingGloveIcon,
 
   MapPin,
-  
+
   SignOut,         //Sign Out
 
   // Shop specific icons
@@ -75,12 +82,31 @@ import {
   Star,
   ImageSquare,
   Check,
-  
+
   // Expose as original names for compatibility
   MagnifyingGlass,
   SquaresFour,
   Barbell,
-  CarProfileIcon
+  Car as CarProfileIcon,        // CarProfileIcon → Car (closest Phosphor equivalent)
+
+  // Reports specific icons
+  FileText as FileTextIcon,
+  ChartLine as ChartLineIcon,
+  Calendar as CalendarIcon,
+  CalendarDots as CalendarDotsIcon,
+  Clock as ClockIcon,
+  GearSix as GearSixIcon,
+  Files as FilesIcon,
+
+  // Finance specific icons
+  Wallet as WalletIcon,
+  CurrencyDollar as CurrencyDollarIcon,
+  Percent as PercentIcon,
+  Money as MoneyIcon,
+
+  // Finance page table icons
+  Receipt as ReceiptText,
+  DotsThreeVertical as MoreVertical,
 } from "@phosphor-icons/react";
 
 export {
@@ -114,6 +140,13 @@ export {
   CaretLeft,
   CaretRight,
   CaretDown,
+  Stack,
+  Wallet,
+  PlusCircle,
+  ChartLineUp,
+  CalendarBlank,
+  Clock,
+  Pulse,
 
   UserCircleCheck,
   PiggyBankIcon,
@@ -158,9 +191,28 @@ export {
   Star,
   ImageSquare,
   Check,
-  
+
   MagnifyingGlass,
   SquaresFour,
   Barbell,
-  CarProfileIcon
+  CarProfileIcon,
+
+  // Reports specific icons
+  FileTextIcon,
+  ChartLineIcon,
+  CalendarIcon,
+  CalendarDotsIcon,
+  ClockIcon,
+  GearSixIcon,
+  FilesIcon,
+
+  // Finance specific icons
+  WalletIcon,
+  CurrencyDollarIcon,
+  PercentIcon,
+  MoneyIcon,
+
+  // Finance page table icons
+  ReceiptText,
+  MoreVertical,
 };

@@ -171,7 +171,7 @@ export default function EquipmentPage() {
 
   return (
     <div className='bg-secondary-100 min-h-screen p-4 sm:p-6 lg:p-8 w-full font-sans transition-all duration-300'>
-      <div className="max-w-375 mx-auto w-full">
+      <div className="max-w-380 mx-auto w-full">
 
         {/* Controls Section */}
         <div className="flex flex-wrap items-center w-full gap-6 mb-8 animate-in fade-in slide-in-from-top-4 duration-500">

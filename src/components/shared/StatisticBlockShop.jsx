@@ -21,7 +21,7 @@ export default function StatisticBlockShop({ data }) {
 
   return (
     <div 
-      className={`relative overflow-hidden rounded-[20px] p-6 border group cursor-default transition-all duration-300 hover:shadow-lg ${data.bgColor === 'bg-secondary-50' ? 'bg-secondary-50 border-secondary-200' : data.bgColor + ' border-transparent'}`}
+      className={`relative overflow-hidden rounded-[20px] p-6 border group cursor-default transition-all duration-500 ease-out hover:-translate-y-1.5 hover:shadow-[0_18px_42px_rgba(105,66,255,0.14)] ${data.bgColor === 'bg-secondary-50' ? 'bg-secondary-50 border-secondary-200 hover:border-primary-200' : data.bgColor + ' border-transparent'}`}
     >
       <div className="relative z-10 flex flex-col h-full justify-between">
         <h3 className={`text-[15px] font-medium md:mb-1 lg:mb-2 xl:mb-3 2xl:mb-4 ${data.textColor === 'text-white' ? 'text-primary-100' : 'text-secondary-500'}`}>
@@ -40,7 +40,7 @@ export default function StatisticBlockShop({ data }) {
       </div>
       
       {data.hasBgIcon && (
-        <div className="absolute -right-2.5 -bottom-5 opacity-20 pointer-events-none group-hover:rotate-6 group-hover:scale-105 transition-all duration-500">
+        <div className="absolute -right-2.5 -bottom-5 opacity-20 pointer-events-none group-hover:rotate-6 group-hover:scale-110 transition-all duration-500 ease-out">
           <IconComponent size={140} weight="fill" className={data.iconColor} />
         </div>
       )}
