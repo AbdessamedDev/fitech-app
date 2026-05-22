@@ -1,34 +1,29 @@
-// Centralized icon file; Here we import all icons that needed for the project
-
 import {
-  SquaresFour as SquaresFourIcon,      // Dashboard
-  Users,                // Members
-  IdentificationCard,   // Subscriptions
-  Money,                // Finance
-  Barbell as BarbellIcon,          // Equipment
-  FileText,             // Reports
-  ShoppingCart,         // Shop
-  Gear,                 // Settings 
+  SquaresFour as SquaresFourIcon,
+  Users,
+  IdentificationCard,
+  Money,
+  Barbell as BarbellIcon,
+  FileText,
+  ShoppingCart,
+  Gear,
   List,
   Bell,
   Moon,
   SunDim,
-
-  MagnifyingGlass as MagnifyingGlassIcon,      // Search
-  SlidersHorizontal,    // Sort
-  Funnel,               // Filter
-  UserPlus,             // Add Member
-  FileCloud,            // Import
-
-  User,                 // Full Name
-  EnvelopeSimple,       // Email
-  Phone,                // Phone
-  WarningCircle,        // Status
-  Calendar,             // Expiry Date
-
-  DotsThreeVertical,    // Operations (3 dots)
-  CaretLeft,            // Pagination prev
-  CaretRight,           // Pagination next
+  MagnifyingGlass as MagnifyingGlassIcon,
+  SlidersHorizontal,
+  Funnel,
+  UserPlus,
+  FileCloud,
+  User,
+  EnvelopeSimple,
+  Phone,
+  WarningCircle,
+  Calendar,
+  DotsThreeVertical,
+  CaretLeft,
+  CaretRight,
   CaretDown,
   Stack,
   Wallet,
@@ -37,7 +32,6 @@ import {
   CalendarBlank,
   Clock,
   Pulse,
-
   UserCircleCheck,
   PiggyBank as PiggyBankIcon,
   TrendUp,
@@ -45,12 +39,8 @@ import {
   CreditCard,
   Megaphone,
   BoxingGlove as BoxingGloveIcon,
-
   MapPin,
-
-  SignOut,         //Sign Out
-
-  // Shop specific icons
+  SignOut,
   ClipboardText,
   Warning,
   Package,
@@ -58,11 +48,9 @@ import {
   PencilSimple,
   Trash,
   Plus,
-
   QrCode,
   Tag,
   Pulse as PulseIcon,
-
   ShieldCheck,
   BellRinging,
   Palette,
@@ -70,15 +58,12 @@ import {
   CheckCircle,
   LockKey,
   Mailbox as MailboxIcon,
-
   Monitor as MonitorIcon,
   DeviceMobileCamera as DeviceMobileCameraIcon,
   DeviceTabletCamera as DeviceTabletCameraIcon,
   Laptop as LaptopIcon,
   X as XIcon,
-
   ChatCircleText,
-
   Star,
   ImageSquare,
   Check,
@@ -119,23 +104,19 @@ export {
   ShoppingCart,
   Gear,
   List,
-
   Bell,
   Moon,
   SunDim,
-
   MagnifyingGlassIcon,
   SlidersHorizontal,
   Funnel,
   UserPlus,
   FileCloud,
-
   User,
   EnvelopeSimple,
   Phone,
   WarningCircle,
   Calendar,
-
   DotsThreeVertical,
   CaretLeft,
   CaretRight,
@@ -147,7 +128,6 @@ export {
   CalendarBlank,
   Clock,
   Pulse,
-
   UserCircleCheck,
   PiggyBankIcon,
   TrendUp,
@@ -155,11 +135,8 @@ export {
   CreditCard,
   Megaphone,
   BoxingGloveIcon,
-
   MapPin,
-
   SignOut,
-
   ClipboardText,
   Warning,
   Package,
@@ -167,11 +144,9 @@ export {
   PencilSimple,
   Trash,
   Plus,
-
   QrCode,
   Tag,
   PulseIcon,
-
   ShieldCheck,
   BellRinging,
   Palette,
@@ -179,15 +154,12 @@ export {
   CheckCircle,
   LockKey,
   MailboxIcon,
-
   MonitorIcon,
   DeviceMobileCameraIcon,
   DeviceTabletCameraIcon,
   LaptopIcon,
   XIcon,
-
   ChatCircleText,
-
   Star,
   ImageSquare,
   Check,
