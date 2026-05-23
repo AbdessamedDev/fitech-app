@@ -32,7 +32,9 @@ export function ActiveSessions() {
                 </div>
                 <div className="flex-1 min-w-0 flex flex-col justify-center">
                   <p className="font-bold text-secondary-800 text-[14px] leading-tight truncate">{session.device}</p>
-                  <p className="text-secondary-400 text-[12px] font-medium leading-tight truncate mt-0.5">{session.location} • {session.isCurrent ? t('Active Now') : session.time}</p>
+                  <p className="text-secondary-400 text-[12px] font-medium leading-tight truncate mt-0.5">
+                    {t(session.location)} • {session.isCurrent ? t('Active Now') : t(session.time)}
+                  </p>
                 </div>
                 {session.isCurrent ? (
                   <span className="shrink-0 px-2 py-1 rounded-sm text-[10px] tracking-wide uppercase font-extrabold bg-success-bg text-success">

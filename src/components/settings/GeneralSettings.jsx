@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { loadScopedSettings, saveScopedSettings } from './settingsPreferences';
 
 function CustomSelect({ value, onChange, options }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -59,11 +60,17 @@ const timeOptions = [
   '06:00 PM', '07:00 PM', '08:00 PM', '09:00 PM', '10:00 PM'
 ];
 
-export function GeneralSettings() {
+export function GeneralSettings({ scope = 'admin' }) {
   const { t } = useTranslation();
-  const [timeZone, setTimeZone] = useState('GMT -08:00 Pacific Time');
-  const [startTime, setStartTime] = useState('08:00 AM');
-  const [endTime, setEndTime] = useState('06:00 PM');
+  const scopedSettings = loadScopedSettings(scope);
+  const [timeZone, setTimeZone] = useState(scopedSettings.timeZone);
+  const [startTime, setStartTime] = useState(scopedSettings.startTime);
+  const [endTime, setEndTime] = useState(scopedSettings.endTime);
+  const [sessionDuration, setSessionDuration] = useState(scopedSettings.sessionDuration);
+
+  const updateSetting = (key, value) => {
+    saveScopedSettings(scope, { [key]: value });
+  };
 
   return (
     <div className="bg-secondary-50 border border-secondary-200 rounded-xl shadow-sm overflow-visible">
@@ -79,7 +86,7 @@ export function GeneralSettings() {
           {/* Time Zone */}
           <div className="space-y-1.5 relative z-30">
             <label className="text-[13px] font-extrabold text-secondary-700">{t('Time zone')}</label>
-            <CustomSelect value={timeZone} onChange={setTimeZone} options={tzOptions} />
+            <CustomSelect value={timeZone} onChange={(value) => { setTimeZone(value); updateSetting('timeZone', value); }} options={tzOptions} />
           </div>
 
           {/* Default Session Duration */}
@@ -88,7 +95,12 @@ export function GeneralSettings() {
             <div className="relative flex items-center">
               <input
                 type="number"
-                defaultValue={60}
+                value={sessionDuration}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  setSessionDuration(value);
+                  updateSetting('sessionDuration', value);
+                }}
                 className="flex-1 h-[42px] ltr:pl-4 rtl:pr-4 ltr:pr-16 rtl:pl-16 rounded-lg border border-secondary-300 bg-secondary-50 focus:outline-none focus:border-primary-600 focus:ring-4 focus:ring-primary-50 transition-all shadow-sm text-[14px] font-medium text-secondary-700 hover:border-secondary-400"
               />
               <span className="absolute ltr:right-4 rtl:left-4 text-[14px] text-secondary-400 font-bold select-none">{t('mins')}</span>
@@ -103,11 +115,11 @@ export function GeneralSettings() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="space-y-1.5">
             <label className="text-[13px] font-extrabold text-secondary-700">{t('Start Time')}</label>
-            <CustomSelect value={startTime} onChange={setStartTime} options={timeOptions} />
+            <CustomSelect value={startTime} onChange={(value) => { setStartTime(value); updateSetting('startTime', value); }} options={timeOptions} />
           </div>
           <div className="space-y-1.5">
             <label className="text-[13px] font-extrabold text-secondary-700">{t('End Time')}</label>
-            <CustomSelect value={endTime} onChange={setEndTime} options={timeOptions} />
+            <CustomSelect value={endTime} onChange={(value) => { setEndTime(value); updateSetting('endTime', value); }} options={timeOptions} />
           </div>
         </div>
       </div>

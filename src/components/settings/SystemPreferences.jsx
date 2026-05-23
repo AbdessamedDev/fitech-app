@@ -1,29 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { SunDim, Moon, CaretDown } from '../../icons/index';
 import { useTranslation } from 'react-i18next';
+import { getLanguageCode, loadScopedSettings, saveScopedSettings } from './settingsPreferences';
 
-export function SystemPreferences() {
+export function SystemPreferences({ scope = 'admin' }) {
   const { t, i18n } = useTranslation();
-  const [unit, setUnit] = useState('metric');
-  const [theme, setTheme] = useState(() => 
-    document.documentElement.classList.contains('dark') ? 'dark' : 'light'
-  );
-  
-  // Initialize with current i18n language, map back to English names for select value.
-  const [language, setLanguage] = useState(() => {
-     const lang = i18n.language || 'en';
-     if(lang === 'ar') return 'Arabic';
-     if(lang === 'fr') return 'French (France)';
-     if(lang === 'es') return 'Spanish (Spain)';
-     return 'English (United States)';
-  });
-
-  const languageMap = {
-    'English (United States)': 'en',
-    'French (France)': 'fr',
-    'Spanish (Spain)': 'es',
-    'Arabic': 'ar'
-  };
+  const scopedSettings = loadScopedSettings(scope);
+  const [unit, setUnit] = useState(scopedSettings.unit);
+  const [theme, setTheme] = useState(scopedSettings.theme);
+  const [language, setLanguage] = useState(scopedSettings.language);
 
   const [isLangOpen, setIsLangOpen] = useState(false);
   const langDropdownRef = useRef(null);
@@ -39,10 +24,10 @@ export function SystemPreferences() {
   }, []);
 
   const languageOptions = [
-    { value: 'English (United States)', label: 'English (United States)' },
-    { value: 'French (France)', label: 'French (France)' },
-    { value: 'Spanish (Spain)', label: 'Spanish (Spain)' },
-    { value: 'Arabic', label: 'Arabic' },
+    { value: 'English (United States)', labelKey: 'English (United States)' },
+    { value: 'French (France)', labelKey: 'French (France)' },
+    { value: 'Spanish (Spain)', labelKey: 'Spanish (Spain)' },
+    { value: 'Arabic', labelKey: 'Arabic' },
   ];
 
   // Handle Theme
@@ -61,6 +46,8 @@ export function SystemPreferences() {
   }, []);
 
   const handleThemeChange = (newTheme) => {
+    setTheme(newTheme);
+    saveScopedSettings(scope, { theme: newTheme });
     if (newTheme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
@@ -68,18 +55,19 @@ export function SystemPreferences() {
     }
   };
 
-  // Handle Language Direction & Content Update
-  useEffect(() => {
-    const langCode = languageMap[language];
-    if (langCode) {
-      i18n.changeLanguage(langCode);
-      if (langCode === 'ar') {
-        document.documentElement.dir = 'rtl';
-      } else {
-        document.documentElement.dir = 'ltr';
-      }
-    }
-  }, [language, i18n]);
+  const handleUnitChange = (nextUnit) => {
+    setUnit(nextUnit);
+    saveScopedSettings(scope, { unit: nextUnit });
+  };
+
+  const handleLanguageChange = (nextLanguage) => {
+    const languageCode = getLanguageCode(nextLanguage);
+    setLanguage(nextLanguage);
+    saveScopedSettings(scope, { language: nextLanguage, languageCode });
+    i18n.changeLanguage(languageCode);
+    document.documentElement.dir = languageCode === 'ar' ? 'rtl' : 'ltr';
+    setIsLangOpen(false);
+  };
 
   return (
     <div className="bg-secondary-200/40 border border-secondary-300 rounded-xl shadow-sm p-6">
@@ -90,7 +78,7 @@ export function SystemPreferences() {
         <p className="text-[12px] font-bold tracking-widest uppercase text-secondary-400 mb-2">{t('MEASUREMENT UNITS')}</p>
         <div className="flex items-center rounded-lg overflow-hidden p-1 bg-secondary-100">
           <button
-            onClick={() => setUnit('metric')}
+            onClick={() => handleUnitChange('metric')}
             className={`flex-1 h-[38px] text-[13px] font-bold rounded-md transition-all duration-200 cursor-pointer ${
               unit === 'metric'
                 ? 'bg-secondary-50 text-secondary-800 shadow-sm border border-secondary-200'
@@ -100,7 +88,7 @@ export function SystemPreferences() {
             {t('Metric')}
           </button>
           <button
-            onClick={() => setUnit('imperial')}
+            onClick={() => handleUnitChange('imperial')}
             className={`flex-1 h-[38px] text-[13px] font-bold rounded-md transition-all duration-200 cursor-pointer ${
               unit === 'imperial'
                 ? 'bg-secondary-50 text-secondary-800 shadow-sm border border-secondary-200'
@@ -149,7 +137,7 @@ export function SystemPreferences() {
             onClick={() => setIsLangOpen(!isLangOpen)}
             className={`w-full h-[42px] px-4 flex items-center justify-between rounded-lg border bg-secondary-50/50 transition-all shadow-sm text-[13px] cursor-pointer ${isLangOpen ? 'border-primary-600 ring-2 ring-primary-50 text-secondary-800 font-bold' : 'border-secondary-200 hover:border-secondary-300 text-secondary-800 font-bold'}`}
           >
-            <span className="rtl:mt-1">{languageOptions.find(opt => opt.value === language)?.label || language}</span>
+            <span className="rtl:mt-1">{t(languageOptions.find(opt => opt.value === language)?.labelKey || language)}</span>
             <CaretDown size={14} className={`text-secondary-400 transition-transform duration-200 ${isLangOpen ? 'rotate-180' : ''}`} />
           </button>
 
@@ -158,10 +146,10 @@ export function SystemPreferences() {
               {languageOptions.map((opt) => (
                 <button
                   key={opt.value}
-                  onClick={() => { setLanguage(opt.value); setIsLangOpen(false); }}
+                  onClick={() => handleLanguageChange(opt.value)}
                   className={`w-full text-left rtl:text-right px-4 flex items-center justify-between py-2 text-[13px] transition-colors ${language === opt.value ? 'bg-primary-50/50 text-primary-600 font-extrabold' : 'text-secondary-600 font-medium hover:bg-secondary-100 hover:text-secondary-800'}`}
                 >
-                  <span className="rtl:mt-1">{opt.label}</span>
+                  <span className="rtl:mt-1">{t(opt.labelKey)}</span>
                   {language === opt.value && (
                     <div className="w-1.5 h-1.5 rounded-full bg-primary-600"></div>
                   )}

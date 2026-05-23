@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../components/ui/Table'
 import { FilterDropdown } from '../../components/shared/FilterDropdown'
 import { Pagination } from '../../components/shared/Pagination'
@@ -64,6 +65,7 @@ const SORT_W   = 126 + 178        // 304
 const FILTER_W = 200
 
 function StatCard({ stat }) {
+  const { t } = useTranslation()
   const Icon = stat.icon
   const isPositive = stat.trend === 'up'
   return (
@@ -85,21 +87,23 @@ function StatCard({ stat }) {
         </span>
       </div>
       <div className="mt-[34px]">
-        <p className="text-[15px] font-medium leading-none text-secondary-600">{stat.label}</p>
+        <p className="text-[15px] font-medium leading-none text-secondary-600">{t(stat.label)}</p>
         <p className="mt-3 text-[39px] font-black leading-[0.95] tracking-normal text-secondary-900">{stat.value}</p>
-        <p className="mt-4 text-[12px] font-medium leading-none text-secondary-500">vs last month</p>
+        <p className="mt-4 text-[12px] font-medium leading-none text-secondary-500">{t('vs last month')}</p>
       </div>
     </section>
   )
 }
 
 function FinanceHeaderCell({ icon: Icon, title, className = '', showDivider = true }) {
+  const { t } = useTranslation()
+
   return (
     <TableHead className={`h-[40px] p-0 align-middle ${className}`}>
       <div className="flex h-full items-center justify-between">
         <div className="flex flex-1 items-center justify-center gap-2 px-3 text-[13px] font-extrabold leading-none text-secondary-700">
           {Icon && <Icon size={16} strokeWidth={2.2} />}
-          <span>{title}</span>
+          <span>{t(title)}</span>
         </div>
         {showDivider && <span className="h-[24px] w-px bg-secondary-300" />}
       </div>
@@ -116,6 +120,7 @@ function FinanceCell({ children, className = '' }) {
 }
 
 export default function Finance() {
+  const { t } = useTranslation()
   const [search,      setSearch]      = useState('')
   const [sortBy,      setSortBy]      = useState('All')
   const [filterBy,    setFilterBy]    = useState('All')
@@ -267,7 +272,7 @@ export default function Finance() {
                 <FinanceCell>{row.name}</FinanceCell>
                 <FinanceCell>{row.email}</FinanceCell>
                 <FinanceCell className="text-[14px] font-extrabold text-success">{row.amount}</FinanceCell>
-                <FinanceCell>{row.subscription}</FinanceCell>
+                <FinanceCell>{t(row.subscription)}</FinanceCell>
                 <FinanceCell>{row.date}</FinanceCell>
                 <FinanceCell>{row.time}</FinanceCell>
                 <FinanceCell className="px-0">

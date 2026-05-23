@@ -17,7 +17,9 @@ export function FilterDropdown({ label, icon: Icon, options, value, onChange, cl
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const selectedLabel = value !== 'All' && !label.includes('Sort') ? t(value) : t(label);
+  const isActive = value !== 'All';
+  const selectedOption = options.find((opt) => opt.value === value);
+  const selectedLabel = isActive ? (selectedOption?.label ?? label) : label;
 
   return (
     <div className={`relative min-w-[140px] ${className}`} ref={dropdownRef}>
@@ -27,8 +29,8 @@ export function FilterDropdown({ label, icon: Icon, options, value, onChange, cl
       >
         <div className="flex items-center gap-2">
           {Icon && <Icon size={18} />}
-          <span className={value !== 'All' && !label.includes('Sort') ? 'text-primary-800 font-bold' : ''}>
-            {selectedLabel}
+          <span className={isActive ? 'text-primary-600 font-bold' : ''}>
+            {t(selectedLabel)}
           </span>
         </div>
         <CaretDown size={14} className={`text-secondary-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />

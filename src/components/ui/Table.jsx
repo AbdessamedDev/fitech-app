@@ -43,9 +43,9 @@ export function TableHead({ children, className = '' }) {
   )
 }
 
-export function TableCell({ children, className = '' }) {
+export function TableCell({ children, className = '', ...props }) {
   return (
-    <td className={`px-4 py-2 text-sm text-secondary-500 whitespace-nowrap ${className}`}>
+    <td className={`px-4 py-2 text-sm text-secondary-500 whitespace-nowrap ${className}`} {...props}>
       {children}
     </td>
   )

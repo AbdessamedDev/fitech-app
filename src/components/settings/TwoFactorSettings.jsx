@@ -1,10 +1,18 @@
 import { useState } from 'react';
 import { LockKey } from '../../icons/index';
 import { useTranslation } from 'react-i18next';
+import { loadScopedSettings, saveScopedSettings } from './settingsPreferences';
 
-export function TwoFactorSettings() {
+export function TwoFactorSettings({ scope = 'admin' }) {
   const { t } = useTranslation();
-  const [twoFa, setTwoFa] = useState(true);
+  const [twoFa, setTwoFa] = useState(() => loadScopedSettings(scope).twoFactor);
+
+  const toggleTwoFactor = () => {
+    setTwoFa((current) => {
+      saveScopedSettings(scope, { twoFactor: !current });
+      return !current;
+    });
+  };
 
   return (
     <div className="bg-secondary-50 border border-secondary-200 rounded-2xl shadow-sm p-8">
@@ -15,7 +23,7 @@ export function TwoFactorSettings() {
         </div>
         {/* Toggle */}
         <button
-          onClick={() => setTwoFa(!twoFa)}
+          onClick={toggleTwoFactor}
           className={`relative w-11 h-[24px] rounded-full transition-colors duration-300 shrink-0 cursor-pointer ${twoFa ? 'bg-primary-600' : 'bg-secondary-300'}`}
         >
           <span className={`absolute top-[2px] ltr:left-[2px] rtl:right-[2px] w-[20px] h-[20px] rounded-full bg-white shadow-sm transition-transform duration-300 ${twoFa ? 'ltr:translate-x-[20px] rtl:-translate-x-[20px]' : 'translate-x-0'}`} />

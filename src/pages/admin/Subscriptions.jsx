@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   CalendarBlank,
   CheckCircle,
@@ -100,6 +101,7 @@ const statToneStyles = {
 }
 
 function StatCard({ stat }) {
+  const { t } = useTranslation()
   const Icon = stat.icon
   const tone = statToneStyles[stat.tone]
 
@@ -112,13 +114,13 @@ function StatCard({ stat }) {
             <Icon size={26} weight="bold" />
           </div>
           <span className="subscription-stat-badge rounded-[18px] bg-success-bg px-3 py-1.5 text-[13px] font-extrabold leading-none text-success">
-            {stat.note}
+            {t(stat.note)}
           </span>
         </div>
 
         <div>
-          <p className="subscription-stat-label text-[16px] font-medium leading-none text-primary-600">{stat.label}</p>
-          <p className="subscription-stat-value mt-4 text-[39px] font-black leading-none tracking-normal text-secondary-900">{stat.value}</p>
+          <p className="subscription-stat-label text-[16px] font-medium leading-none text-primary-600">{t(stat.label)}</p>
+          <p className="subscription-stat-value mt-4 text-[39px] font-black leading-none tracking-normal text-secondary-900">{t(stat.value)}</p>
         </div>
       </div>
     </section>
@@ -126,6 +128,8 @@ function StatCard({ stat }) {
 }
 
 function RevenueCard() {
+  const { t } = useTranslation()
+
   return (
     <section className="subscription-revenue-card group h-[206px] overflow-hidden rounded-[14px] bg-linear-to-br from-[#251467] via-[#2B176D] to-[#372170] px-8 py-8 text-white shadow-[0_14px_34px_rgba(38,20,103,0.32)] transition-all duration-500 ease-out hover:-translate-y-1.5 hover:shadow-[0_24px_54px_rgba(38,20,103,0.46)]">
       <div className="flex items-start justify-between gap-4">
@@ -138,7 +142,7 @@ function RevenueCard() {
       </div>
 
       <div className="mt-[34px]">
-        <p className="text-[17px] font-medium leading-none text-[#AFA3E2]">Monthly Revenue</p>
+        <p className="text-[17px] font-medium leading-none text-[#AFA3E2]">{t('Monthly Revenue')}</p>
         <p className="mt-4 text-[43px] font-black leading-none tracking-normal text-white">$42,850</p>
       </div>
     </section>
@@ -146,12 +150,14 @@ function RevenueCard() {
 }
 
 function HeaderCell({ icon: Icon, title, className = '', showDivider = true }) {
+  const { t } = useTranslation()
+
   return (
     <TableHead className={`h-[48px] p-0 align-middle ${className}`}>
       <div className="flex h-full items-center justify-between">
         <div className="flex flex-1 items-center justify-center gap-2 px-3 text-[15px] font-semibold leading-none text-secondary-500">
           {Icon && <Icon size={17} weight="bold" />}
-          <span>{title}</span>
+          <span>{t(title)}</span>
         </div>
         {showDivider && <span className="h-[28px] w-px bg-secondary-300" />}
       </div>
@@ -168,14 +174,17 @@ function PlanCell({ children, className = '' }) {
 }
 
 function StatusBadge({ status }) {
+  const { t } = useTranslation()
+
   return (
     <span className={`inline-flex h-[24px] min-w-[68px] items-center justify-center rounded-full px-3 text-[11px] font-extrabold leading-none ${statusStyles[status]}`}>
-      {status}
+      {t(status)}
     </span>
   )
 }
 
 export default function Subscriptions() {
+  const { t } = useTranslation()
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState('All')
   const [status, setStatus] = useState('All')
@@ -329,7 +338,7 @@ export default function Subscriptions() {
 
           <button className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-[10px] bg-primary-600 px-5 text-[14px] font-bold text-white shadow-[0_8px_18px_rgba(105,66,255,0.26)] transition-all duration-200 ease-out hover:bg-primary-700 active:scale-[0.98]">
             <PlusCircle size={20} weight="bold" />
-            Add Plan
+            {t('Add Plan')}
           </button>
         </div>
 
@@ -357,13 +366,13 @@ export default function Subscriptions() {
           <TableBody>
             {paginatedPlans.map((plan) => (
               <TableRow key={plan.id} className="border-b border-secondary-200 bg-secondary-50 last:border-b-0 hover:bg-secondary-100">
-                <PlanCell>{plan.name}</PlanCell>
+                <PlanCell>{t(plan.name)}</PlanCell>
                 <PlanCell>{plan.price}</PlanCell>
                 <PlanCell>
                   <StatusBadge status={plan.status} />
                 </PlanCell>
                 <PlanCell>{plan.sessions}</PlanCell>
-                <PlanCell>{plan.duration}</PlanCell>
+                <PlanCell>{t(plan.duration)}</PlanCell>
                 <PlanCell>{plan.createdAt}</PlanCell>
                 <PlanCell className="px-0">
                   <button className="inline-flex h-7 w-7 items-center justify-center rounded-full text-secondary-700 transition-colors hover:bg-secondary-200">

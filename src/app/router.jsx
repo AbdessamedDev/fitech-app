@@ -9,7 +9,19 @@ import Equipment from '../pages/admin/Equipment'
 import Reports from '../pages/admin/Reports'
 import Shop from '../pages/admin/Shop'
 import Settings from '../pages/admin/Settings'
+import Clients from '../pages/coach/Clients'
 import LoginPage from '../pages/auth/LoginPage'
+import { useTranslation } from 'react-i18next'
+
+function ComingSoonPage({ title }) {
+  const { t } = useTranslation()
+
+  return (
+    <div className="p-8 h-full flex items-center justify-center">
+      <h1 className="text-2xl font-bold text-secondary-500">{t(`${title} - Coming Soon`)}</h1>
+    </div>
+  )
+}
 
 export const router = createBrowserRouter([
   {
@@ -50,7 +62,7 @@ export const router = createBrowserRouter([
       },
       {
         path: '/admin/settings',
-        element: <Settings />,
+        element: <Settings scope="admin" />,
       },
     ],
   },
@@ -68,27 +80,27 @@ export const router = createBrowserRouter([
       },
       {
         path: '/coach/clients',
-        element: <div className="p-8 h-full flex items-center justify-center"><h1 className="text-2xl font-bold text-secondary-500">Clients - Coming Soon</h1></div>,
+        element: <Clients />,
       },
       {
         path: '/coach/programs',
-        element: <div className="p-8 h-full flex items-center justify-center"><h1 className="text-2xl font-bold text-secondary-500">Programs - Coming Soon</h1></div>,
+        element: <ComingSoonPage title="Programs" />,
       },
       {
         path: '/coach/exercises',
-        element: <div className="p-8 h-full flex items-center justify-center"><h1 className="text-2xl font-bold text-secondary-500">Exercises - Coming Soon</h1></div>,
+        element: <ComingSoonPage title="Exercises" />,
       },
       {
         path: '/coach/schedule',
-        element: <div className="p-8 h-full flex items-center justify-center"><h1 className="text-2xl font-bold text-secondary-500">Schedule - Coming Soon</h1></div>,
+        element: <ComingSoonPage title="Schedule" />,
       },
       {
         path: '/coach/messaging',
-        element: <div className="p-8 h-full flex items-center justify-center"><h1 className="text-2xl font-bold text-secondary-500">Messaging - Coming Soon</h1></div>,
+        element: <ComingSoonPage title="Messaging" />,
       },
       {
         path: '/coach/settings',
-        element: <Settings />, // Reuse admin settings for now
+        element: <Settings scope="coach" />,
       },
     ],
   },

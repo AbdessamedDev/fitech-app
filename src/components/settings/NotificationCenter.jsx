@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { loadScopedSettings, saveScopedSettings } from './settingsPreferences';
 
 const items = [
   { id: 'new_messages', labelKey: 'New Messages', defaultChecked: true },
@@ -8,13 +9,15 @@ const items = [
   { id: 'push_notifs', labelKey: 'Push Notifications', defaultChecked: true },
 ];
 
-export function NotificationCenter() {
+export function NotificationCenter({ scope = 'admin' }) {
   const { t } = useTranslation();
-  const [checked, setChecked] = useState(() =>
-    Object.fromEntries(items.map(i => [i.id, i.defaultChecked]))
-  );
+  const [checked, setChecked] = useState(() => loadScopedSettings(scope).notifications);
 
-  const toggle = (id) => setChecked(prev => ({ ...prev, [id]: !prev[id] }));
+  const toggle = (id) => setChecked(prev => {
+    const next = { ...prev, [id]: !prev[id] };
+    saveScopedSettings(scope, { notifications: next });
+    return next;
+  });
 
   return (
     <div className="rounded-2xl overflow-hidden shadow-sm relative" style={{background: 'linear-gradient(135deg, #7c3aed 0%, #6942ff 100%)'}}>

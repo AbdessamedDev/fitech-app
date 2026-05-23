@@ -3,7 +3,7 @@ import { CaretRight, Moon, SunDim, Bell, Gear } from "../../icons/index"
 import Logo from "../../assets/Logo.png"
 import { useTranslation } from 'react-i18next';
 
-export function Navbar({ title = 'Dashboard', hasNotification = true }) {
+export function Navbar({ title = 'Dashboard', hasNotification = true, role = 'admin' }) {
   const { t } = useTranslation();
 
   const [isDark, setIsDark] = useState(() =>
@@ -74,7 +74,7 @@ export function Navbar({ title = 'Dashboard', hasNotification = true }) {
               Olivia Buckhorton
             </p>
             <p className="text-xs font-normal text-secondary-500">
-              {t('Admin')}
+              {t(role === 'coach' ? 'Coach' : 'Admin')}
             </p>
           </div>
         </div>

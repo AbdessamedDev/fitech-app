@@ -5,7 +5,7 @@ import { NotificationCenter } from '../../components/settings/NotificationCenter
 import { SystemPreferences } from '../../components/settings/SystemPreferences';
 import { ProTip } from '../../components/settings/ProTip';
 
-export default function Settings() {
+export default function Settings({ scope = 'admin' }) {
   return (
     <div className="bg-secondary-100 min-h-screen p-4 sm:p-6 lg:p-8 w-full font-sans transition-all duration-300">
       <div className="max-w-380 mx-auto w-full">
@@ -13,15 +13,15 @@ export default function Settings() {
 
           {/* LEFT COLUMN */}
           <div className="flex-1 min-w-0 flex flex-col justify-start gap-4 xl:gap-12.5">
-            <GeneralSettings />
-            <TwoFactorSettings />
+            <GeneralSettings scope={scope} />
+            <TwoFactorSettings scope={scope} />
             <ActiveSessions />
           </div>
 
           {/* RIGHT COLUMN */}
           <div className="w-full xl:w-[320px] shrink-0 flex flex-col gap-4">
-            <NotificationCenter />
-            <SystemPreferences />
+            <NotificationCenter scope={scope} />
+            <SystemPreferences scope={scope} />
             <ProTip />
           </div>
 

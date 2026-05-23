@@ -39,7 +39,7 @@ export default function AddProductModal({ onClose }) {
   const handleFileChange = (e) => setForm({ ...form, image: e.target.files[0] });
 
   return (
-    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-end p-4">
+    <div className="fixed inset-0 bg-black/40 z-100 flex items-center justify-end p-4">
       <div className={`bg-white w-[480px] h-[calc(100vh-32px)] shadow-2xl flex flex-col rounded-2xl transition-all duration-300 ${isClosing ? 'translate-x-full opacity-0' : 'translate-x-0 opacity-100'}`}>
 
         {/* Header */}
