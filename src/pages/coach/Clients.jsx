@@ -1,9 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../components/ui/Table'
 import { FilterDropdown } from '../../components/shared/FilterDropdown'
 import { Pagination } from '../../components/shared/Pagination'
 import { SearchInput } from '../../components/shared/SearchInput'
+import { TableOperationsDropdown } from '../../components/shared/TableOperationsDropdown'
+import { ArrowClockwise } from '@phosphor-icons/react'
 import {
   CalendarIcon,
   EnvelopeSimple,
@@ -13,6 +15,9 @@ import {
   Phone,
   SlidersHorizontal,
   User,
+  ClipboardText,
+  Eye,
+  ChatCircleText,
 } from '../../icons/index'
 
 const ROWS_PER_PAGE = 15
@@ -30,11 +35,26 @@ const clientSeeds = [
   { name: 'Zara Khan', email: 'z.khan@gmail...', phone: '+2137748120', date: 'Jul 01, 2026', joinedAt: '2026-07-01' },
 ]
 
+const mockProgramsList = [
+  ['Elite HIIT 30', 'Zen Flow Yoga'],
+  ['Power Lifting', 'Cardio Blast', 'CrossFit X', 'Pilates Core', 'Spin Studio'],
+  ['Zen Flow Yoga'],
+  ['Cardio Blast', 'Elite HIIT 30', 'Boxing Basics'],
+  ['CrossFit X', 'Pilates Core', 'Spin Studio', 'Aqua Aerobics', 'Boxing Basics'],
+  ['Elite HIIT 30'],
+  ['Power Lifting', 'CrossFit X'],
+  ['Zen Flow Yoga', 'Pilates Core'],
+  ['Cardio Blast'],
+  ['Boxing Basics', 'Aqua Aerobics', 'Spin Studio']
+]
+
 const clients = Array.from({ length: 390 }, (_, index) => {
   const seed = clientSeeds[index % clientSeeds.length]
+  const programs = mockProgramsList[index % mockProgramsList.length]
   return {
     id: index + 1,
     ...seed,
+    programs,
     name: index < ROWS_PER_PAGE ? 'ishaq Boukaddah' : seed.name,
     email: index < ROWS_PER_PAGE ? 'i.boukadeh@gmail...' : seed.email,
     phone: index < ROWS_PER_PAGE ? '+2136171813' : seed.phone,
@@ -81,6 +101,19 @@ export default function Clients() {
   const [sortBy, setSortBy] = useState('All')
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedIds, setSelectedIds] = useState([])
+  const [activeProgramsClientId, setActiveProgramsClientId] = useState(null)
+
+  useEffect(() => {
+    function handleGlobalClick() {
+      setActiveProgramsClientId(null)
+    }
+    if (activeProgramsClientId !== null) {
+      document.addEventListener('click', handleGlobalClick)
+    }
+    return () => {
+      document.removeEventListener('click', handleGlobalClick)
+    }
+  }, [activeProgramsClientId])
 
   const visibleClients = useMemo(() => {
     const query = search.trim().toLowerCase()
@@ -198,11 +231,12 @@ export default function Clients() {
         <Table className="mt-8 w-full overflow-hidden rounded-lg border border-secondary-200 bg-secondary-50 shadow-none">
           <colgroup>
             <col className="w-[48px]" />
-            <col className="w-[190px]" />
-            <col className="w-[210px]" />
             <col className="w-[170px]" />
-            <col className="w-[190px]" />
-            <col className="w-[150px]" />
+            <col className="w-[200px]" />
+            <col className="w-[140px]" />
+            <col className="w-[160px]" />
+            <col className="w-[180px]" />
+            <col className="w-[110px]" />
           </colgroup>
 
           <TableHeader className="border-b border-secondary-200 bg-secondary-100">
@@ -229,6 +263,7 @@ export default function Clients() {
               <HeaderCell icon={EnvelopeSimple} title="Email" />
               <HeaderCell icon={Phone} title="Phone" />
               <HeaderCell icon={CalendarIcon} title="Registration Date" />
+              <HeaderCell icon={ClipboardText} title="Programs" />
               <HeaderCell icon={GearSixIcon} title="Operations" showDivider={false} />
             </TableRow>
           </TableHeader>
@@ -253,14 +288,75 @@ export default function Clients() {
                 <ClientCell>{client.email}</ClientCell>
                 <ClientCell>{client.phone}</ClientCell>
                 <ClientCell>{client.date}</ClientCell>
-                <ClientCell className="px-0">
-                  <button
-                    type="button"
-                    aria-label={`Open actions for ${client.name}`}
-                    className="inline-flex h-7 w-7 items-center justify-center rounded-full text-secondary-700 transition-colors hover:bg-secondary-200"
-                  >
-                    <MoreVertical size={20} weight="bold" />
-                  </button>
+                <ClientCell className="relative flex justify-center items-center gap-1 flex-wrap overflow-visible py-1 h-auto min-h-[42px]">
+                  {client.programs && client.programs.length > 0 ? (
+                    <>
+                      {client.programs.length <= 2 ? (
+                        client.programs.map((prog, index) => (
+                          <span key={index} className="inline-block bg-primary-50 text-primary-700 border border-primary-100/50 rounded-lg px-2 py-0.5 text-xs font-semibold select-none leading-none truncate max-w-[120px]">
+                            {prog}
+                          </span>
+                        ))
+                      ) : (
+                        <>
+                          <span className="inline-block bg-primary-50 text-primary-700 border border-primary-100/50 rounded-lg px-2 py-0.5 text-xs font-semibold select-none leading-none truncate max-w-[100px]">
+                            {client.programs[0]}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveProgramsClientId(
+                                activeProgramsClientId === client.id ? null : client.id
+                              );
+                            }}
+                            className="inline-flex h-5 px-1.5 items-center justify-center rounded-lg bg-secondary-200 border border-secondary-300 text-secondary-700 text-xs font-bold transition-all hover:bg-secondary-300 active:bg-secondary-400 cursor-pointer select-none"
+                          >
+                            +{client.programs.length - 1}
+                          </button>
+                          {activeProgramsClientId === client.id && (
+                            <div 
+                              className="absolute z-[999] right-2 mt-1 top-full w-52 bg-secondary-50 border border-secondary-200 rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.08)] p-3 text-left animate-in fade-in slide-in-from-top-1 duration-150"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <p className="text-[10px] font-extrabold tracking-widest uppercase text-secondary-400 mb-2">{t('ALL PROGRAMS')}</p>
+                              <div className="max-h-36 overflow-y-auto mini-scrollbar flex flex-col gap-1.5 pr-1">
+                                {client.programs.map((prog, idx) => (
+                                  <div key={idx} className="bg-primary-50/50 text-primary-700 border border-primary-100/50 rounded-lg px-2.5 py-1.5 text-xs font-semibold truncate hover:bg-primary-50 transition-colors leading-none">
+                                    {prog}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <span className="text-secondary-400 font-bold">-</span>
+                  )}
+                </ClientCell>
+                <ClientCell className="px-0 overflow-visible">
+                  <TableOperationsDropdown
+                    align="right"
+                    items={[
+                      {
+                        label: t('View Details'),
+                        icon: <Eye size={16} weight="bold" />,
+                        onClick: () => alert(`${t('Viewing details for')} ${client.name}`),
+                      },
+                      {
+                        label: t('Send Message'),
+                        icon: <ChatCircleText size={16} weight="bold" />,
+                        onClick: () => alert(`${t('Sending message to')} ${client.name}`),
+                      },
+                      {
+                        label: t('Edit Registration'),
+                        icon: <ArrowClockwise size={16} weight="bold" />,
+                        onClick: () => alert(`${t('Editing registration for')} ${client.name}`),
+                      },
+                    ]}
+                  />
                 </ClientCell>
               </TableRow>
             ))}
@@ -268,7 +364,7 @@ export default function Clients() {
             {paginatedClients.length === 0 && (
               <TableRow className="bg-secondary-50 hover:bg-secondary-50">
                 <TableCell
-                  colSpan={6}
+                  colSpan={7}
                   className="h-[120px] text-center text-[14px] font-semibold text-secondary-400"
                 >
                   {t('No clients found')}

@@ -35,10 +35,9 @@ export function Sidebar({ role = 'admin' }) {
   ]
 
   const coachNavItems = [
-    { label: 'Dashboard', path: '/coach/dashboard', icon: SquaresFourIcon },
+    { label: 'Profile', path: '/coach/dashboard', icon: SquaresFourIcon },
     { label: 'Clients', path: '/coach/clients', icon: Users },
     { label: 'Programs', path: '/coach/programs', icon: FileText },
-    { label: 'Exercises', path: '/coach/exercises', icon: BarbellIcon },
     { label: 'Schedule', path: '/coach/schedule', icon: Calendar },
     { label: 'Messaging', path: '/coach/messaging', icon: ChatCircleText },
   ]
