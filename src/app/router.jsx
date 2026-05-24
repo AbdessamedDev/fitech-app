@@ -10,6 +10,7 @@ import Reports from '../pages/admin/Reports'
 import Shop from '../pages/admin/Shop'
 import Settings from '../pages/admin/Settings'
 import Clients from '../pages/coach/Clients'
+import Programs, { ProgramDetails } from '../pages/coach/Programs'
 import LoginPage from '../pages/auth/LoginPage'
 import { useTranslation } from 'react-i18next'
 
@@ -84,7 +85,11 @@ export const router = createBrowserRouter([
       },
       {
         path: '/coach/programs',
-        element: <ComingSoonPage title="Programs" />,
+        element: <Programs />,
+      },
+      {
+        path: '/coach/programs/:programId',
+        element: <ProgramDetails />,
       },
       {
         path: '/coach/exercises',

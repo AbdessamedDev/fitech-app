@@ -18,13 +18,14 @@ export default function CoachLayout() {
     const titles = {
       '/coach/dashboard': 'Profile',
       '/coach/clients': 'Clients',
-      '/coach/programs': 'Programs',
       '/coach/schedule': 'Schedule',
       '/coach/messaging': 'Messaging',
       '/coach/settings': 'Settings',
       '/coach': 'Profile'
     }
                                                                         
+    if (location.pathname.startsWith('/coach/programs')) return 'Programs'
+
     return titles[location.pathname] || 'Profile'
   }
 
