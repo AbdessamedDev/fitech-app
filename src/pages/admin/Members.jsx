@@ -70,6 +70,22 @@ export default function Members() {
     )
   }
 
+  const allSelected =
+    paginatedMembers.length > 0 && paginatedMembers.every((member) => selectedIds.includes(member.id))
+  const someSelected = paginatedMembers.some((member) => selectedIds.includes(member.id)) && !allSelected
+
+  const handleSelectAll = () => {
+    if (allSelected) {
+      setSelectedIds((current) =>
+        current.filter((id) => !paginatedMembers.some((member) => member.id === id))
+      )
+    } else {
+      setSelectedIds((current) =>
+        Array.from(new Set([...current, ...paginatedMembers.map((member) => member.id)]))
+      )
+    }
+  }
+
   const sortOptions = [
     { label: 'Sort by', value: 'All' },
     { label: 'Name (A-Z)', value: 'name-asc' },
@@ -102,13 +118,6 @@ export default function Members() {
               <Funnel size={18} />
               {t('Filter')}
             </button>
-
-            <span className="hidden sm:inline-block text-secondary-300 font-extrabold opacity-50">|</span>
-
-            <button className="h-10 flex items-center gap-2 px-4 py-2 rounded-md transition-colors bg-transparent text-primary-600 hover:bg-primary-50 active:bg-primary-100 cursor-pointer text-sm font-bold whitespace-nowrap">
-              <Download size={18} />
-              {t('Import')}
-            </button>
           </div>
 
           <PrimaryButton icon={UserPlus} onClick={() => setShowModal(true)}>
@@ -122,7 +131,16 @@ export default function Members() {
               <TableHead className="p-0 align-middle w-[60px]">
                 <div className="flex items-center justify-between h-full h-[44px]">
                   <div className="flex-1 flex justify-center">
-                    <input type="checkbox" className="w-[16px] h-[16px] rounded border-secondary-300 cursor-pointer" style={{ accentColor: 'var(--color-primary-600)' }} />
+                    <input
+                      type="checkbox"
+                      checked={allSelected}
+                      ref={(input) => {
+                        if (input) input.indeterminate = someSelected
+                      }}
+                      onChange={handleSelectAll}
+                      className="w-[16px] h-[16px] rounded border-secondary-300 cursor-pointer"
+                      style={{ accentColor: 'var(--color-primary-600)' }}
+                    />
                   </div>
                   <div className="w-px h-[18px] bg-secondary-200"></div>
                 </div>

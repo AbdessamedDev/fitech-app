@@ -374,7 +374,7 @@ function CourseProgress({ title, percentage, delay }) {
 function SessionCard({ type, typeColor, typeBg, time, title, avatar, instructor, enrolled, idx }) {
   const { t } = useTranslation();
   return (
-    <div className="bg-secondary-100 border border-secondary-200 rounded-[20px] p-6 flex flex-col justify-between hover:-translate-y-1.5 hover:shadow-[0_10px_30px_rgba(0,0,0,0.05)] transition-all duration-300 opacity-0 animate-fade-up" style={{ animationDelay: `${800 + (idx * 100)}ms` }}>
+    <div className="h-[215px] bg-secondary-100 border border-secondary-200 rounded-[20px] p-6 flex flex-col justify-between hover:-translate-y-1.5 hover:shadow-[0_10px_30px_rgba(0,0,0,0.05)] transition-all duration-300 opacity-0 animate-fade-up" style={{ animationDelay: `${800 + (idx * 100)}ms` }}>
       <div>
         <div className="flex justify-between items-center mb-4 text-[11px] font-bold">
           <span className={`px-2.5 py-1 rounded-md ${typeBg} ${typeColor}`}>{type}</span>

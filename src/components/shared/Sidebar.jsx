@@ -16,6 +16,7 @@ import {
   SignOut,
   ChatCircleText,
   Calendar,
+  ClipboardText,
 } from '../../icons/index'
 
 export function Sidebar({ role = 'admin' }) {
@@ -32,6 +33,7 @@ export function Sidebar({ role = 'admin' }) {
     { label: 'Equipment', path: '/admin/equipment', icon: BarbellIcon },
     { label: 'Reports', path: '/admin/reports', icon: FileText },
     { label: 'Shop', path: '/admin/shop', icon: ShoppingCart },
+    { label: 'Requests', path: '/admin/requests', icon: ClipboardText },
   ]
 
   const coachNavItems = [

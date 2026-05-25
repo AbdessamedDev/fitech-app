@@ -9,8 +9,10 @@ import Equipment from '../pages/admin/Equipment'
 import Reports from '../pages/admin/Reports'
 import Shop from '../pages/admin/Shop'
 import Settings from '../pages/admin/Settings'
+import Requests from '../pages/admin/Requests'
 import Clients from '../pages/coach/Clients'
 import Programs, { ProgramDetails } from '../pages/coach/Programs'
+import Messaging from '../pages/coach/Messaging'
 import LoginPage from '../pages/auth/LoginPage'
 import { useTranslation } from 'react-i18next'
 
@@ -62,6 +64,10 @@ export const router = createBrowserRouter([
         element: <Shop />,
       },
       {
+        path: '/admin/requests',
+        element: <Requests />,
+      },
+      {
         path: '/admin/settings',
         element: <Settings scope="admin" />,
       },
@@ -101,7 +107,7 @@ export const router = createBrowserRouter([
       },
       {
         path: '/coach/messaging',
-        element: <ComingSoonPage title="Messaging" />,
+        element: <Messaging />,
       },
       {
         path: '/coach/settings',

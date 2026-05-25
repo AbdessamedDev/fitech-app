@@ -18,7 +18,7 @@ export default function LoginPage() {
         className="w-[58%] bg-cover bg-center relative flex items-center justify-center overflow-hidden"
         style={{ backgroundImage: "url('/gym-bg.png')" }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-[#111111] via-black/60 to-black/40" />
+        <div className="absolute inset-0 bg-linear-to-r from-[#111111] via-black/60 to-black/40" />
         <div className="relative z-10 text-left">
           <h2 className="text-5xl font-medium text-white leading-tight">Control the System</h2>
           <h2 className="text-5xl font-medium text-white leading-tight">
