@@ -21,29 +21,12 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '.
 import { FilterDropdown } from '../../components/shared/FilterDropdown'
 import { Pagination } from '../../components/shared/Pagination'
 import { SearchInput } from '../../components/shared/SearchInput'
+import AddPlanModal from '../../components/ui/AddPlanModal'
 
 const stats = [
-  {
-    label: 'Total Plans',
-    value: '12',
-    note: '+2 this month',
-    icon: Stack,
-    tone: 'purple',
-  },
-  {
-    label: 'Active Plans',
-    value: '8',
-    note: 'All live',
-    icon: CheckCircle,
-    tone: 'blue',
-  },
-  {
-    label: 'Most Popular',
-    value: 'Performance',
-    note: '45% Share',
-    icon: Star,
-    tone: 'neutral',
-  },
+  { label: 'Total Plans', value: '12', note: '+2 this month', icon: Stack, tone: 'purple' },
+  { label: 'Active Plans', value: '8', note: 'All live', icon: CheckCircle, tone: 'blue' },
+  { label: 'Most Popular', value: 'Performance', note: '45% Share', icon: Star, tone: 'neutral' },
 ]
 
 const plans = [
@@ -104,7 +87,6 @@ function StatCard({ stat }) {
   const { t } = useTranslation()
   const Icon = stat.icon
   const tone = statToneStyles[stat.tone]
-
   return (
     <section className={`subscription-stat-card subscription-stat-card--${stat.tone} group relative h-[206px] overflow-hidden rounded-[14px] border border-secondary-300 bg-secondary-50 px-8 py-8 shadow-[0_8px_26px_rgba(105,66,255,0.05)] transition-all duration-500 ease-out hover:-translate-y-1.5 hover:border-primary-200 hover:shadow-[0_18px_42px_rgba(105,66,255,0.16)]`}>
       <div className={`subscription-stat-glow absolute inset-0 origin-bottom-right bg-linear-to-br opacity-90 transition-all duration-500 ease-out ${tone.glow} ${tone.glowHover}`} />
@@ -117,7 +99,6 @@ function StatCard({ stat }) {
             {t(stat.note)}
           </span>
         </div>
-
         <div>
           <p className="subscription-stat-label text-[16px] font-medium leading-none text-primary-600">{t(stat.label)}</p>
           <p className="subscription-stat-value mt-4 text-[39px] font-black leading-none tracking-normal text-secondary-900">{t(stat.value)}</p>
@@ -129,7 +110,6 @@ function StatCard({ stat }) {
 
 function RevenueCard() {
   const { t } = useTranslation()
-
   return (
     <section className="subscription-revenue-card group h-[206px] overflow-hidden rounded-[14px] bg-linear-to-br from-[#251467] via-[#2B176D] to-[#372170] px-8 py-8 text-white shadow-[0_14px_34px_rgba(38,20,103,0.32)] transition-all duration-500 ease-out hover:-translate-y-1.5 hover:shadow-[0_24px_54px_rgba(38,20,103,0.46)]">
       <div className="flex items-start justify-between gap-4">
@@ -140,7 +120,6 @@ function RevenueCard() {
           ↑ 12.4%
         </span>
       </div>
-
       <div className="mt-[34px]">
         <p className="text-[17px] font-medium leading-none text-[#AFA3E2]">{t('Monthly Revenue')}</p>
         <p className="mt-4 text-[43px] font-black leading-none tracking-normal text-white">$42,850</p>
@@ -151,7 +130,6 @@ function RevenueCard() {
 
 function HeaderCell({ icon: Icon, title, className = '', showDivider = true }) {
   const { t } = useTranslation()
-
   return (
     <TableHead className={`h-[48px] p-0 align-middle ${className}`}>
       <div className="flex h-full items-center justify-between">
@@ -175,7 +153,6 @@ function PlanCell({ children, className = '' }) {
 
 function StatusBadge({ status }) {
   const { t } = useTranslation()
-
   return (
     <span className={`inline-flex h-[24px] min-w-[68px] items-center justify-center rounded-full px-3 text-[11px] font-extrabold leading-none ${statusStyles[status]}`}>
       {t(status)}
@@ -189,6 +166,7 @@ export default function Subscriptions() {
   const [sortBy, setSortBy] = useState('All')
   const [status, setStatus] = useState('All')
   const [currentPage, setCurrentPage] = useState(1)
+  const [showModal, setShowModal] = useState(false)
   const itemsPerPage = 12
 
   const visiblePlans = useMemo(() => {
@@ -198,15 +176,8 @@ export default function Subscriptions() {
       const matchesStatus = status === 'All' || plan.status === status
       return matchesSearch && matchesStatus
     })
-
-    if (sortBy === 'price-asc') {
-      nextPlans = [...nextPlans].sort((a, b) => Number.parseInt(a.price, 10) - Number.parseInt(b.price, 10))
-    }
-
-    if (sortBy === 'price-desc') {
-      nextPlans = [...nextPlans].sort((a, b) => Number.parseInt(b.price, 10) - Number.parseInt(a.price, 10))
-    }
-
+    if (sortBy === 'price-asc') nextPlans = [...nextPlans].sort((a, b) => Number.parseInt(a.price) - Number.parseInt(b.price))
+    if (sortBy === 'price-desc') nextPlans = [...nextPlans].sort((a, b) => Number.parseInt(b.price) - Number.parseInt(a.price))
     return nextPlans
   }, [search, sortBy, status])
 
@@ -214,9 +185,7 @@ export default function Subscriptions() {
   const paginatedPlans = visiblePlans.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
 
   useEffect(() => {
-    if (totalPages > 0 && currentPage > totalPages) {
-      setCurrentPage(totalPages)
-    }
+    if (totalPages > 0 && currentPage > totalPages) setCurrentPage(totalPages)
   }, [currentPage, totalPages])
 
   const focusSearch = () => {
@@ -225,67 +194,27 @@ export default function Subscriptions() {
 
   return (
     <div className="min-h-full w-full bg-secondary-100 px-4 py-[36px] text-sm text-secondary-700 sm:px-8">
-      <style>
-        {`
-          .dark .subscription-stat-card {
-            background: #101014;
-            border-color: #34343d;
-            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.02);
-          }
 
-          .dark .subscription-stat-card:hover {
-            border-color: #454552;
-            box-shadow: 0 22px 46px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03);
-          }
+      {/* Modal */}
+      {showModal && <AddPlanModal onClose={() => setShowModal(false)} />}
 
-          .dark .subscription-stat-card--purple .subscription-stat-glow {
-            background: radial-gradient(circle at 100% 100%, rgba(105, 66, 255, 0.48) 0%, rgba(105, 66, 255, 0.22) 25%, rgba(16, 16, 20, 0) 60%);
-            opacity: 0.74;
-          }
+      <style>{`
+        .dark .subscription-stat-card { background: #101014; border-color: #34343d; box-shadow: 0 16px 32px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.02); }
+        .dark .subscription-stat-card:hover { border-color: #454552; box-shadow: 0 22px 46px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03); }
+        .dark .subscription-stat-card--purple .subscription-stat-glow { background: radial-gradient(circle at 100% 100%, rgba(105,66,255,0.48) 0%, rgba(105,66,255,0.22) 25%, rgba(16,16,20,0) 60%); opacity: 0.74; }
+        .dark .subscription-stat-card--blue .subscription-stat-glow, .dark .subscription-stat-card--neutral .subscription-stat-glow { opacity: 0; }
+        .dark .subscription-stat-card--purple:hover .subscription-stat-glow { opacity: 0.95; transform: scale(1.12) translate(8px, 8px); }
+        .dark .subscription-stat-icon { background: #1e1f29; color: #6942ff; }
+        .dark .subscription-stat-badge { background: rgba(51,109,59,0.42); color: #7dde85; }
+        .dark .subscription-stat-label { color: #8368ff; }
+        .dark .subscription-stat-value { color: #f4f4fb; }
+        .dark .subscription-revenue-card { background: linear-gradient(135deg, #281673 0%, #2e1a77 52%, #3a2182 100%); box-shadow: 0 18px 38px rgba(27,12,77,0.36); }
+        .dark .subscription-revenue-card:hover { box-shadow: 0 26px 58px rgba(27,12,77,0.52); }
+      `}</style>
 
-          .dark .subscription-stat-card--blue .subscription-stat-glow,
-          .dark .subscription-stat-card--neutral .subscription-stat-glow {
-            opacity: 0;
-          }
-
-          .dark .subscription-stat-card--purple:hover .subscription-stat-glow {
-            opacity: 0.95;
-            transform: scale(1.12) translate(8px, 8px);
-          }
-
-          .dark .subscription-stat-icon {
-            background: #1e1f29;
-            color: #6942ff;
-          }
-
-          .dark .subscription-stat-badge {
-            background: rgba(51, 109, 59, 0.42);
-            color: #7dde85;
-          }
-
-          .dark .subscription-stat-label {
-            color: #8368ff;
-          }
-
-          .dark .subscription-stat-value {
-            color: #f4f4fb;
-          }
-
-          .dark .subscription-revenue-card {
-            background: linear-gradient(135deg, #281673 0%, #2e1a77 52%, #3a2182 100%);
-            box-shadow: 0 18px 38px rgba(27, 12, 77, 0.36);
-          }
-
-          .dark .subscription-revenue-card:hover {
-            box-shadow: 0 26px 58px rgba(27, 12, 77, 0.52);
-          }
-        `}
-      </style>
       <div className="mx-auto flex w-full max-w-380 flex-col">
         <div className="grid grid-cols-1 gap-7 lg:grid-cols-[1fr_1fr_1fr_1fr]">
-          {stats.map((stat) => (
-            <StatCard key={stat.label} stat={stat} />
-          ))}
+          {stats.map((stat) => <StatCard key={stat.label} stat={stat} />)}
           <RevenueCard />
         </div>
 
@@ -293,40 +222,22 @@ export default function Subscriptions() {
           <div className="flex w-full flex-col gap-3 lg:flex-row lg:items-center xl:w-auto">
             <SearchInput
               value={search}
-              onChange={(value) => {
-                setSearch(value)
-                setCurrentPage(1)
-              }}
+              onChange={(value) => { setSearch(value); setCurrentPage(1) }}
               placeholder="Search"
               className="w-full lg:w-62.5 xl:w-120"
             />
-
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:flex lg:w-auto">
               <FilterDropdown
-                label="Sort by"
-                icon={SlidersHorizontal}
-                options={sortOptions}
-                value={sortBy}
-                onChange={(value) => {
-                  setSortBy(value)
-                  setCurrentPage(1)
-                }}
+                label="Sort by" icon={SlidersHorizontal} options={sortOptions} value={sortBy}
+                onChange={(value) => { setSortBy(value); setCurrentPage(1) }}
                 className="w-full lg:w-[196px]"
               />
-
               <FilterDropdown
-                label="Status"
-                icon={TrendUp}
-                options={statusOptions}
-                value={status}
-                onChange={(value) => {
-                  setStatus(value)
-                  setCurrentPage(1)
-                }}
+                label="Status" icon={TrendUp} options={statusOptions} value={status}
+                onChange={(value) => { setStatus(value); setCurrentPage(1) }}
                 className="w-full lg:w-[196px]"
               />
             </div>
-
             <button
               onClick={focusSearch}
               className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md px-3 text-[13px] font-bold text-primary-600 transition-colors hover:bg-primary-50 lg:justify-start"
@@ -336,7 +247,11 @@ export default function Subscriptions() {
             </button>
           </div>
 
-          <button className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-[10px] bg-primary-600 px-5 text-[14px] font-bold text-white shadow-[0_8px_18px_rgba(105,66,255,0.26)] transition-all duration-200 ease-out hover:bg-primary-700 active:scale-[0.98]">
+          {/* Add Plan Button — opens modal */}
+          <button
+            onClick={() => setShowModal(true)}
+            className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-[10px] bg-primary-600 px-5 text-[14px] font-bold text-white shadow-[0_8px_18px_rgba(105,66,255,0.26)] transition-all duration-200 ease-out hover:bg-primary-700 active:scale-[0.98]"
+          >
             <PlusCircle size={20} weight="bold" />
             {t('Add Plan')}
           </button>
@@ -368,9 +283,7 @@ export default function Subscriptions() {
               <TableRow key={plan.id} className="border-b border-secondary-200 bg-secondary-50 last:border-b-0 hover:bg-secondary-100">
                 <PlanCell>{t(plan.name)}</PlanCell>
                 <PlanCell>{plan.price}</PlanCell>
-                <PlanCell>
-                  <StatusBadge status={plan.status} />
-                </PlanCell>
+                <PlanCell><StatusBadge status={plan.status} /></PlanCell>
                 <PlanCell>{plan.sessions}</PlanCell>
                 <PlanCell>{t(plan.duration)}</PlanCell>
                 <PlanCell>{plan.createdAt}</PlanCell>

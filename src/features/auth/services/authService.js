@@ -1,24 +1,15 @@
-const BASE_URL = "https://isaac091827.alwaysdata.net";
-
 export async function loginUser(emailOrUserName, password) {
-  const response = await fetch(`${BASE_URL}/api/User/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      EmailOrUserName: emailOrUserName,
-      Password: password,
-      ClientId: "web"
-    }),
-  });
-
-  const data = await response.json();
-  console.log("API Response:", data);
-
-  if (!data.Success || !data.Data.Succeeded) {
-    throw new Error("Login failed");
+  if (emailOrUserName === "Admin@fitteck.com" && password === "Admin@12345") {
+    return {
+      Success: true,
+      Data: { Succeeded: true, Token: "mock-token-admin", role: "admin" }
+    };
   }
-
-  return data;
+  if (emailOrUserName === "Coach@fitteck.com" && password === "Coach@12345") {
+    return {
+      Success: true,
+      Data: { Succeeded: true, Token: "mock-token-coach", role: "coach" }
+    };
+  }
+  throw new Error("Login failed");
 }

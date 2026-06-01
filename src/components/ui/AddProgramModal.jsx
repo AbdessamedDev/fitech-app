@@ -6,12 +6,14 @@ import {
   ChartPie,
   TrendUp,
   ChartLine,
-  CurrencyDollar,
   CloudArrowUp,
   MagnifyingGlass,
   Trash,
   Plus,
   Person,
+  Clock,
+  CalendarBlank,
+  TextT,
 } from "@phosphor-icons/react";
 
 const mockExercises = [
@@ -20,15 +22,21 @@ const mockExercises = [
   { id: 3, name: "Plank Hold", type: "CORE", sets: 3, reps: 45, rest: 30 },
 ];
 
+const emptySession = () => ({
+  id: Date.now(),
+  day: "",
+  startTime: "",
+  endTime: "",
+  description: "",
+});
+
 export default function AddProgramModal({ onClose }) {
   const [isClosing, setIsClosing] = useState(false);
-  const [visibility, setVisibility] = useState("published");
   const [selectedExercises, setSelectedExercises] = useState(mockExercises);
+  const [sessions, setSessions] = useState([emptySession()]);
   const [form, setForm] = useState({
     name: "", description: "", category: "Weight Loss", level: "Beginner",
-    duration: "4 weeks", exerciseType: "Strength",
-    durationWeeks: "0", totalSessions: "0",
-    price: "0", promotionalPrice: "0", image: null,
+    duration: "4 weeks", exerciseType: "Strength", image: null,
   });
 
   const handleClose = () => {
@@ -39,6 +47,12 @@ export default function AddProgramModal({ onClose }) {
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
   const handleFileChange = (e) => setForm({ ...form, image: e.target.files[0] });
   const removeExercise = (id) => setSelectedExercises(prev => prev.filter(e => e.id !== id));
+
+  const addSession = () => setSessions(prev => [...prev, emptySession()]);
+  const removeSession = (id) => setSessions(prev => prev.filter(s => s.id !== id));
+  const updateSession = (id, field, value) => {
+    setSessions(prev => prev.map(s => s.id === id ? { ...s, [field]: value } : s));
+  };
 
   const getTypeColor = (type) => {
     switch (type) {
@@ -142,67 +156,6 @@ export default function AddProgramModal({ onClose }) {
               </div>
             </div>
 
-            {/* Duration Weeks & Total Sessions */}
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <label className="text-xs text-secondary-500 font-normal mb-2 block">Duration (weeks)</label>
-                <input name="durationWeeks" type="number" placeholder="0" value={form.durationWeeks} onChange={handleChange}
-                  className="w-full border border-secondary-200 rounded-lg px-3 h-10 text-sm outline-none text-secondary-700 focus:border-primary-600 transition-all" />
-              </div>
-              <div className="flex-1">
-                <label className="text-xs text-secondary-500 font-normal mb-2 block">Total Sessions</label>
-                <input name="totalSessions" type="number" placeholder="0" value={form.totalSessions} onChange={handleChange}
-                  className="w-full border border-secondary-200 rounded-lg px-3 h-10 text-sm outline-none text-secondary-700 focus:border-primary-600 transition-all" />
-              </div>
-            </div>
-
-            {/* Price & Promotional Price */}
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <label className="text-xs text-secondary-500 font-normal mb-2 block">Price ($)</label>
-                <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
-                  <CurrencyDollar size={18} className="text-secondary-300 shrink-0" />
-                  <input name="price" type="number" placeholder="0" value={form.price} onChange={handleChange}
-                    className="w-full text-sm outline-none text-secondary-700 placeholder-secondary-300 bg-transparent" />
-                </div>
-              </div>
-              <div className="flex-1">
-                <label className="text-xs text-secondary-500 font-normal mb-2 block">Promotional Price ($)</label>
-                <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
-                  <CurrencyDollar size={18} className="text-secondary-300 shrink-0" />
-                  <input name="promotionalPrice" type="number" placeholder="0" value={form.promotionalPrice} onChange={handleChange}
-                    className="w-full text-sm outline-none text-secondary-700 placeholder-secondary-300 bg-transparent" />
-                </div>
-              </div>
-            </div>
-
-            {/* Visibility */}
-            <div>
-              <label className="text-xs text-secondary-500 font-normal mb-2 block">Visibility & Status</label>
-              <div className="flex gap-3">
-                <button onClick={() => setVisibility("draft")}
-                  className={`flex-1 p-3 rounded-xl border-2 text-left transition-all cursor-pointer ${visibility === 'draft' ? 'border-secondary-300 bg-secondary-50' : 'border-secondary-200'}`}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm">✏️</span>
-                    <div className={`w-4 h-4 rounded-full border-2 ${visibility === 'draft' ? 'border-secondary-400' : 'border-secondary-200'}`} />
-                  </div>
-                  <p className="text-xs font-semibold text-secondary-700">Draft</p>
-                  <p className="text-xs text-secondary-400 mt-0.5">Only you can see and edit this program.</p>
-                </button>
-                <button onClick={() => setVisibility("published")}
-                  className={`flex-1 p-3 rounded-xl border-2 text-left transition-all cursor-pointer ${visibility === 'published' ? 'border-primary-600 bg-primary-50' : 'border-secondary-200'}`}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm">🌐</span>
-                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${visibility === 'published' ? 'border-primary-600 bg-primary-600' : 'border-secondary-200'}`}>
-                      {visibility === 'published' && <div className="w-2 h-2 bg-white rounded-full" />}
-                    </div>
-                  </div>
-                  <p className="text-xs font-semibold text-primary-600">Published</p>
-                  <p className="text-xs text-secondary-400 mt-0.5">Visible to all clients on your public profile.</p>
-                </button>
-              </div>
-            </div>
-
             {/* Image Upload */}
             <div>
               <label className="text-xs text-secondary-500 font-normal mb-2 block">Upload Program Image</label>
@@ -253,6 +206,81 @@ export default function AddProgramModal({ onClose }) {
               </div>
             </div>
 
+            {/* Sessions */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-xs text-secondary-500 font-normal">Add Sessions</label>
+                <button onClick={addSession}
+                  className="flex items-center gap-1 text-xs text-primary-600 hover:text-primary-900 cursor-pointer transition-colors">
+                  <Plus size={14} /> Add Session
+                </button>
+              </div>
+              <div className="flex flex-col gap-3">
+                {sessions.map((session, index) => (
+                  <div key={session.id} className="border border-secondary-200 rounded-xl p-3 flex flex-col gap-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-secondary-600">Session {index + 1}</span>
+                      {sessions.length > 1 && (
+                        <button onClick={() => removeSession(session.id)} className="text-secondary-300 hover:text-red-500 cursor-pointer transition-colors">
+                          <Trash size={14} />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Day */}
+                    <div>
+                      <label className="text-xs text-secondary-400 mb-1 block">Day</label>
+                      <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-9 focus-within:border-primary-600 transition-all">
+                        <CalendarBlank size={14} className="text-secondary-300 shrink-0" />
+                        <select value={session.day} onChange={(e) => updateSession(session.id, 'day', e.target.value)}
+                          className="w-full text-sm text-secondary-700 outline-none bg-transparent">
+                          <option value="">Select day</option>
+                          <option>Monday</option>
+                          <option>Tuesday</option>
+                          <option>Wednesday</option>
+                          <option>Thursday</option>
+                          <option>Friday</option>
+                          <option>Saturday</option>
+                          <option>Sunday</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Start & End Time */}
+                    <div className="flex gap-3">
+                      <div className="flex-1">
+                        <label className="text-xs text-secondary-400 mb-1 block">Start Time</label>
+                        <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-9 focus-within:border-primary-600 transition-all">
+                          <Clock size={14} className="text-secondary-300 shrink-0" />
+                          <input type="time" value={session.startTime} onChange={(e) => updateSession(session.id, 'startTime', e.target.value)}
+                            className="w-full text-sm text-secondary-700 outline-none bg-transparent" />
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <label className="text-xs text-secondary-400 mb-1 block">End Time</label>
+                        <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-9 focus-within:border-primary-600 transition-all">
+                          <Clock size={14} className="text-secondary-300 shrink-0" />
+                          <input type="time" value={session.endTime} onChange={(e) => updateSession(session.id, 'endTime', e.target.value)}
+                            className="w-full text-sm text-secondary-700 outline-none bg-transparent" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <div>
+                      <label className="text-xs text-secondary-400 mb-1 block">Description</label>
+                      <div className="flex items-start border border-secondary-200 rounded-lg px-3 gap-2 focus-within:border-primary-600 transition-all pt-2">
+                        <TextT size={14} className="text-secondary-300 shrink-0 mt-0.5" />
+                        <textarea value={session.description} onChange={(e) => updateSession(session.id, 'description', e.target.value)}
+                          placeholder="What will be done in this session..." rows={2}
+                          className="w-full text-sm text-secondary-700 outline-none bg-transparent placeholder-secondary-300 resize-none" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -261,7 +289,7 @@ export default function AddProgramModal({ onClose }) {
           <Button onClick={handleClose} className="border border-secondary-300 text-secondary-600 text-sm px-6 py-2.5 rounded-xl hover:bg-secondary-100 transition-all">
             Cancel
           </Button>
-          <Button onClick={() => { console.log(form); handleClose(); }} className="bg-primary-600 text-white text-base font-medium px-6 py-2.5 rounded-xl hover:bg-primary-900 transition-all">
+          <Button onClick={() => { console.log(form, sessions); handleClose(); }} className="bg-primary-600 text-white text-base font-medium px-6 py-2.5 rounded-xl hover:bg-primary-900 transition-all">
             Add Program
           </Button>
         </div>

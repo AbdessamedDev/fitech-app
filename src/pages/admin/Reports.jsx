@@ -11,6 +11,7 @@ import { Pagination } from '../../components/shared/Pagination';
 import { SearchInput } from '../../components/shared/SearchInput';
 import { FilterDropdown } from '../../components/shared/FilterDropdown';
 import { PrimaryButton } from '../../components/shared/PrimaryButton';
+import GenerateReportModal from '../../components/ui/GenerateReportModal';
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -339,6 +340,7 @@ export default function Reports() {
   const [statusFilter, setStatusFilter] = useState('All');
   const [typeFilter, setTypeFilter]     = useState('All');
   const [currentPage, setCurrentPage]   = useState(1);
+  const [showModal, setShowModal]       = useState(false);
   const itemsPerPage = 8;
 
   const filteredReports = useMemo(() => {
@@ -390,6 +392,7 @@ export default function Reports() {
 
   return (
     <div className="bg-secondary-100 min-h-screen py-8 px-4 sm:px-8 w-full flex justify-center text-sm font-sans">
+      {showModal && <GenerateReportModal onClose={() => setShowModal(false)} />}
       <div className="w-full max-w-380 flex flex-col gap-8 xl:gap-12">
 
         {/* ── Revenue Trend + Payment Channels ── */}
@@ -506,128 +509,128 @@ export default function Reports() {
 
           </div>
 
-          <PrimaryButton>{t('Generate Report')}</PrimaryButton>
+          <PrimaryButton onClick={() => setShowModal(true)}>{t('Generate Report')}</PrimaryButton>
         </div>
 
         {/* ── Table ── */}
-        {/* ── Table ── */}
-<Table className="rounded-xl border border-secondary-200 overflow-hidden shadow-sm w-full text-[14px]">
-  <TableHeader className="bg-secondary-100 border-b border-secondary-300">
-    <TableRow isHeader={true} className="h-9 bg-secondary-100">
+        <Table className="rounded-xl border border-secondary-200 overflow-hidden shadow-sm w-full text-[14px]">
+          <TableHeader className="bg-secondary-100 border-b border-secondary-300">
+            <TableRow isHeader={true} className="h-9 bg-secondary-100">
 
-      {/* Report Name – left-aligned with left padding */}
-      <TableHead className="w-56 py-2 pl-6 pr-3 text-left">
-        <div className="flex items-center gap-2 text-secondary-500 font-bold text-[14px]">
-          <FilesIcon size={15} strokeWidth={2} />
-          <span>{t('Report Name')}</span>
-          <div className="w-0.5 h-7 bg-secondary-300 ml-20" />
-        </div>
-      </TableHead>
+              {/* Report Name – left-aligned with left padding */}
+              <TableHead className="w-56 py-2 pl-6 pr-3 text-left">
+                <div className="flex items-center gap-2 text-secondary-500 font-bold text-[14px]">
+                  <FilesIcon size={15} strokeWidth={2} />
+                  <span>{t('Report Name')}</span>
+                  <div className="w-0.5 h-7 bg-secondary-300 ml-20" />
+                </div>
+              </TableHead>
 
-      {[
-        { key: 'Type',       Icon: () => <FileTextIcon size={18} className="text-secondary-600 font-semibold" /> },
-        { key: 'Status',     Icon: () => <ChartLineIcon size={18} className="text-secondary-600 font-semibold" /> },
-        { key: 'Date',       Icon: () => <CalendarIcon size={18} className="text-secondary-600 font-semibold" /> },
-        { key: 'Date Range', Icon: () => <CalendarDotsIcon size={18} className="text-secondary-600 font-semibold" /> },
-        { key: 'Time',       Icon: () => <ClockIcon size={18} className="text-secondary-600 font-semibold" /> },
-        { key: 'Operations', Icon: () => <GearSixIcon size={18} className="text-secondary-600 font-semibold" /> },
-      ].map(({ key, Icon }, i, arr) => (
-        <TableHead key={key} className="p-0 align-middle">
-          <div className="flex items-center justify-between h-9">
-            <div className="flex flex-1 items-center justify-center gap-1.5 px-3 lg:px-4 text-secondary-500 font-bold text-[14px]">
-              <Icon />
-              <span>{t(key)}</span>
-            </div>
-            {i < arr.length - 1 && (
-              <div className="w-0.5 h-7 bg-secondary-300" />
+              {[
+                { key: 'Type',       Icon: () => <FileTextIcon size={18} className="text-secondary-600 font-semibold" /> },
+                { key: 'Status',     Icon: () => <ChartLineIcon size={18} className="text-secondary-600 font-semibold" /> },
+                { key: 'Date',       Icon: () => <CalendarIcon size={18} className="text-secondary-600 font-semibold" /> },
+                { key: 'Date Range', Icon: () => <CalendarDotsIcon size={18} className="text-secondary-600 font-semibold" /> },
+                { key: 'Time',       Icon: () => <ClockIcon size={18} className="text-secondary-600 font-semibold" /> },
+                { key: 'Operations', Icon: () => <GearSixIcon size={18} className="text-secondary-600 font-semibold" /> },
+              ].map(({ key, Icon }, i, arr) => (
+                <TableHead key={key} className="p-0 align-middle">
+                  <div className="flex items-center justify-between h-9">
+                    <div className="flex flex-1 items-center justify-center gap-1.5 px-3 lg:px-4 text-secondary-500 font-bold text-[14px]">
+                      <Icon />
+                      <span>{t(key)}</span>
+                    </div>
+                    {i < arr.length - 1 && (
+                      <div className="w-0.5 h-7 bg-secondary-300" />
+                    )}
+                  </div>
+                </TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            {paginatedReports.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-12 text-secondary-400 font-medium">
+                  {t('No reports found')}
+                </TableCell>
+              </TableRow>
+            ) : (
+              paginatedReports.map((report) => (
+                <TableRow
+                  key={report.id}
+                  className="hover:bg-secondary-100 transition-colors border-b border-secondary-200"
+                  style={{ borderBottomWidth: '1.5px' }}
+                >
+                  {/* Report Name */}
+                  <TableCell className="pl-6 pr-3 py-3.5 w-56">
+                    <div className="flex items-center gap-2">
+                      <FileTextIcon size={15} className="text-secondary-400 shrink-0" />
+                      <span className="font-medium text-secondary-700 truncate">{report.name}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center text-secondary-600 font-medium px-2 lg:px-4 py-3.5">
+                    {t(report.type)}
+                  </TableCell>
+                  <TableCell className="text-center px-2 lg:px-4 py-3.5">
+                    <div className="flex justify-center">
+                      <ReportStatusBadge status={report.status} />
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center text-secondary-600 font-medium px-2 lg:px-4 py-3.5">
+                    {report.date}
+                  </TableCell>
+                  <TableCell className="text-center text-secondary-600 font-medium px-2 lg:px-4 py-3.5 whitespace-nowrap text-xs">
+                    {report.dateRange}
+                  </TableCell>
+                  <TableCell className="text-center text-secondary-600 font-medium px-2 lg:px-4 py-3.5">
+                    {report.time}
+                  </TableCell>
+                  <TableCell className="text-center px-2 lg:px-4 py-3.5">
+                    <div className="flex justify-center gap-1">
+                      {report.status === 'FAILED' ? (
+                        <>
+                          <button className="p-2 rounded-full hover:bg-secondary-200 text-secondary-500 transition-colors" title={t('Retry')}>
+                            <RefreshCw size={16} />
+                          </button>
+                          <button className="p-2 rounded-full hover:bg-error-bg text-secondary-500 transition-colors" title={t('Delete')}>
+                            <Trash2 size={16} />
+                          </button>
+                        </>
+                      ) : report.status === 'PROCESSING' ? (
+                        <>
+                          <button className="p-2 rounded-full hover:bg-secondary-200 text-secondary-500 transition-colors opacity-50 cursor-not-allowed" title={t('View')} disabled>
+                            <Eye size={16} />
+                          </button>
+                          <button className="p-2 rounded-full hover:bg-secondary-200 text-secondary-500 transition-colors opacity-50 cursor-not-allowed" title={t('Download')} disabled>
+                            <Download size={16} />
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button className="p-2 rounded-full hover:bg-secondary-200 text-secondary-500 transition-colors" title={t('View')}>
+                            <Eye size={16} />
+                          </button>
+                          <button className="p-2 rounded-full hover:bg-secondary-200 text-secondary-500 transition-colors" title={t('Download')}>
+                            <Download size={16} />
+                          </button>
+                          <button className="p-2 rounded-full hover:bg-secondary-200 text-secondary-500 transition-colors" title={t('Copy')}>
+                            <Copy size={16} />
+                          </button>
+                          <button className="p-2 rounded-full hover:bg-error-bg text-secondary-500 transition-colors" title={t('Delete')}>
+                            <Trash2 size={16} />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
             )}
-          </div>
-        </TableHead>
-      ))}
-    </TableRow>
-  </TableHeader>
+          </TableBody>
+        </Table>
 
-  <TableBody>
-    {paginatedReports.length === 0 ? (
-      <TableRow>
-        <TableCell colSpan={7} className="text-center py-12 text-secondary-400 font-medium">
-          {t('No reports found')}
-        </TableCell>
-      </TableRow>
-    ) : (
-      paginatedReports.map((report) => (
-        <TableRow
-          key={report.id}
-          className="hover:bg-secondary-100 transition-colors border-b border-secondary-200"
-          style={{ borderBottomWidth: '1.5px' }}
-        >
-          {/* Report Name */}
-          <TableCell className="pl-6 pr-3 py-3.5 w-56">
-            <div className="flex items-center gap-2">
-              <FileTextIcon size={15} className="text-secondary-400 shrink-0" />
-              <span className="font-medium text-secondary-700 truncate">{report.name}</span>
-            </div>
-          </TableCell>
-          <TableCell className="text-center text-secondary-600 font-medium px-2 lg:px-4 py-3.5">
-            {t(report.type)}
-          </TableCell>
-          <TableCell className="text-center px-2 lg:px-4 py-3.5">
-            <div className="flex justify-center">
-              <ReportStatusBadge status={report.status} />
-            </div>
-          </TableCell>
-          <TableCell className="text-center text-secondary-600 font-medium px-2 lg:px-4 py-3.5">
-            {report.date}
-          </TableCell>
-          <TableCell className="text-center text-secondary-600 font-medium px-2 lg:px-4 py-3.5 whitespace-nowrap text-xs">
-            {report.dateRange}
-          </TableCell>
-          <TableCell className="text-center text-secondary-600 font-medium px-2 lg:px-4 py-3.5">
-            {report.time}
-          </TableCell>
-          <TableCell className="text-center px-2 lg:px-4 py-3.5">
-            <div className="flex justify-center gap-1">
-              {report.status === 'FAILED' ? (
-                <>
-                  <button className="p-2 rounded-full hover:bg-secondary-200 text-secondary-500 transition-colors" title={t('Retry')}>
-                    <RefreshCw size={16} />
-                  </button>
-                  <button className="p-2 rounded-full hover:bg-error-bg text-secondary-500 transition-colors" title={t('Delete')}>
-                    <Trash2 size={16} />
-                  </button>
-                </>
-              ) : report.status === 'PROCESSING' ? (
-                <>
-                  <button className="p-2 rounded-full hover:bg-secondary-200 text-secondary-500 transition-colors opacity-50 cursor-not-allowed" title={t('View')} disabled>
-                    <Eye size={16} />
-                  </button>
-                  <button className="p-2 rounded-full hover:bg-secondary-200 text-secondary-500 transition-colors opacity-50 cursor-not-allowed" title={t('Download')} disabled>
-                    <Download size={16} />
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button className="p-2 rounded-full hover:bg-secondary-200 text-secondary-500 transition-colors" title={t('View')}>
-                    <Eye size={16} />
-                  </button>
-                  <button className="p-2 rounded-full hover:bg-secondary-200 text-secondary-500 transition-colors" title={t('Download')}>
-                    <Download size={16} />
-                  </button>
-                  <button className="p-2 rounded-full hover:bg-secondary-200 text-secondary-500 transition-colors" title={t('Copy')}>
-                    <Copy size={16} />
-                  </button>
-                  <button className="p-2 rounded-full hover:bg-error-bg text-secondary-500 transition-colors" title={t('Delete')}>
-                    <Trash2 size={16} />
-                  </button>
-                </>
-              )}
-            </div>
-          </TableCell>
-        </TableRow>
-      ))
-    )}
-  </TableBody>
-</Table>
         {/* ── Pagination ── */}
         <div className="mt-4 mb-8">
           <Pagination
