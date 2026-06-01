@@ -3,6 +3,7 @@ import AdminLayout from '../layouts/AdminLayout'
 import CoachLayout from '../layouts/CoachLayout'
 import Dashboard from '../pages/admin/Dashboard'
 import Members from '../pages/admin/Members'
+import MemberProfile from '../pages/admin/MemberProfile'
 import Subscriptions from '../pages/admin/Subscriptions'
 import Finance from '../pages/admin/Finance'
 import Equipment from '../pages/admin/Equipment'
@@ -14,6 +15,7 @@ import AdminProfile from '../pages/admin/Profile'
 import CoachProfile from '../pages/coach/Profile'
 import Clients from '../pages/coach/Clients'
 import Programs, { ProgramDetails } from '../pages/coach/Programs'
+import Schedule from '../pages/coach/Schedule'
 import Messaging from '../pages/coach/Messaging'
 import LoginPage from '../pages/auth/LoginPage'
 import VerifyEmailPage from '../pages/auth/VerifyEmailPage'
@@ -22,7 +24,6 @@ import { getDefaultRouteForRole, getToken, getUserRole, normalizeRole } from '..
 
 function ComingSoonPage({ title }) {
   const { t } = useTranslation()
-
   return (
     <div className="p-8 h-full flex items-center justify-center">
       <h1 className="text-2xl font-bold text-secondary-500">{t(`${title} - Coming Soon`)}</h1>
@@ -87,6 +88,10 @@ export const router = createBrowserRouter([
       {
         path: '/admin/members',
         element: <Members />,
+      },
+      {
+        path: '/admin/member-profile',
+        element: <MemberProfile />,
       },
       {
         path: '/admin/subscriptions',
@@ -160,7 +165,7 @@ export const router = createBrowserRouter([
       },
       {
         path: '/coach/schedule',
-        element: <ComingSoonPage title="Schedule" />,
+        element: <Schedule />,
       },
       {
         path: '/coach/messaging',

@@ -67,7 +67,6 @@ function StatCard({ stat }) {
   const { t } = useTranslation()
   const Icon = stat.icon
   const tone = statToneStyles[stat.tone]
-
   return (
     <section className={`subscription-stat-card subscription-stat-card--${stat.tone} group relative h-[206px] overflow-hidden rounded-[14px] border border-secondary-300 bg-secondary-50 px-8 py-8 shadow-[0_8px_26px_rgba(105,66,255,0.05)] transition-all duration-500 ease-out hover:-translate-y-1.5 hover:border-primary-200 hover:shadow-[0_18px_42px_rgba(105,66,255,0.16)]`}>
       <div className={`subscription-stat-glow absolute inset-0 origin-bottom-right bg-linear-to-br opacity-90 transition-all duration-500 ease-out ${tone.glow} ${tone.glowHover}`} />
@@ -80,7 +79,6 @@ function StatCard({ stat }) {
             {t(stat.note)}
           </span>
         </div>
-
         <div>
           <p className="subscription-stat-label text-[16px] font-medium leading-none text-primary-600">{t(stat.label)}</p>
           <p className="subscription-stat-value mt-4 text-[39px] font-black leading-none tracking-normal text-secondary-900">{t(stat.value)}</p>
@@ -92,7 +90,6 @@ function StatCard({ stat }) {
 
 function RevenueCard({ totalRevenue = "$42,850" }) {
   const { t } = useTranslation()
-
   return (
     <section className="subscription-revenue-card group h-[206px] overflow-hidden rounded-[14px] bg-linear-to-br from-[#251467] via-[#2B176D] to-[#372170] px-8 py-8 text-white shadow-[0_14px_34px_rgba(38,20,103,0.32)] transition-all duration-500 ease-out hover:-translate-y-1.5 hover:shadow-[0_24px_54px_rgba(38,20,103,0.46)]">
       <div className="flex items-start justify-between gap-4">
@@ -103,7 +100,6 @@ function RevenueCard({ totalRevenue = "$42,850" }) {
           ↑ 12.4%
         </span>
       </div>
-
       <div className="mt-[34px]">
         <p className="text-[17px] font-medium leading-none text-[#AFA3E2]">{t('Monthly Revenue')}</p>
         <p className="mt-4 text-[43px] font-black leading-none tracking-normal text-white">{totalRevenue}</p>
@@ -114,7 +110,6 @@ function RevenueCard({ totalRevenue = "$42,850" }) {
 
 function HeaderCell({ icon: Icon, title, className = '', showDivider = true }) {
   const { t } = useTranslation()
-
   return (
     <TableHead className={`h-[48px] p-0 align-middle ${className}`}>
       <div className="flex h-full items-center justify-between">
@@ -139,7 +134,6 @@ function PlanCell({ children, className = '' }) {
 function StatusBadge({ status }) {
   const { t } = useTranslation()
   const displayStatus = status === "ACTIVE" || status === "Active" ? "Active" : status === "DRAFT" || status === "Draft" ? "Draft" : "Archived";
-
   return (
     <span className={`inline-flex h-[24px] min-w-[68px] items-center justify-center rounded-full px-3 text-[11px] font-extrabold leading-none ${statusStyles[displayStatus] || statusStyles.Draft}`}>
       {t(displayStatus)}
@@ -228,9 +222,7 @@ export default function Subscriptions() {
   const paginatedPlans = visiblePlans.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
 
   useEffect(() => {
-    if (totalPages > 0 && currentPage > totalPages) {
-      setCurrentPage(totalPages)
-    }
+    if (totalPages > 0 && currentPage > totalPages) setCurrentPage(totalPages)
   }, [currentPage, totalPages])
 
   // Calculated Stats
@@ -334,17 +326,14 @@ export default function Subscriptions() {
             border-color: #34343d;
             box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.02);
           }
-
           .dark .subscription-stat-card:hover {
             border-color: #454552;
             box-shadow: 0 22px 46px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03);
           }
-
           .dark .subscription-stat-card--purple .subscription-stat-glow {
             background: radial-gradient(circle at 100% 100%, rgba(105, 66, 255, 0.48) 0%, rgba(105, 66, 255, 0.22) 25%, rgba(16, 16, 20, 0) 60%);
             opacity: 0.74;
           }
-
           .dark .subscription-stat-card--blue .subscription-stat-glow,
           .dark .subscription-stat-card--neutral .subscription-stat-glow {
             opacity: 0;
@@ -385,9 +374,7 @@ export default function Subscriptions() {
       </style>
       <div className="mx-auto flex w-full max-w-380 flex-col overflow-visible">
         <div className="grid grid-cols-1 gap-7 lg:grid-cols-[1fr_1fr_1fr_1fr]">
-          {stats.map((stat) => (
-            <StatCard key={stat.label} stat={stat} />
-          ))}
+          {stats.map((stat) => <StatCard key={stat.label} stat={stat} />)}
           <RevenueCard />
         </div>
 
@@ -395,40 +382,22 @@ export default function Subscriptions() {
           <div className="flex w-full flex-col gap-3 lg:flex-row lg:items-center xl:w-auto">
             <SearchInput
               value={search}
-              onChange={(value) => {
-                setSearch(value)
-                setCurrentPage(1)
-              }}
+              onChange={(value) => { setSearch(value); setCurrentPage(1) }}
               placeholder="Search"
               className="w-full lg:w-62.5 xl:w-120"
             />
-
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:flex lg:w-auto">
               <FilterDropdown
-                label="Sort by"
-                icon={SlidersHorizontal}
-                options={sortOptions}
-                value={sortBy}
-                onChange={(value) => {
-                  setSortBy(value)
-                  setCurrentPage(1)
-                }}
+                label="Sort by" icon={SlidersHorizontal} options={sortOptions} value={sortBy}
+                onChange={(value) => { setSortBy(value); setCurrentPage(1) }}
                 className="w-full lg:w-[196px]"
               />
-
               <FilterDropdown
-                label="Status"
-                icon={TrendUp}
-                options={statusOptions}
-                value={status}
-                onChange={(value) => {
-                  setStatus(value)
-                  setCurrentPage(1)
-                }}
+                label="Status" icon={TrendUp} options={statusOptions} value={status}
+                onChange={(value) => { setStatus(value); setCurrentPage(1) }}
                 className="w-full lg:w-[196px]"
               />
             </div>
-
             <button
               onClick={focusSearch}
               className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md px-3 text-[13px] font-bold text-primary-600 transition-colors hover:bg-primary-50 lg:justify-start"

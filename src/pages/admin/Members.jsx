@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   MoreVertical, User, Mail, Phone,
@@ -9,7 +10,6 @@ import { Badge } from '../../components/ui/Badge'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../components/ui/Table'
 import AddMemberModal from '../../components/ui/AddMemberModal'
 import { api } from '../../services/api'
-
 import { FilterDropdown } from '../../components/shared/FilterDropdown'
 import { Pagination } from '../../components/shared/Pagination'
 import { SearchInput } from '../../components/shared/SearchInput'
@@ -53,6 +53,7 @@ const TableHeaderCell = ({ icon: Icon, title, showPipe = true }) => (
 
 export default function Members() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState('All') // Status Filter: 'All', 'Active', 'Suspended', 'Pending'
   const [currentPage, setCurrentPage] = useState(1)
@@ -218,12 +219,13 @@ export default function Members() {
       <div className="w-full max-w-380 flex flex-col">
         {showModal && <AddMemberModal onClose={() => { setShowModal(false); fetchMembers(); }} />}
 
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-12 w-full">
-          <div className="flex flex-wrap items-center gap-4 flex-1">
+        {/* ── TOP BAR ── */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 w-full">
+          <div className="flex flex-wrap items-center gap-3 flex-1">
             <SearchInput
               value={search}
-              onChange={(val) => { setSearch(val); setCurrentPage(1); }}
-              placeholder="Search members..."
+              onChange={(val) => { setSearch(val); setCurrentPage(1) }}
+              placeholder={t('Search members...')}
               className="w-full md:w-80 lg:w-96"
             />
 
@@ -235,9 +237,19 @@ export default function Members() {
               onChange={(val) => { setSortBy(val); setCurrentPage(1); }}
             />
 
-            <button onClick={() => document.getElementById('global-search-input')?.focus()} className="h-10 flex items-center gap-2 px-4 py-2 rounded-md transition-colors bg-transparent text-primary-600 hover:bg-primary-50 active:bg-primary-100 cursor-pointer text-sm font-bold whitespace-nowrap">
-              <Funnel size={18} />
+            <button className="h-10 flex items-center gap-2 px-4 py-2 rounded-lg text-primary-600 hover:bg-primary-50 dark:hover:bg-secondary-800 transition-colors font-semibold text-sm">
+              <Funnel size={17} />
               {t('Filter')}
+            </button>
+
+            <span
+              className="hidden sm:inline h-5 w-px"
+              style={{ backgroundColor: 'var(--color-secondary-300, #d1d5db)' }}
+            />
+
+            <button className="h-10 flex items-center gap-2 px-4 py-2 rounded-lg text-primary-600 hover:bg-primary-50 dark:hover:bg-secondary-800 transition-colors font-semibold text-sm">
+              <Download size={17} />
+              {t('Import')}
             </button>
           </div>
 
@@ -369,6 +381,7 @@ export default function Members() {
           </Table>
         )}
 
+        {/* ── PAGINATION ── */}
         <div className="mt-8">
           <Pagination
             currentPage={currentPage}
