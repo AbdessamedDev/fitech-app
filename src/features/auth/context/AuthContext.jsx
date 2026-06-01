@@ -1,15 +1,24 @@
 import { createContext, useContext, useState } from "react";
-import { saveToken, removeToken, saveRole } from "../utils/authHelpers";
+import {
+  getStoredUser,
+  removeToken,
+  saveRefreshToken,
+  saveRole,
+  saveToken,
+  saveUser,
+} from "../utils/authHelpers";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => getStoredUser());
 
   const login = (userData) => {
     setUser(userData);
     if (userData.token) saveToken(userData.token);
+    if (userData.refreshToken) saveRefreshToken(userData.refreshToken);
     if (userData.role) saveRole(userData.role);
+    saveUser(userData);
   };
 
   const logout = () => {

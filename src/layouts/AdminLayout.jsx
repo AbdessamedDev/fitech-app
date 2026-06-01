@@ -25,6 +25,7 @@ export default function AdminLayout() {
                   '/admin/shop': 'Shop',
                   '/admin/settings': 'Settings',
                   '/admin/requests': 'Requests',
+                  '/admin/profile': 'Profile',
                   '/admin': 'Dashboard'   }
                                                                         
                         return titles[location.pathname] || 'Dashboard'

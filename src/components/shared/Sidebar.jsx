@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import Logo from "../../assets/Logo.png";
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../features/auth/hooks/useAuth';
 import {
   SquaresFourIcon,                
   Users,                
@@ -21,7 +22,9 @@ import {
 
 export function Sidebar({ role = 'admin' }) {
   const [collapsed, setCollapsed] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const location = useLocation()
+  const { handleLogout } = useAuth()
 
   const { t } = useTranslation()
 
@@ -48,11 +51,16 @@ export function Sidebar({ role = 'admin' }) {
   const settingsPath = role === 'coach' ? '/coach/settings' : '/admin/settings';
 
   const isActive = (path) => {
+    if (role === 'coach' && path === '/coach/dashboard') {
+      return ['/coach', '/coach/dashboard', '/coach/profile'].includes(location.pathname)
+    }
+
     return location.pathname === path || location.pathname.startsWith(path)
   }
 
   return (
-    <aside
+    <>
+      <aside
       className={`${
         collapsed ? 'w-20' : 'w-56'
       } bg-secondary-50 border border-secondary-300 transition-all duration-300 flex flex-col h-screen overflow-y-auto`}
@@ -116,6 +124,7 @@ export function Sidebar({ role = 'admin' }) {
           {!collapsed && <span>{t('Settings')}</span>}
         </Link>
         <button
+          onClick={() => setShowLogoutConfirm(true)}
           className="w-full flex items-center gap-3 px-3 py-3 transition-all duration-200 text-base font-medium cursor-pointer text-[#E46962]"
           title={collapsed ? t('Sign Out') : ''}
         >
@@ -124,5 +133,50 @@ export function Sidebar({ role = 'admin' }) {
         </button>
       </div>
     </aside>
+
+    {/* Sign Out Confirmation Modal */}
+    {showLogoutConfirm && (
+      <div 
+        className="fixed inset-0 bg-[#121219]/60 dark:bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-fade-in"
+        onClick={() => setShowLogoutConfirm(false)}
+      >
+        <div 
+          className="bg-secondary-50 border border-secondary-300 w-full max-w-[360px] rounded-3xl shadow-2xl p-6 flex flex-col items-center text-center gap-5 animate-scale-up"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Icon with beautiful glassmorphism style red background */}
+          <div className="w-14 h-14 rounded-full bg-red-100 dark:bg-red-950/40 flex items-center justify-center text-red-500 dark:text-red-400">
+            <SignOut size={30} className="rtl:rotate-180" />
+          </div>
+
+          {/* Text Info */}
+          <div className="space-y-1.5">
+            <h3 className="text-lg font-bold text-secondary-900 leading-none animate-pulse">
+              {t('Sign Out')}
+            </h3>
+            <p className="text-sm text-secondary-500 max-w-[280px]">
+              {t('Are you sure you want to sign out?')}
+            </p>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-3 w-full mt-2">
+            <button
+              onClick={() => setShowLogoutConfirm(false)}
+              className="flex-1 px-4 py-2.5 rounded-xl border border-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800 text-secondary-700 dark:text-secondary-200 text-sm font-medium transition cursor-pointer"
+            >
+              {t('Cancel')}
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex-1 px-4 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white text-sm font-medium transition cursor-pointer shadow-sm shadow-red-200 dark:shadow-none"
+            >
+              {t('Sign Out')}
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+  </>
   )
 }

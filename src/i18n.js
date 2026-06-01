@@ -427,7 +427,9 @@ const extraTranslations = {
     "Rejected": "Rejected",
     "Requests List": "Requests List",
     "No requests found": "No requests found",
-    "We couldn't find any requests matching your filters.": "We couldn't find any requests matching your filters."
+    "We couldn't find any requests matching your filters.": "We couldn't find any requests matching your filters.",
+    "Are you sure you want to sign out?": "Are you sure you want to sign out?",
+    "Cancel": "Cancel"
   },
   ar: {
     "Clients": "العملاء",
@@ -516,7 +518,9 @@ const extraTranslations = {
     "Rejected": "مرفوض",
     "Requests List": "قائمة الطلبات",
     "No requests found": "لم يتم العثور على طلبات",
-    "We couldn't find any requests matching your filters.": "لم نتمكن من العثور على أي طلبات تطابق فلاترك."
+    "We couldn't find any requests matching your filters.": "لم نتمكن من العثور على أي طلبات تطابق فلاترك.",
+    "Are you sure you want to sign out?": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+    "Cancel": "إلغاء"
   },
   fr: {
     "Clients": "Clients",
@@ -545,7 +549,9 @@ const extraTranslations = {
     "Pending": "En attente",
     "Requests List": "Liste des demandes",
     "No requests found": "Aucune demande trouvée",
-    "We couldn't find any requests matching your filters.": "Nous n'avons trouvé aucune demande correspondant à vos filtres."
+    "We couldn't find any requests matching your filters.": "Nous n'avons trouvé aucune demande correspondant à vos filtres.",
+    "Are you sure you want to sign out?": "Êtes-vous sûr de vouloir vous déconnecter?",
+    "Cancel": "Annuler"
   },
   es: {
     "Clients": "Clientes",
@@ -574,7 +580,9 @@ const extraTranslations = {
     "Pending": "Pendiente",
     "Requests List": "Lista de solicitudes",
     "No requests found": "No se encontraron solicitudes",
-    "We couldn't find any requests matching your filters.": "No pudimos encontrar ninguna solicitud que coincida con sus filtros."
+    "We couldn't find any requests matching your filters.": "No pudimos encontrar ninguna solicitud que coincida con sus filtros.",
+    "Are you sure you want to sign out?": "¿Está seguro de que desea cerrar sesión?",
+    "Cancel": "Cancelar"
   },
 };
 

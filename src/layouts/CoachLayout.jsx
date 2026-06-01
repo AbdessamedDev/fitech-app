@@ -21,6 +21,7 @@ export default function CoachLayout() {
       '/coach/schedule': 'Schedule',
       '/coach/messaging': 'Messaging',
       '/coach/settings': 'Settings',
+      '/coach/profile': 'Profile',
       '/coach': 'Profile'
     }
                                                                         

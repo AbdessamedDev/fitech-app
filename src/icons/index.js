@@ -189,4 +189,5 @@ export {
   // Finance page table icons
   ReceiptText,
   MoreVertical,
+
 };

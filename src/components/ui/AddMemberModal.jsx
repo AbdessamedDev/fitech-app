@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "./Button";
 import { User, EnvelopeSimple, Phone, X, IdentificationCard, PencilSimple } from "../../icons/index";
 import { GenderIntersex, CalendarDots, MoneyWavy, ListNumbers, HourglassSimple, CalendarBlank } from "@phosphor-icons/react";
+import { api } from "../../services/api";
 
 const tabs = ["Information", "Subscription"];
 
@@ -12,8 +13,38 @@ export default function AddMemberModal({ onClose }) {
   const [form, setForm] = useState({
     firstName: "", lastName: "", email: "", phone: "",
     gender: "Male", birthDate: "", medicalCertificate: null,
-    plan: "Gold Membership", startDate: "", priceOverride: "9.99",
+    plan: "", startDate: "", priceOverride: "",
   });
+
+  const [plans, setPlans] = useState([]);
+  const [loadingPlans, setLoadingPlans] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+
+  // Fetch plans on mount
+  useEffect(() => {
+    async function loadPlans() {
+      setLoadingPlans(true);
+      try {
+        const data = await api.listPlans();
+        if (Array.isArray(data)) {
+          setPlans(data);
+          if (data.length > 0) {
+            setForm(prev => ({
+              ...prev,
+              plan: data[0].id || data[0].planId || ""
+            }));
+          }
+        }
+      } catch (err) {
+        console.error("Error loading plans:", err);
+      } finally {
+        setLoadingPlans(false);
+      }
+    }
+    loadPlans();
+  }, []);
 
   const handleClose = () => {
     setIsClosing(true);
@@ -22,6 +53,82 @@ export default function AddMemberModal({ onClose }) {
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
   const handleFileChange = (e) => setForm({ ...form, medicalCertificate: e.target.files[0] });
+
+  const handleSubmit = async () => {
+    setError("");
+    setSuccess(false);
+
+    if (!form.firstName || !form.lastName || !form.email) {
+      setError("Please fill out all required fields (First Name, Last Name, and Email).");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // 1. Create Member
+      const formData = new FormData();
+      formData.append("FirstName", form.firstName);
+      formData.append("LastName", form.lastName);
+      formData.append("Email", form.email);
+      formData.append("PhoneNumber", form.phone || "");
+      formData.append("Gender", form.gender);
+      formData.append("DateOfBirth", form.birthDate ? new Date(form.birthDate).toISOString() : new Date().toISOString());
+      formData.append("Objectives", "Lose weight, build muscle");
+      formData.append("MedicalRestrictions", "None");
+      formData.append("Status", "Active");
+
+      if (form.medicalCertificate) {
+        formData.append("ProfilePicture", form.medicalCertificate);
+      }
+
+      const memberResponse = await api.createMember(formData);
+      const memberId = memberResponse?.memberId || memberResponse?.Data?.memberId || memberResponse?.data?.memberId;
+
+      if (!memberId) {
+        throw new Error("Member was created, but no Member ID was returned from backend.");
+      }
+
+      // 2. Add Subscription (if requested)
+      if (activeTab === "Subscription" && form.plan) {
+        const selectedPlanObj = plans.find(p => (p.id || p.planId) === form.plan);
+        const planId = selectedPlanObj ? (selectedPlanObj.id || selectedPlanObj.planId) : form.plan;
+
+        const subResponse = await api.createSubscription({
+          memberId,
+          planId,
+          paymentMethod: "Cash",
+          notes: "Initial membership subscription created via Admin portal."
+        });
+
+        const subscriptionId = subResponse?.subscriptionId || subResponse?.Data?.subscriptionId || subResponse?.data?.subscriptionId;
+
+        // 3. Auto Confirm Payment if Cash Method
+        if (subscriptionId) {
+          const planPrice = selectedPlanObj ? (selectedPlanObj.price || selectedPlanObj.amount || 0) : 0;
+          const finalAmount = parseFloat(form.priceOverride) || planPrice;
+
+          await api.confirmCashPayment({
+            subscriptionId,
+            amountReceived: finalAmount,
+            paymentMethod: "Cash",
+            notes: "Cash payment received at counter during member creation."
+          });
+        }
+      }
+
+      setSuccess(true);
+      setTimeout(() => {
+        handleClose();
+      }, 1500);
+
+    } catch (err) {
+      console.error("Error adding member:", err);
+      setError(err.message || "Failed to save member. Please check your network or backend connection.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-end p-4">
@@ -148,90 +255,100 @@ export default function AddMemberModal({ onClose }) {
                   <PencilSimple size={16} /> Create Custom Plan
                 </button>
               </div>
-
               {useSavedPlan ? (
-                <>
-                  {/* Select Plan */}
-                  <div>
-                    <label className="text-xs text-secondary-500 font-normal mb-2 block">Select member's Plan</label>
-                    <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
-                      <span className="text-secondary-300 text-base">☆</span>
-                      <select name="plan" value={form.plan} onChange={handleChange}
-                        className="w-full text-sm text-secondary-700 outline-none bg-transparent">
-                        <option value="Gold Membership">Gold Membership</option>
-                        <option value="Silver Membership">Silver Membership</option>
-                        <option value="Basic Monthly">Basic Monthly</option>
-                        <option value="Premium Monthly">Premium Monthly</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Plan Card */}
-                  <div className="border border-secondary-200 rounded-xl p-4">
-                    <div className="flex items-start justify-between mb-3">
+                (() => {
+                  const selectedPlanObj = plans.find(p => (p.id || p.planId) === form.plan) || plans[0] || { name: "Loading plans...", price: 0, sessionCount: 0, duration: "N/A" };
+                  const finalPrice = form.priceOverride || selectedPlanObj.price || 0;
+                  return (
+                    <>
+                      {/* Select Plan */}
                       <div>
-                        <p className="text-sm font-semibold text-secondary-700">Gold Membership</p>
-                        <p className="text-xs text-secondary-400 mt-0.5">All-access gym, pool, and sauna.</p>
+                        <label className="text-xs text-secondary-500 font-normal mb-2 block">Select member's Plan</label>
+                        <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
+                          <span className="text-secondary-300 text-base">☆</span>
+                          <select name="plan" value={form.plan} onChange={handleChange}
+                            className="w-full text-sm text-secondary-700 outline-none bg-transparent">
+                            {plans.map(p => (
+                              <option key={p.id || p.planId} value={p.id || p.planId}>
+                                {p.name} - ${p.price}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-xl font-bold text-primary-600">$9.99</p>
-                        <p className="text-xs text-secondary-400">/ 1 Months</p>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <span className="flex items-center gap-1 text-xs bg-secondary-100 text-secondary-600 px-2.5 py-1 rounded-full">∞ Unlimited Sessions</span>
-                      <span className="flex items-center gap-1 text-xs bg-secondary-100 text-secondary-600 px-2.5 py-1 rounded-full">⏰ Peak Hours Included</span>
-                    </div>
-                  </div>
 
-                  {/* Start Date & Price Override */}
-                  <div className="flex gap-3">
-                    <div className="flex-1">
-                      <label className="text-xs text-secondary-500 font-normal mb-2 block">Start Date</label>
-                      <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
-                        <CalendarDots size={16} className="text-secondary-300 shrink-0" />
-                        <input name="startDate" type="date" value={form.startDate} onChange={handleChange}
-                          className="w-full text-sm text-secondary-700 outline-none bg-transparent" />
+                      {/* Plan Card */}
+                      <div className="border border-secondary-200 rounded-xl p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <p className="text-sm font-semibold text-secondary-700">{selectedPlanObj.name}</p>
+                            <p className="text-xs text-secondary-400 mt-0.5">All-access gym membership plan.</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xl font-bold text-primary-600">${selectedPlanObj.price}</p>
+                            <p className="text-xs text-secondary-400">/ {selectedPlanObj.duration || "1 Month"}</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <span className="flex items-center gap-1 text-xs bg-secondary-100 text-secondary-600 px-2.5 py-1 rounded-full">
+                            {selectedPlanObj.sessionCount || selectedPlanObj.sessions || "∞"} Sessions
+                          </span>
+                          <span className="flex items-center gap-1 text-xs bg-secondary-100 text-secondary-600 px-2.5 py-1 rounded-full">⏰ Peak Hours Included</span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex-1">
-                      <label className="text-xs text-secondary-500 font-normal mb-2 block">Price Override ($)</label>
-                      <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
-                        <MoneyWavy size={16} className="text-secondary-300 shrink-0" />
-                        <input name="priceOverride" placeholder="9.99" value={form.priceOverride} onChange={handleChange}
-                          className="w-full text-sm text-secondary-700 outline-none bg-transparent" />
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Subscription Summary */}
-                  <div className="border border-secondary-200 rounded-xl p-4 bg-secondary-50">
-                    <p className="text-sm font-semibold text-secondary-700 mb-3">Subscription Summary</p>
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-9 h-9 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
-                        <CalendarDots size={18} className="text-primary-600" />
+                      {/* Start Date & Price Override */}
+                      <div className="flex gap-3">
+                        <div className="flex-1">
+                          <label className="text-xs text-secondary-500 font-normal mb-2 block">Start Date</label>
+                          <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
+                            <CalendarDots size={16} className="text-secondary-300 shrink-0" />
+                            <input name="startDate" type="date" value={form.startDate} onChange={handleChange}
+                              className="w-full text-sm text-secondary-700 outline-none bg-transparent" />
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <label className="text-xs text-secondary-500 font-normal mb-2 block">Price Override ($)</label>
+                          <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
+                            <MoneyWavy size={16} className="text-secondary-300 shrink-0" />
+                            <input name="priceOverride" placeholder={selectedPlanObj.price} value={form.priceOverride} onChange={handleChange}
+                              className="w-full text-sm text-secondary-700 outline-none bg-transparent" />
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-xs text-secondary-400">Expiration Date</p>
-                        <p className="text-sm font-semibold text-secondary-700">May 20, 2025</p>
+
+                      {/* Subscription Summary */}
+                      <div className="border border-secondary-200 rounded-xl p-4 bg-secondary-50">
+                        <p className="text-sm font-semibold text-secondary-700 mb-3">Subscription Summary</p>
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-9 h-9 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
+                            <CalendarDots size={18} className="text-primary-600" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-secondary-400">Expiration Date</p>
+                            <p className="text-sm font-semibold text-secondary-700">
+                              {form.startDate ? new Date(new Date(form.startDate).setMonth(new Date(form.startDate).getMonth() + 1)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '1 Month from Start'}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
+                            <ListNumbers size={18} className="text-primary-600" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-secondary-400">Session Allowance</p>
+                            <p className="text-sm font-semibold text-secondary-700">{selectedPlanObj.sessionCount || selectedPlanObj.sessions || "Unlimited"}</p>
+                          </div>
+                        </div>
+                        <div className="border-t border-secondary-200 mt-4 pt-4 flex items-center justify-between">
+                          <p className="text-sm text-secondary-600">Due Today</p>
+                          <p className="text-3xl font-bold text-secondary-700">${finalPrice}</p>
+                        </div>
+                        <p className="text-xs text-secondary-400 mt-1">First billing cycle starts on member activation.</p>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
-                        <ListNumbers size={18} className="text-primary-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-secondary-400">Session Allowance</p>
-                        <p className="text-sm font-semibold text-secondary-700">Unlimited</p>
-                      </div>
-                    </div>
-                    <div className="border-t border-secondary-200 mt-4 pt-4 flex items-center justify-between">
-                      <p className="text-sm text-secondary-600">Due Today</p>
-                      <p className="text-3xl font-bold text-secondary-700">$9.99</p>
-                    </div>
-                    <p className="text-xs text-secondary-400 mt-1">Next billing cycle starts May 20, 2025.</p>
-                  </div>
-                </>
+                    </>
+                  );
+                })()
               ) : (
                 <>
                   <div>
@@ -358,13 +475,42 @@ export default function AddMemberModal({ onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-secondary-200">
-          <Button onClick={handleClose} className="border border-secondary-300 text-secondary-600 text-sm px-6 py-2.5 rounded-xl hover:bg-secondary-100 transition-all">
-            Cancel
-          </Button>
-          <Button onClick={() => { console.log(form); handleClose(); }} className="bg-primary-600 text-white text-sm px-6 py-2.5 rounded-xl hover:bg-primary-900 transition-all">
-            {activeTab === "Subscription" ? "Add Subscription" : "Add Member"}
-          </Button>
+        <div className="flex flex-col gap-3 px-6 py-4 border-t border-secondary-200 bg-white rounded-b-2xl">
+          {error && (
+            <p className="text-rose-600 text-xs font-semibold text-center bg-rose-50 border border-rose-100 py-2 px-3 rounded-lg">
+              ✕ {error}
+            </p>
+          )}
+          {success && (
+            <p className="text-emerald-600 text-xs font-semibold text-center bg-emerald-50 border border-emerald-100 py-2 px-3 rounded-lg">
+              ✓ Member added successfully! Verification email is being dispatched...
+            </p>
+          )}
+          <div className="flex items-center justify-end gap-3 w-full">
+            <Button 
+              onClick={handleClose} 
+              disabled={loading}
+              className="border border-secondary-300 text-secondary-600 text-sm px-6 py-2.5 rounded-xl hover:bg-secondary-100 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSubmit} 
+              disabled={loading || success}
+              className="bg-primary-600 text-white text-sm px-6 py-2.5 rounded-xl hover:bg-primary-900 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                  Saving...
+                </>
+              ) : success ? (
+                "Success"
+              ) : (
+                activeTab === "Subscription" ? "Add Subscription" : "Add Member"
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     </div>

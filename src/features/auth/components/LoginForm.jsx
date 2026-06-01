@@ -10,20 +10,21 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const { handleLogin } = useAuth();
 
-  const onSubmit = async () => {
+  const onSubmit = async (event) => {
+    event.preventDefault();
     setError("");
     setLoading(true);
     try {
       await handleLogin(email, password);
     } catch (err) {
-      setError("Invalid email or password. Please try again.");
+      setError(err.message || "Invalid email or password. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <form onSubmit={onSubmit} className="flex flex-col gap-6">
 
       {/* Email */}
       <div className="flex flex-col gap-2">
@@ -35,6 +36,7 @@ export default function LoginForm() {
             placeholder="Enter your Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
             className="bg-transparent outline-none text-gray-700 text-sm w-full placeholder-gray-400"
           />
         </div>
@@ -50,6 +52,7 @@ export default function LoginForm() {
             placeholder="Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
             className="bg-transparent outline-none text-gray-700 text-sm w-full placeholder-gray-400"
           />
           <span
@@ -69,13 +72,14 @@ export default function LoginForm() {
       </p>
 
       <button
-        onClick={onSubmit}
+        type="submit"
         disabled={loading}
         className="bg-[#6c3fff] hover:bg-[#5a2ee0] text-white font-semibold py-3 rounded-lg transition text-base disabled:opacity-50"
       >
         {loading ? "Logging in..." : "Login"}
       </button>
 
-    </div>
+    </form>
   );
 }
+

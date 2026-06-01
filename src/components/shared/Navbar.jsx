@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react"
+import { Link } from "react-router-dom"
 import { CaretRight, Moon, SunDim, Bell, Gear } from "../../icons/index"
 import Logo from "../../assets/Logo.png"
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../features/auth/hooks/useAuth';
+import { getUserDisplayName } from '../../features/auth/utils/authHelpers';
 
 export function Navbar({ title = 'Dashboard', hasNotification = true, role = 'admin' }) {
   const { t } = useTranslation();
+  const { user } = useAuth();
 
   const [isDark, setIsDark] = useState(() =>
     document.documentElement.classList.contains("dark")
@@ -26,6 +30,8 @@ export function Navbar({ title = 'Dashboard', hasNotification = true, role = 'ad
   const toggleDark = () => {
     document.documentElement.classList.toggle('dark')
   }
+
+  const profilePath = role === 'coach' ? '/coach/dashboard' : '/admin/profile'
 
   const actions = [
     { icon: isDark ? SunDim : Moon, size: 18, onClick: toggleDark },
@@ -62,7 +68,10 @@ export function Navbar({ title = 'Dashboard', hasNotification = true, role = 'ad
           )
         })}
 
-        <div className="flex items-center gap-2 ltr:ml-2 rtl:mr-2">
+        <Link
+          to={profilePath}
+          className="flex items-center gap-2 rounded-md px-1.5 py-1 ltr:ml-2 rtl:mr-2 transition-all duration-300 hover:bg-primary-50 hover:shadow-[0_6px_16px_rgba(105,66,255,0.10)]"
+        >
           <img
             src={Logo} 
             alt="Profile"
@@ -71,13 +80,13 @@ export function Navbar({ title = 'Dashboard', hasNotification = true, role = 'ad
 
           <div className="text-left rtl:text-right">
             <p className="text-sm font-medium text-secondary-700">
-              Olivia Buckhorton
+              {getUserDisplayName(user)}
             </p>
             <p className="text-xs font-normal text-secondary-500">
               {t(role === 'coach' ? 'Coach' : 'Admin')}
             </p>
           </div>
-        </div>
+        </Link>
       </div>
     </nav>
   )

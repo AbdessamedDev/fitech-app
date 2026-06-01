@@ -1,28 +1,38 @@
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
 import { loginUser } from "../services/authService";
-import { saveToken } from "../utils/authHelpers";
+import { getDefaultRouteForRole, getRoleFromToken, normalizeRole } from "../utils/authHelpers";
 
 export function useAuth() {
   const { login, logout, user } = useAuthContext();
   const navigate = useNavigate();
 
   const handleLogin = async (email, password) => {
-    const data = await loginUser(email, password);
-    
-    // Save token
-    saveToken(data.Data.Token);
-    login(data.Data);
+    const response = await loginUser(email, password);
+    const token = response.data.Token ?? response.data.token;
+    const refreshToken = response.data.RefreshToken ?? response.data.refreshToken;
+    const role = normalizeRole(getRoleFromToken(token));
 
-    // Redirect to dashboard (update later when roles are added)
-    navigate("/admin/dashboard");
+    if (!token) {
+      throw new Error("Login response did not include an access token.");
+    }
 
-    return data;
+    const userData = {
+      ...response.data,
+      token,
+      refreshToken,
+      role,
+    };
+
+    login(userData);
+    navigate(getDefaultRouteForRole(role), { replace: true });
+
+    return response;
   };
 
   const handleLogout = () => {
     logout();
-    navigate("/login");
+    navigate("/login", { replace: true });
   };
 
   return { handleLogin, handleLogout, user };

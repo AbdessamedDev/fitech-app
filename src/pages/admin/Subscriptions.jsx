@@ -16,52 +16,15 @@ import {
   TrendUp,
   Wallet,
   ChartLineUp,
+  X,
+  PencilSimple as Edit2,
+  Trash as Trash2
 } from '../../icons/index'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../components/ui/Table'
 import { FilterDropdown } from '../../components/shared/FilterDropdown'
 import { Pagination } from '../../components/shared/Pagination'
 import { SearchInput } from '../../components/shared/SearchInput'
-
-const stats = [
-  {
-    label: 'Total Plans',
-    value: '12',
-    note: '+2 this month',
-    icon: Stack,
-    tone: 'purple',
-  },
-  {
-    label: 'Active Plans',
-    value: '8',
-    note: 'All live',
-    icon: CheckCircle,
-    tone: 'blue',
-  },
-  {
-    label: 'Most Popular',
-    value: 'Performance',
-    note: '45% Share',
-    icon: Star,
-    tone: 'neutral',
-  },
-]
-
-const plans = [
-  { id: 1, name: 'Plan name', price: '12$', status: 'ACTIVE', sessions: '20', duration: '1 Month', createdAt: '12:45 PM' },
-  { id: 2, name: 'Plan name', price: '12$', status: 'ACTIVE', sessions: '20', duration: '1 Month', createdAt: '12:45 PM' },
-  { id: 3, name: 'Plan name', price: '25$', status: 'DRAFT', sessions: '12', duration: '1 Month', createdAt: '2:00 PM' },
-  { id: 4, name: 'Plan name', price: '50$', status: 'ARCHIVED', sessions: '30', duration: '1 Month', createdAt: '11:00 AM' },
-  { id: 5, name: 'Plan name', price: '50$', status: 'ARCHIVED', sessions: '30', duration: '1 Month', createdAt: '11:00 AM' },
-  { id: 6, name: 'Plan name', price: '15$', status: 'ACTIVE', sessions: '25', duration: '1 Month', createdAt: '11:30 AM' },
-  { id: 7, name: 'Plan name', price: '18$', status: 'ACTIVE', sessions: '15', duration: '2 Months', createdAt: '10:15 AM' },
-  { id: 8, name: 'Plan name', price: '25$', status: 'DRAFT', sessions: '12', duration: '1 Month', createdAt: '2:00 PM' },
-  { id: 10, name: 'Plan name', price: '25$', status: 'DRAFT', sessions: '12', duration: '1 Month', createdAt: '2:00 PM' },
-  { id: 11, name: 'Plan name', price: '25$', status: 'DRAFT', sessions: '12', duration: '1 Month', createdAt: '2:00 PM' },
-  { id: 12, name: 'Plan name', price: '25$', status: 'DRAFT', sessions: '12', duration: '1 Month', createdAt: '2:00 PM' },
-  { id: 13, name: 'Plan name', price: '25$', status: 'DRAFT', sessions: '12', duration: '1 Month', createdAt: '2:00 PM' },
-  { id: 14, name: 'Plan name', price: '25$', status: 'DRAFT', sessions: '12', duration: '1 Month', createdAt: '2:00 PM' },
-  { id: 9, name: 'Plan name', price: '25$', status: 'DRAFT', sessions: '12', duration: '1 Month', createdAt: '2:00 PM' },
-]
+import { api } from '../../services/api'
 
 const sortOptions = [
   { label: 'Sort by', value: 'All' },
@@ -71,15 +34,15 @@ const sortOptions = [
 
 const statusOptions = [
   { label: 'Status', value: 'All' },
-  { label: 'Active', value: 'ACTIVE' },
-  { label: 'Draft', value: 'DRAFT' },
-  { label: 'Archived', value: 'ARCHIVED' },
+  { label: 'Active', value: 'Active' },
+  { label: 'Draft', value: 'Draft' },
+  { label: 'Archived', value: 'Archived' },
 ]
 
 const statusStyles = {
-  ACTIVE: 'bg-success-bg text-success',
-  DRAFT: 'bg-bg-suspended text-suspended',
-  ARCHIVED: 'bg-error-bg text-error',
+  Active: 'bg-success-bg text-success border border-success/15',
+  Draft: 'bg-bg-suspended text-suspended border border-suspended/15',
+  Archived: 'bg-error-bg text-error border border-error/15',
 }
 
 const statToneStyles = {
@@ -127,7 +90,7 @@ function StatCard({ stat }) {
   )
 }
 
-function RevenueCard() {
+function RevenueCard({ totalRevenue = "$42,850" }) {
   const { t } = useTranslation()
 
   return (
@@ -143,7 +106,7 @@ function RevenueCard() {
 
       <div className="mt-[34px]">
         <p className="text-[17px] font-medium leading-none text-[#AFA3E2]">{t('Monthly Revenue')}</p>
-        <p className="mt-4 text-[43px] font-black leading-none tracking-normal text-white">$42,850</p>
+        <p className="mt-4 text-[43px] font-black leading-none tracking-normal text-white">{totalRevenue}</p>
       </div>
     </section>
   )
@@ -175,40 +138,91 @@ function PlanCell({ children, className = '' }) {
 
 function StatusBadge({ status }) {
   const { t } = useTranslation()
+  const displayStatus = status === "ACTIVE" || status === "Active" ? "Active" : status === "DRAFT" || status === "Draft" ? "Draft" : "Archived";
 
   return (
-    <span className={`inline-flex h-[24px] min-w-[68px] items-center justify-center rounded-full px-3 text-[11px] font-extrabold leading-none ${statusStyles[status]}`}>
-      {t(status)}
+    <span className={`inline-flex h-[24px] min-w-[68px] items-center justify-center rounded-full px-3 text-[11px] font-extrabold leading-none ${statusStyles[displayStatus] || statusStyles.Draft}`}>
+      {t(displayStatus)}
     </span>
   )
 }
 
+// Offline fallback mock data
+const mockPlans = [
+  { id: 'p1', name: 'Gold Membership', price: 99.99, status: 'Active', sessionCount: 50, duration: '1 Month', createdAt: 'Nov 12, 2026' },
+  { id: 'p2', name: 'Silver Membership', price: 59.99, status: 'Active', sessionCount: 20, duration: '1 Month', createdAt: 'Nov 12, 2026' },
+  { id: 'p3', name: 'Basic Monthly', price: 29.99, status: 'Active', sessionCount: 12, duration: '1 Month', createdAt: 'Mar 08, 2025' },
+  { id: 'p4', name: 'Premium Monthly', price: 49.99, status: 'Active', sessionCount: 30, duration: '1 Month', createdAt: 'Mai 02, 2026' },
+  { id: 'p5', name: 'Annual Pro', price: 499.99, status: 'Active', sessionCount: 360, duration: '1 Year', createdAt: 'Dec 10, 2023' },
+  { id: 'p6', name: 'Weekend Warrior', price: 19.99, status: 'Draft', sessionCount: 8, duration: '1 Month', createdAt: 'Jun 06, 2026' }
+];
+
 export default function Subscriptions() {
   const { t } = useTranslation()
+  const [plans, setPlans] = useState([])
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState('All')
   const [status, setStatus] = useState('All')
   const [currentPage, setCurrentPage] = useState(1)
+  const [loading, setLoading] = useState(false)
+
+  // Modals state
+  const [showPlanModal, setShowPlanModal] = useState(false)
+  const [editingPlan, setEditingPlan] = useState(null)
+  const [planForm, setPlanForm] = useState({
+    name: "", price: "", sessionCount: "", duration: "1 Month"
+  })
+
+  // Operations dropdown
+  const [activeMenuId, setActiveMenuId] = useState(null)
+
   const itemsPerPage = 12
+
+  const loadPlans = async () => {
+    setLoading(true)
+    try {
+      const data = await api.listPlans();
+      if (Array.isArray(data)) {
+        setPlans(data);
+      } else {
+        setPlans(mockPlans);
+      }
+    } catch (err) {
+      console.error("Failed to load plans:", err);
+      // Offline fallback
+      setPlans(mockPlans);
+    } finally {
+      setLoading(false)
+    }
+  };
+
+  useEffect(() => {
+    loadPlans();
+  }, []);
 
   const visiblePlans = useMemo(() => {
     const query = search.trim().toLowerCase()
     let nextPlans = plans.filter((plan) => {
-      const matchesSearch = !query || [plan.name, plan.price, plan.status, plan.duration, plan.createdAt].join(' ').toLowerCase().includes(query)
-      const matchesStatus = status === 'All' || plan.status === status
+      const pName = plan.name || '';
+      const pPrice = String(plan.price || '');
+      const pStatus = plan.status || '';
+      const pDuration = plan.duration || '';
+
+      const matchesSearch = !query || [pName, pPrice, pStatus, pDuration].join(' ').toLowerCase().includes(query)
+      const matchesStatus = status === 'All' || pStatus.toLowerCase() === status.toLowerCase()
       return matchesSearch && matchesStatus
     })
 
     if (sortBy === 'price-asc') {
-      nextPlans = [...nextPlans].sort((a, b) => Number.parseInt(a.price, 10) - Number.parseInt(b.price, 10))
+      nextPlans = [...nextPlans].sort((a, b) => Number(a.price) - Number(b.price))
     }
 
     if (sortBy === 'price-desc') {
-      nextPlans = [...nextPlans].sort((a, b) => Number.parseInt(b.price, 10) - Number.parseInt(a.price, 10))
+      nextPlans = [...nextPlans].sort((a, b) => Number(b.price) - Number(a.price))
     }
 
     return nextPlans
-  }, [search, sortBy, status])
+  }, [plans, search, sortBy, status])
 
   const totalPages = Math.ceil(visiblePlans.length / itemsPerPage)
   const paginatedPlans = visiblePlans.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
@@ -219,12 +233,100 @@ export default function Subscriptions() {
     }
   }, [currentPage, totalPages])
 
+  // Calculated Stats
+  const stats = useMemo(() => {
+    const totalCount = plans.length;
+    const activeCount = plans.filter(p => p.status === 'Active' || p.status === 'ACTIVE').length;
+    const draftedCount = plans.filter(p => p.status === 'Draft' || p.status === 'DRAFT').length;
+
+    return [
+      {
+        label: 'Total Plans',
+        value: String(totalCount),
+        note: `+${draftedCount} drafts`,
+        icon: Stack,
+        tone: 'purple',
+      },
+      {
+        label: 'Active Plans',
+        value: String(activeCount),
+        note: 'All live and running',
+        icon: CheckCircle,
+        tone: 'blue',
+      },
+      {
+        label: 'Most Popular',
+        value: plans[0]?.name || 'N/A',
+        note: 'High demand',
+        icon: Star,
+        tone: 'neutral',
+      },
+    ]
+  }, [plans]);
+
   const focusSearch = () => {
     document.getElementById('global-search-input')?.focus()
   }
 
+  const handleOpenCreateModal = () => {
+    setEditingPlan(null);
+    setPlanForm({ name: "", price: "", sessionCount: "", duration: "1 Month" });
+    setShowPlanModal(true);
+  };
+
+  const handleOpenEditModal = (plan) => {
+    setActiveMenuId(null);
+    setEditingPlan(plan);
+    setPlanForm({
+      name: plan.name,
+      price: String(plan.price),
+      sessionCount: String(plan.sessionCount || plan.sessions || ""),
+      duration: plan.duration || "1 Month"
+    });
+    setShowPlanModal(true);
+  };
+
+  const handleSavePlan = async () => {
+    if (!planForm.name || !planForm.price) {
+      alert("Name and Price are required.");
+      return;
+    }
+
+    try {
+      const payload = {
+        name: planForm.name,
+        price: parseFloat(planForm.price) || 0,
+        sessionCount: parseInt(planForm.sessionCount) || null,
+        duration: planForm.duration,
+        status: "Active"
+      };
+
+      if (editingPlan) {
+        await api.updatePlan(editingPlan.id || editingPlan.planId, payload);
+      } else {
+        await api.createPlan(payload);
+      }
+
+      setShowPlanModal(false);
+      loadPlans();
+    } catch (err) {
+      alert(`Error saving plan: ${err.message}`);
+    }
+  };
+
+  const handleDeletePlan = async (plan) => {
+    setActiveMenuId(null);
+    if (!confirm(`Are you sure you want to soft-delete the "${plan.name}" plan?`)) return;
+    try {
+      await api.deletePlan(plan.id || plan.planId);
+      loadPlans();
+    } catch (err) {
+      alert(`Error deleting plan: ${err.message}`);
+    }
+  };
+
   return (
-    <div className="min-h-full w-full bg-secondary-100 px-4 py-[36px] text-sm text-secondary-700 sm:px-8">
+    <div className="min-h-full w-full bg-secondary-100 px-4 py-[36px] text-sm text-secondary-700 sm:px-8 overflow-visible">
       <style>
         {`
           .dark .subscription-stat-card {
@@ -281,7 +383,7 @@ export default function Subscriptions() {
           }
         `}
       </style>
-      <div className="mx-auto flex w-full max-w-380 flex-col">
+      <div className="mx-auto flex w-full max-w-380 flex-col overflow-visible">
         <div className="grid grid-cols-1 gap-7 lg:grid-cols-[1fr_1fr_1fr_1fr]">
           {stats.map((stat) => (
             <StatCard key={stat.label} stat={stat} />
@@ -336,58 +438,196 @@ export default function Subscriptions() {
             </button>
           </div>
 
-          <button className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-[10px] bg-primary-600 px-5 text-[14px] font-bold text-white shadow-[0_8px_18px_rgba(105,66,255,0.26)] transition-all duration-200 ease-out hover:bg-primary-700 active:scale-[0.98]">
+          <button onClick={handleOpenCreateModal} className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-[10px] bg-primary-600 px-5 text-[14px] font-bold text-white shadow-[0_8px_18px_rgba(105,66,255,0.26)] transition-all duration-200 ease-out hover:bg-primary-700 active:scale-[0.98]">
             <PlusCircle size={20} weight="bold" />
             {t('Add Plan')}
           </button>
         </div>
 
-        <Table className="mt-8 w-full overflow-hidden rounded-lg border border-secondary-200 bg-secondary-50 shadow-none">
-          <colgroup>
-            <col className="w-[186px]" />
-            <col className="w-[152px]" />
-            <col className="w-[168px]" />
-            <col className="w-[176px]" />
-            <col className="w-[160px]" />
-            <col className="w-[158px]" />
-            <col className="w-[146px]" />
-          </colgroup>
-          <TableHeader className="border-b border-secondary-200 bg-secondary-50">
-            <TableRow isHeader={true} className="border-b-0 bg-secondary-50 hover:bg-secondary-50">
-              <HeaderCell icon={Pulse} title="Plan Name" />
-              <HeaderCell icon={Tag} title="Price" />
-              <HeaderCell icon={ChartLineUp} title="Status" />
-              <HeaderCell icon={CalendarBlank} title="Sessions Number" />
-              <HeaderCell icon={CalendarBlank} title="Duration" />
-              <HeaderCell icon={Clock} title="Created At" />
-              <HeaderCell icon={GearSixIcon} title="Operations" showDivider={false} />
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedPlans.map((plan) => (
-              <TableRow key={plan.id} className="border-b border-secondary-200 bg-secondary-50 last:border-b-0 hover:bg-secondary-100">
-                <PlanCell>{t(plan.name)}</PlanCell>
-                <PlanCell>{plan.price}</PlanCell>
-                <PlanCell>
-                  <StatusBadge status={plan.status} />
-                </PlanCell>
-                <PlanCell>{plan.sessions}</PlanCell>
-                <PlanCell>{t(plan.duration)}</PlanCell>
-                <PlanCell>{plan.createdAt}</PlanCell>
-                <PlanCell className="px-0">
-                  <button className="inline-flex h-7 w-7 items-center justify-center rounded-full text-secondary-700 transition-colors hover:bg-secondary-200">
-                    <DotsThreeVertical size={19} weight="bold" />
-                  </button>
-                </PlanCell>
+        {loading && plans.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 gap-4">
+            <div className="w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
+            <p className="text-secondary-500 font-semibold text-base animate-pulse">{t('Loading plans...')}</p>
+          </div>
+        ) : (
+          <Table className="mt-8 w-full overflow-visible rounded-lg border border-secondary-200 bg-secondary-50 shadow-none">
+            <colgroup>
+              <col className="w-[186px]" />
+              <col className="w-[152px]" />
+              <col className="w-[168px]" />
+              <col className="w-[176px]" />
+              <col className="w-[160px]" />
+              <col className="w-[158px]" />
+              <col className="w-[146px]" />
+            </colgroup>
+            <TableHeader className="border-b border-secondary-200 bg-secondary-50">
+              <TableRow isHeader={true} className="border-b-0 bg-secondary-50 hover:bg-secondary-50">
+                <HeaderCell icon={Pulse} title="Plan Name" />
+                <HeaderCell icon={Tag} title="Price" />
+                <HeaderCell icon={ChartLineUp} title="Status" />
+                <HeaderCell icon={CalendarBlank} title="Sessions Number" />
+                <HeaderCell icon={CalendarBlank} title="Duration" />
+                <HeaderCell icon={Clock} title="Created At" showDivider={false} />
+                <HeaderCell icon={GearSixIcon} title="Operations" showDivider={false} />
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {paginatedPlans.map((plan) => {
+                const planId = plan.id || plan.planId;
+                const formattedPrice = typeof plan.price === 'number' ? `$${plan.price.toFixed(2)}` : plan.price;
+                const sessions = plan.sessionCount || plan.sessions || "Unlimited";
+                const creationDate = plan.createdAt ? (plan.createdAt.includes('PM') || plan.createdAt.includes('AM') ? plan.createdAt : new Date(plan.createdAt).toLocaleDateString()) : "Counter Registration";
+
+                return (
+                  <TableRow key={planId} className="border-b border-secondary-200 bg-secondary-50 last:border-b-0 hover:bg-secondary-100 overflow-visible">
+                    <PlanCell>{t(plan.name)}</PlanCell>
+                    <PlanCell>{formattedPrice}</PlanCell>
+                    <PlanCell>
+                      <StatusBadge status={plan.status || 'Active'} />
+                    </PlanCell>
+                    <PlanCell>{sessions}</PlanCell>
+                    <PlanCell>{t(plan.duration || '1 Month')}</PlanCell>
+                    <PlanCell>{creationDate}</PlanCell>
+                    <PlanCell className="px-0 relative overflow-visible">
+                      <button
+                        onClick={() => setActiveMenuId(activeMenuId === planId ? null : planId)}
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-full text-secondary-700 transition-colors hover:bg-secondary-200 cursor-pointer"
+                      >
+                        <DotsThreeVertical size={19} weight="bold" />
+                      </button>
+
+                      {activeMenuId === planId && (
+                        <>
+                          <div className="fixed inset-0 z-10" onClick={() => setActiveMenuId(null)} />
+                          <div className="absolute right-8 top-0 mt-1 w-32 bg-white rounded-lg border border-secondary-200 shadow-lg z-20 py-1 text-left">
+                            <button
+                              onClick={() => handleOpenEditModal(plan)}
+                              className="w-full px-4 py-2 text-xs font-semibold text-secondary-600 hover:bg-secondary-100 flex items-center gap-2 cursor-pointer"
+                            >
+                              <Edit2 size={12} />
+                              {t('Edit Plan')}
+                            </button>
+                            <button
+                              onClick={() => handleDeletePlan(plan)}
+                              className="w-full px-4 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer"
+                            >
+                              <Trash2 size={12} />
+                              {t('Delete Plan')}
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </PlanCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        )}
 
         <div className="mt-[34px]">
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </div>
       </div>
+
+      {/* Plan Add/Edit Modal */}
+      {showPlanModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-xs transition-all duration-300">
+          <div className="bg-white border border-secondary-300 rounded-2xl shadow-2xl w-full max-w-md mx-4 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-secondary-200 bg-secondary-100">
+              <h3 className="font-bold text-secondary-800 text-base flex items-center gap-2">
+                <Pulse size={20} className="text-primary-600 animate-pulse" />
+                {editingPlan ? t('Edit Plan') : t('Create Subscription Plan')}
+              </h3>
+              <button
+                onClick={() => setShowPlanModal(false)}
+                className="p-1.5 rounded-lg hover:bg-secondary-200 text-secondary-400 hover:text-secondary-700 transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            {/* Modal Body */}
+            <div className="p-6 flex flex-col gap-4">
+              <div>
+                <label className="text-xs text-secondary-500 font-bold uppercase tracking-wider mb-2 block">{t('Plan Name')}</label>
+                <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
+                  <Pulse size={16} className="text-secondary-300 shrink-0" />
+                  <input
+                    value={planForm.name}
+                    onChange={(e) => setPlanForm({ ...planForm, name: e.target.value })}
+                    placeholder="e.g. Premium Monthly"
+                    className="w-full text-sm text-secondary-700 outline-none bg-transparent"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <label className="text-xs text-secondary-500 font-bold uppercase tracking-wider mb-2 block">{t('Price ($)')}</label>
+                  <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
+                    <Tag size={16} className="text-secondary-300 shrink-0" />
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={planForm.price}
+                      onChange={(e) => setPlanForm({ ...planForm, price: e.target.value })}
+                      placeholder="49.99"
+                      className="w-full text-sm text-secondary-700 outline-none bg-transparent"
+                    />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <label className="text-xs text-secondary-500 font-bold uppercase tracking-wider mb-2 block">{t('Sessions')}</label>
+                  <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
+                    <CalendarBlank size={16} className="text-secondary-300 shrink-0" />
+                    <input
+                      type="number"
+                      value={planForm.sessionCount}
+                      onChange={(e) => setPlanForm({ ...planForm, sessionCount: e.target.value })}
+                      placeholder="e.g. 30"
+                      className="w-full text-sm text-secondary-700 outline-none bg-transparent"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs text-secondary-500 font-bold uppercase tracking-wider mb-2 block">{t('Duration')}</label>
+                <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
+                  <Clock size={16} className="text-secondary-300 shrink-0" />
+                  <select
+                    value={planForm.duration}
+                    onChange={(e) => setPlanForm({ ...planForm, duration: e.target.value })}
+                    className="w-full text-sm text-secondary-700 outline-none bg-transparent"
+                  >
+                    <option value="1 Week">1 Week</option>
+                    <option value="1 Month">1 Month</option>
+                    <option value="3 Months">3 Months</option>
+                    <option value="6 Months">6 Months</option>
+                    <option value="1 Year">1 Year</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            {/* Modal Footer */}
+            <div className="flex justify-end gap-3 px-6 py-4 border-t border-secondary-200 bg-secondary-100 shrink-0">
+              <button
+                onClick={() => setShowPlanModal(false)}
+                className="h-10 px-5 rounded-md bg-secondary-200 hover:bg-secondary-300 text-secondary-700 hover:text-secondary-900 transition-all font-bold text-sm cursor-pointer border border-secondary-300"
+              >
+                {t('Cancel')}
+              </button>
+              <button
+                onClick={handleSavePlan}
+                className="h-10 px-5 rounded-md bg-primary-600 hover:bg-primary-700 text-white font-bold text-sm cursor-pointer transition-all shadow-md"
+              >
+                {t('Save Plan')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
 import AdminLayout from '../layouts/AdminLayout'
 import CoachLayout from '../layouts/CoachLayout'
 import Dashboard from '../pages/admin/Dashboard'
@@ -10,11 +10,15 @@ import Reports from '../pages/admin/Reports'
 import Shop from '../pages/admin/Shop'
 import Settings from '../pages/admin/Settings'
 import Requests from '../pages/admin/Requests'
+import AdminProfile from '../pages/admin/Profile'
+import CoachProfile from '../pages/coach/Profile'
 import Clients from '../pages/coach/Clients'
 import Programs, { ProgramDetails } from '../pages/coach/Programs'
 import Messaging from '../pages/coach/Messaging'
 import LoginPage from '../pages/auth/LoginPage'
+import VerifyEmailPage from '../pages/auth/VerifyEmailPage'
 import { useTranslation } from 'react-i18next'
+import { getDefaultRouteForRole, getToken, getUserRole, normalizeRole } from '../features/auth/utils/authHelpers'
 
 function ComingSoonPage({ title }) {
   const { t } = useTranslation()
@@ -26,10 +30,51 @@ function ComingSoonPage({ title }) {
   )
 }
 
+function RequireAuth({ allowedRoles, children }) {
+  const token = getToken()
+  const role = normalizeRole(getUserRole())
+
+  if (!token) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (allowedRoles && !allowedRoles.includes(role)) {
+    return <Navigate to={getDefaultRouteForRole(role)} replace />
+  }
+
+  return children
+}
+
+function StartRoute() {
+  const token = getToken()
+  const role = normalizeRole(getUserRole())
+
+  if (!token) {
+    return <Navigate to="/login" replace />
+  }
+
+  return <Navigate to={getDefaultRouteForRole(role)} replace />
+}
+
+function LoginRoute() {
+  const token = getToken()
+  const role = normalizeRole(getUserRole())
+
+  if (token) {
+    return <Navigate to={getDefaultRouteForRole(role)} replace />
+  }
+
+  return <LoginPage />
+}
+
 export const router = createBrowserRouter([
   {
     path: '/admin',
-    element: <AdminLayout />,
+    element: (
+      <RequireAuth allowedRoles={['admin']}>
+        <AdminLayout />
+      </RequireAuth>
+    ),
     children: [
       {
         path: '/admin',
@@ -68,6 +113,10 @@ export const router = createBrowserRouter([
         element: <Requests />,
       },
       {
+        path: '/admin/profile',
+        element: <AdminProfile />,
+      },
+      {
         path: '/admin/settings',
         element: <Settings scope="admin" />,
       },
@@ -75,15 +124,23 @@ export const router = createBrowserRouter([
   },
   {
     path: '/coach',
-    element: <CoachLayout />,
+    element: (
+      <RequireAuth allowedRoles={['coach']}>
+        <CoachLayout />
+      </RequireAuth>
+    ),
     children: [
       {
         path: '/coach',
-        element: <Dashboard />,
+        element: <CoachProfile />,
       },
       {
         path: '/coach/dashboard',
-        element: <Dashboard />,
+        element: <CoachProfile />,
+      },
+      {
+        path: '/coach/profile',
+        element: <CoachProfile />,
       },
       {
         path: '/coach/clients',
@@ -117,10 +174,14 @@ export const router = createBrowserRouter([
   },
   {
     path: '/login',
-    element: <LoginPage/>,
+    element: <LoginRoute />,
+  },
+  {
+    path: '/confirm-email',
+    element: <VerifyEmailPage />,
   },
   {
     path: '/',
-    element: <Dashboard />,
+    element: <StartRoute />,
   }
 ])
