@@ -148,7 +148,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Row 2: Charts & Actions */}
+        {/* Row 2: Charts (Membership Growth & Membership Plans) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
           {/* Membership Growth Chart */}
@@ -156,11 +156,8 @@ export default function Dashboard() {
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h3 className="text-xl font-bold text-secondary-900 font-sans tracking-tight">{t('Membership Growth')}</h3>
-                <p className="text-[14px] font-normal text-secondary-600 mt-1">{t('Historical performance over the last 6 months')}</p>
+                <p className="text-[14px] font-normal text-secondary-600 mt-1">{t('Historical performance over the current year')}</p>
               </div>
-              <button className="flex items-center gap-2 bg-secondary-200 text-secondary-900 px-4 py-2 rounded-full text-xs font-semibold hover:bg-gray-200 transition-colors">
-                {t('Last 6 Months')} <CaretDown size={14} weight="bold" />
-              </button>
             </div>
             <div className="flex-1 w-full min-h-75 -ml-2">
               <ResponsiveContainer width="100%" height="100%">
@@ -197,40 +194,8 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Quick Actions & Occupancy */}
-          <div className="lg:col-span-4 py-4 px-12 bg-primary-50 border border-secondary-300 rounded-2xl flex flex-col gap-3 animate-fade-up" style={{ animationDelay: '500ms' }}>
-            <div className="py-4 rounded-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.01)] flex-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-shadow duration-300">
-              <h3 className="text-xl font-bold text-secondary-800 mb-6 font-sans tracking-tight">{t('Quick Actions')}</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <QuickAction icon={<UserPlus size={26} weight="regular" color="#6942FF" />} title={t('Add Member')} />
-                <QuickAction icon={<CreditCard size={26} weight="regular" color="#6942FF" />} title={t('New Subscription')} />
-                <QuickAction icon={<BoxingGloveIcon size={26} weight="regular" color="#6942FF" />} title={t('Add a Coach')} />
-                <QuickAction icon={<Megaphone size={26} weight="regular" color="#6942FF" />} title={t('Broadcast')} />
-              </div>
-            </div>
-            
-            <div className="bg-linear-to-r from-primary-900 to-primary-600 rounded-[20px] w-full mx-auto mb-6 -mt-2 p-7 shadow-lg relative overflow-hidden flex flex-col justify-end group hover:-translate-y-1 transition-transform duration-300">
-              <BarbellIcon size={140} weight="fill" className="absolute ltr:-right-8 rtl:-left-8 -bottom-6 text-white opacity-10 transform rotate-12 pointer-events-none group-hover:rotate-0 transition-transform duration-700" />
-              <div className="relative z-10">
-                <p className="text-[11px] font-bold text-secondary-50 uppercase tracking-[0.15em] mb-1.5">{t('Gym Occupancy')}</p>
-                <div className="flex items-end gap-2 mb-4">
-                  <h2 className="text-[35px] font-bold text-secondary-50 leading-none tracking-tight">68%</h2>
-                  <span className="text-secondary-50 text-[15px] font-medium mb-1">{t('Full')}</span>
-                </div>
-                <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden">
-                  <div className="h-full bg-secondary-50 rounded-full relative" style={{ width: '68%', transition: 'width 1.5s cubic-bezier(0.22, 1, 0.36, 1) 0.5s' }}>
-                    <div className="absolute top-0 right-0 bottom-0 w-8 bg-linear-to-r from-transparent to-white/50 blur-[2px]"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Row 3: Membership Plans & Course Popularity */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Donut Chart */}
-          <div className="lg:col-span-4 bg-secondary-50 p-8 rounded-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-secondary-300 flex flex-col animate-fade-up hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-300" style={{ animationDelay: '600ms' }}>
+          {/* Membership Plans Donut Chart */}
+          <div className="lg:col-span-4 bg-secondary-50 p-8 rounded-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-secondary-300 flex flex-col animate-fade-up hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-300" style={{ animationDelay: '500ms' }}>
             <div className="w-full mb-8">
               <h3 className="text-xl font-bold text-secondary-800 font-sans tracking-tight">{t('Membership Plans')}</h3>
               <p className="text-[14px] text-secondary-700 mt-1">{t('Active distribution by tier')}</p>
@@ -284,68 +249,64 @@ export default function Dashboard() {
               ))}
             </div>
           </div>
-
-          {/* Progress Bars */}
-          <div className="lg:col-span-8 bg-secondary-50  p-8 rounded-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-secondary-300 flex flex-col animate-fade-up hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-300" style={{ animationDelay: '700ms' }}>
-            <div className="flex justify-between items-start mb-8">
-              <div>
-                <h3 className="text-xl font-bold text-secondary-800 font-sans tracking-tight">{t('Course Popularity')}</h3>
-                <p className="text-[14px] text-secondary-600 mt-1">{t('Enrollment trends per class type')}</p>
-              </div>
-              <button className="text-primary-800 font-bold text-[14px] pt-1 hover:text-[#563BCA] transition-colors cursor-pointer">
-                {t('View All Courses')}
-              </button>
-            </div>
-            
-            <div className="flex flex-col gap-8 justify-center flex-1 pb-4">
-              <CourseProgress title="HIGH INTENSITY INTERVAL TRAINING (HIIT)" percentage={88} delay="800ms" />
-              <CourseProgress title="POWER VINYASA YOGA" percentage={74} delay="900ms" />
-              <CourseProgress title="BRAZILIAN JIU-JITSU" percentage={92} delay="1000ms" />
-              <CourseProgress title="OLYMPIC WEIGHTLIFTING" percentage={45} delay="1100ms" />
-            </div>
-          </div>
         </div>
 
-        {/* Row 4: Sessions */}
-        <div className="bg-secondary-50 p-8 rounded-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-secondary-300 animate-fade-up hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-300" style={{ animationDelay: '800ms' }}>
-          <div className="flex justify-between items-center mb-8">
-            <h3 className="text-xl font-bold text-secondary-900 font-sans tracking-tight">{t('Upcoming Sessions')}</h3>
-            <div className="flex gap-2">
-              <button 
-                onClick={handlePrevSession}
-                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-secondary-100 transition-colors text-secondary-900 cursor-pointer"
-              >
-                <CaretLeft size={16} weight="bold" />
-              </button>
-              <button 
-                onClick={handleNextSession}
-                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-secondary-100 transition-colors text-secondary-900 cursor-pointer"
-              >
-                <CaretRight size={16} weight="bold" />
-              </button>
-            </div>
-          </div>
+        {/* Row 3: Upcoming Sessions & Quick Actions */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
-          <div className="overflow-hidden w-full px-4 pt-6 pb-8 -mx-4 -mt-6 -mb-8">
-            <div 
-              className="flex gap-5 carousel-track transition-transform duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
-              style={{ transform: `translateX(calc(${currentSessionIndex} * var(--translate-step)))` }}
-            >
-              {extendedSessions.map((session, idx) => {
-                const styles = sessionTypeStyles[session.type] || sessionTypeStyles.default;
-                return (
-                  <div key={`${session.id}-${idx}`} className="carousel-item">
-                    <SessionCard 
-                      type={session.type} typeColor={styles.text} typeBg={styles.bg}
-                      time={session.time} title={session.title}
-                      avatar={session.avatar} instructor={session.instructor} enrolled={session.enrolled}
-                      idx={(idx % 4) + 1}
-                    />
-                  </div>
-                );
-              })}
+          {/* Upcoming Sessions Carousel */}
+          <div className="lg:col-span-8 bg-secondary-50 p-8 rounded-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-secondary-300 flex flex-col animate-fade-up hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-300" style={{ animationDelay: '600ms' }}>
+            <div className="flex justify-between items-center mb-8">
+              <h3 className="text-xl font-bold text-secondary-900 font-sans tracking-tight">{t('Upcoming Sessions')}</h3>
+              <div className="flex gap-2">
+                <button 
+                  onClick={handlePrevSession}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-secondary-100 transition-colors text-secondary-900 cursor-pointer"
+                >
+                  <CaretLeft size={16} weight="bold" />
+                </button>
+                <button 
+                  onClick={handleNextSession}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-secondary-100 transition-colors text-secondary-900 cursor-pointer"
+                >
+                  <CaretRight size={16} weight="bold" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="overflow-hidden w-full px-4 pt-6 pb-8 -mx-4 -mt-6 -mb-8">
+              <div 
+                className="flex gap-5 carousel-track transition-transform duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
+                style={{ transform: `translateX(calc(${currentSessionIndex} * var(--translate-step)))` }}
+              >
+                {extendedSessions.map((session, idx) => {
+                  const styles = sessionTypeStyles[session.type] || sessionTypeStyles.default;
+                  return (
+                    <div key={`${session.id}-${idx}`} className="carousel-item">
+                      <SessionCard 
+                        type={session.type} typeColor={styles.text} typeBg={styles.bg}
+                        time={session.time} title={session.title}
+                        avatar={session.avatar} instructor={session.instructor} enrolled={session.enrolled}
+                        idx={(idx % 4) + 1}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
+
+          {/* Quick Actions (Without Gym Occupancy) */}
+          <div className="lg:col-span-4 p-8 bg-secondary-50 border border-secondary-300 rounded-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-start animate-fade-up hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-300" style={{ animationDelay: '700ms' }}>
+            <h3 className="text-xl font-bold text-secondary-800 mb-6 font-sans tracking-tight">{t('Quick Actions')}</h3>
+            <div className="grid grid-cols-2 gap-4 flex-1 items-center">
+              <QuickAction icon={<UserPlus size={26} weight="regular" color="#6942FF" />} title={t('Add Member')} />
+              <QuickAction icon={<CreditCard size={26} weight="regular" color="#6942FF" />} title={t('New Subscription')} />
+              <QuickAction icon={<BoxingGloveIcon size={26} weight="regular" color="#6942FF" />} title={t('Add a Coach')} />
+              <QuickAction icon={<Megaphone size={26} weight="regular" color="#6942FF" />} title={t('Broadcast')} />
+            </div>
+          </div>
+
         </div>
 
       </div>
@@ -413,7 +374,7 @@ function CourseProgress({ title, percentage, delay }) {
 function SessionCard({ type, typeColor, typeBg, time, title, avatar, instructor, enrolled, idx }) {
   const { t } = useTranslation();
   return (
-    <div className="bg-secondary-100 border border-secondary-200 rounded-[20px] p-6 flex flex-col justify-between hover:-translate-y-1.5 hover:shadow-[0_10px_30px_rgba(0,0,0,0.05)] transition-all duration-300 opacity-0 animate-fade-up" style={{ animationDelay: `${800 + (idx * 100)}ms` }}>
+    <div className="h-[215px] bg-secondary-100 border border-secondary-200 rounded-[20px] p-6 flex flex-col justify-between hover:-translate-y-1.5 hover:shadow-[0_10px_30px_rgba(0,0,0,0.05)] transition-all duration-300 opacity-0 animate-fade-up" style={{ animationDelay: `${800 + (idx * 100)}ms` }}>
       <div>
         <div className="flex justify-between items-center mb-4 text-[11px] font-bold">
           <span className={`px-2.5 py-1 rounded-md ${typeBg} ${typeColor}`}>{type}</span>

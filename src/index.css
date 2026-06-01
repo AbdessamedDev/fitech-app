@@ -116,6 +116,10 @@
     @apply w-full h-full;
   }
 
+  button, [role="button"] {
+    @apply cursor-pointer;
+  }
+
   /* Scrollbar */
   ::-webkit-scrollbar {
     width: 8px;

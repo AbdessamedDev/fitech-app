@@ -6,7 +6,6 @@ import { getLanguageCode, loadScopedSettings, saveScopedSettings } from './setti
 export function SystemPreferences({ scope = 'admin' }) {
   const { t, i18n } = useTranslation();
   const scopedSettings = loadScopedSettings(scope);
-  const [unit, setUnit] = useState(scopedSettings.unit);
   const [theme, setTheme] = useState(scopedSettings.theme);
   const [language, setLanguage] = useState(scopedSettings.language);
 
@@ -26,8 +25,6 @@ export function SystemPreferences({ scope = 'admin' }) {
   const languageOptions = [
     { value: 'English (United States)', labelKey: 'English (United States)' },
     { value: 'French (France)', labelKey: 'French (France)' },
-    { value: 'Spanish (Spain)', labelKey: 'Spanish (Spain)' },
-    { value: 'Arabic', labelKey: 'Arabic' },
   ];
 
   // Handle Theme
@@ -55,11 +52,6 @@ export function SystemPreferences({ scope = 'admin' }) {
     }
   };
 
-  const handleUnitChange = (nextUnit) => {
-    setUnit(nextUnit);
-    saveScopedSettings(scope, { unit: nextUnit });
-  };
-
   const handleLanguageChange = (nextLanguage) => {
     const languageCode = getLanguageCode(nextLanguage);
     setLanguage(nextLanguage);
@@ -70,35 +62,8 @@ export function SystemPreferences({ scope = 'admin' }) {
   };
 
   return (
-    <div className="bg-secondary-200/40 border border-secondary-300 rounded-xl shadow-sm p-6">
-      <h3 className="text-secondary-800 font-bold text-[18px] tracking-tight mb-4">{t('System Preferences')}</h3>
-
-      {/* Measurement Units */}
-      <div className="mb-6">
-        <p className="text-[12px] font-bold tracking-widest uppercase text-secondary-400 mb-2">{t('MEASUREMENT UNITS')}</p>
-        <div className="flex items-center rounded-lg overflow-hidden p-1 bg-secondary-100">
-          <button
-            onClick={() => handleUnitChange('metric')}
-            className={`flex-1 h-[38px] text-[13px] font-bold rounded-md transition-all duration-200 cursor-pointer ${
-              unit === 'metric'
-                ? 'bg-secondary-50 text-secondary-800 shadow-sm border border-secondary-200'
-                : 'bg-transparent text-secondary-600 hover:text-secondary-700'
-            }`}
-          >
-            {t('Metric')}
-          </button>
-          <button
-            onClick={() => handleUnitChange('imperial')}
-            className={`flex-1 h-[38px] text-[13px] font-bold rounded-md transition-all duration-200 cursor-pointer ${
-              unit === 'imperial'
-                ? 'bg-secondary-50 text-secondary-800 shadow-sm border border-secondary-200'
-                : 'bg-transparent text-secondary-600 hover:text-secondary-700'
-            }`}
-          >
-            {t('Imperial')}
-          </button>
-        </div>
-      </div>
+    <div className="bg-secondary-50 border border-secondary-200 rounded-xl shadow-sm p-6">
+      <h3 className="text-secondary-900 font-extrabold text-[18px] tracking-tight mb-5">{t('System Preferences')}</h3>
 
       {/* Interface Theme */}
       <div className="mb-6">

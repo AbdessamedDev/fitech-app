@@ -16,17 +16,17 @@ export default function CoachLayout() {
     
   const getPageTitle = () => {
     const titles = {
-      '/coach/dashboard': 'Dashboard',
+      '/coach/dashboard': 'Profile',
       '/coach/clients': 'Clients',
-      '/coach/programs': 'Programs',
-      '/coach/exercises': 'Exercises',
       '/coach/schedule': 'Schedule',
       '/coach/messaging': 'Messaging',
       '/coach/settings': 'Settings',
-      '/coach': 'Dashboard'
+      '/coach': 'Profile'
     }
                                                                         
-    return titles[location.pathname] || 'Dashboard'
+    if (location.pathname.startsWith('/coach/programs')) return 'Programs'
+
+    return titles[location.pathname] || 'Profile'
   }
 
   return (
