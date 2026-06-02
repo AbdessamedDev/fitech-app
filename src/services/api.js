@@ -285,20 +285,21 @@ export const api = {
     return apiFetch("/api/subscriptions/renew/pending");
   },
 
-  acceptRenewal: async (requestId, notes = "Accepted") => {
+  requestRenewal: async ({ subscriptionId, amount, notes = "" }) => {
+    return apiFetch("/api/subscriptions/renew", {
+      method: "POST",
+      body: JSON.stringify({ subscriptionId, amount, notes }),
+    });
+  },
+
+  acceptRenewal: async (requestId, notes = "") => {
     return apiFetch(`/api/subscriptions/renew/${requestId}/accept`, {
       method: "PATCH",
-      body: JSON.stringify({ requestId, notes }),
+      body: notes ? JSON.stringify({ notes }) : JSON.stringify({}),
     });
   },
 
-  rejectRenewal: async (requestId, notes = "Rejected") => {
-    return apiFetch(`/api/subscriptions/renew/${requestId}/reject`, {
-      method: "PATCH",
-      body: JSON.stringify({ requestId, notes }),
-    });
-  },
-
+<<<<<<< HEAD
   // Courses / Programs
   createProgram: async (programData) => {
     return apiFetch("/api/programs", {
@@ -472,5 +473,51 @@ export const api = {
 
   downloadExcelReport: async () => {
     return downloadFetch("/api/reports/excel", {}, AGGREGATION_BASE_URL);
+=======
+  rejectRenewal: async (requestId, notes = "") => {
+    return apiFetch(`/api/subscriptions/renew/${requestId}/reject`, {
+      method: "PATCH",
+      body: notes ? JSON.stringify({ notes }) : JSON.stringify({}),
+    });
+  },
+
+  onlineRenewal: async ({ subscriptionId, amount, notes = "" }) => {
+    return apiFetch("/api/subscriptions/renew/online", {
+      method: "POST",
+      body: JSON.stringify({ subscriptionId, amount, notes }),
+    });
+  },
+
+  // Member endpoints
+  getMyProfile: async () => {
+    return apiFetch("/api/me");
+  },
+
+  updateMyProfile: async (profileData) => {
+    return apiFetch("/api/me", {
+      method: "PUT",
+      body: JSON.stringify(profileData),
+    });
+  },
+
+  getMySubscription: async () => {
+    return apiFetch("/api/me/subscription");
+  },
+
+  getMySubscriptions: async () => {
+    return apiFetch("/api/me/subscriptions");
+  },
+
+  getMySessions: async () => {
+    return apiFetch("/api/me/sessions");
+  },
+
+  getMyPayments: async () => {
+    return apiFetch("/api/me/payments");
+  },
+
+  getActiveSubscription: async () => {
+    return apiFetch("/api/members/active-subscription");
+>>>>>>> a1e0208993aee333a8297e22d84586e11ae270ba
   },
 };
