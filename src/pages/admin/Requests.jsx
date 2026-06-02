@@ -15,6 +15,7 @@ import {
 } from '../../icons/index'
 import { FilterDropdown } from '../../components/shared/FilterDropdown'
 import { SearchInput } from '../../components/shared/SearchInput'
+import { api } from '../../services/api'
 
 const initialMockRequests = [
   {
@@ -100,65 +101,104 @@ export default function Requests() {
   // Description modal state
   const [activeDescription, setActiveDescription] = useState(null)
 
-  // Simulate loading requests from backend on mount
+  // Load requests from backend on mount
   useEffect(() => {
-    // Load from localStorage if present to maintain persistence, else use initialMockRequests
-    const saved = localStorage.getItem('fitech_requests')
-    const initialData = saved ? JSON.parse(saved) : initialMockRequests
-    
-    const timer = setTimeout(() => {
-      setRequests(initialData)
-      setLoading(false)
-    }, 800) // 800ms simulated backend delay
+    const loadRequests = async () => {
+      try {
+        const renewalRequests = await api.listPendingRenewals();
+        
+        if (Array.isArray(renewalRequests) && renewalRequests.length > 0) {
+          // Transform renewal API response to match UI format
+          const transformedRequests = renewalRequests.map((req, idx) => ({
+            id: req.id || req.requestId || idx,
+            authorName: req.memberName || 'Unknown Member',
+            authorEmail: req.memberEmail || '',
+            authorImage: `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(req.memberName || 'User')}&backgroundColor=6942ff,8d70ff,d6fbc7,e8e8ee&fontWeight=700&chars=2&radius=50`,
+            authorType: 'member',
+            status: req.status?.toLowerCase() || 'pending',
+            description: req.notes || `Requesting renewal for subscription: ${req.subscriptionId || 'N/A'}. Amount: $${req.amount || 0}`,
+            dateRequested: req.requestedDate ? new Date(req.requestedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            dateResolved: req.resolvedDate ? new Date(req.resolvedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : null,
+            apiData: req // Store original API response for actions
+          }));
+          setRequests(transformedRequests);
+        } else {
+          // Fallback to mock data
+          setRequests(initialMockRequests);
+        }
+      } catch (err) {
+        console.error('Failed to load renewal requests:', err.message);
+        // Use mock data as fallback
+        setRequests(initialMockRequests);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return () => clearTimeout(timer)
+    loadRequests();
   }, [])
 
-  // Sync to localstorage when requests list changes
-  const saveToBackend = (updatedList) => {
-    setRequests(updatedList)
-    localStorage.setItem('fitech_requests', JSON.stringify(updatedList))
-  }
+  // Handle Accept - Call API
+  const handleAccept = async (id) => {
+    const request = requests.find(req => req.id === id);
+    if (!request) return;
 
-  // Handle Accept
-  const handleAccept = (id) => {
-    const todayStr = new Date().toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    })
-    
-    const updated = requests.map(req => {
-      if (req.id === id) {
-        return { ...req, status: 'approved', dateResolved: todayStr }
-      }
-      return req
-    })
-    saveToBackend(updated)
-  }
+    try {
+      await api.acceptRenewal(request.apiData?.id || id, '');
+      
+      // Update local state
+      const todayStr = new Date().toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+      
+      const updated = requests.map(req => {
+        if (req.id === id) {
+          return { ...req, status: 'approved', dateResolved: todayStr }
+        }
+        return req
+      });
+      setRequests(updated);
+    } catch (err) {
+      console.error('[v0] Error accepting renewal request:', err);
+      alert(`Failed to accept request: ${err.message}`);
+    }
+  };
 
-  // Handle Reject
-  const handleReject = (id) => {
-    const todayStr = new Date().toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    })
-    
-    const updated = requests.map(req => {
-      if (req.id === id) {
-        return { ...req, status: 'rejected', dateResolved: todayStr }
-      }
-      return req
-    })
-    saveToBackend(updated)
-  }
+  // Handle Reject - Call API
+  const handleReject = async (id) => {
+    const request = requests.find(req => req.id === id);
+    if (!request) return;
+
+    try {
+      await api.rejectRenewal(request.apiData?.id || id, '');
+      
+      // Update local state
+      const todayStr = new Date().toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+      
+      const updated = requests.map(req => {
+        if (req.id === id) {
+          return { ...req, status: 'rejected', dateResolved: todayStr }
+        }
+        return req
+      });
+      setRequests(updated);
+    } catch (err) {
+      console.error('[v0] Error rejecting renewal request:', err);
+      alert(`Failed to reject request: ${err.message}`);
+    }
+  };
 
   // Handle Delete
   const handleDelete = (id) => {
-    const updated = requests.filter(req => req.id !== id)
-    saveToBackend(updated)
-  }
+    const updated = requests.filter(req => req.id !== id);
+    setRequests(updated);
+  };
 
   // Filter options
   const authorOptions = [

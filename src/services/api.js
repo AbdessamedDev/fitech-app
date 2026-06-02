@@ -157,17 +157,63 @@ export const api = {
     return apiFetch("/api/subscriptions/renew/pending");
   },
 
-  acceptRenewal: async (requestId, notes = "Accepted") => {
-    return apiFetch(`/api/subscriptions/renew/${requestId}/accept`, {
-      method: "PATCH",
-      body: JSON.stringify({ requestId, notes }),
+  requestRenewal: async ({ subscriptionId, amount, notes = "" }) => {
+    return apiFetch("/api/subscriptions/renew", {
+      method: "POST",
+      body: JSON.stringify({ subscriptionId, amount, notes }),
     });
   },
 
-  rejectRenewal: async (requestId, notes = "Rejected") => {
+  acceptRenewal: async (requestId, notes = "") => {
+    return apiFetch(`/api/subscriptions/renew/${requestId}/accept`, {
+      method: "PATCH",
+      body: notes ? JSON.stringify({ notes }) : JSON.stringify({}),
+    });
+  },
+
+  rejectRenewal: async (requestId, notes = "") => {
     return apiFetch(`/api/subscriptions/renew/${requestId}/reject`, {
       method: "PATCH",
-      body: JSON.stringify({ requestId, notes }),
+      body: notes ? JSON.stringify({ notes }) : JSON.stringify({}),
     });
+  },
+
+  onlineRenewal: async ({ subscriptionId, amount, notes = "" }) => {
+    return apiFetch("/api/subscriptions/renew/online", {
+      method: "POST",
+      body: JSON.stringify({ subscriptionId, amount, notes }),
+    });
+  },
+
+  // Member endpoints
+  getMyProfile: async () => {
+    return apiFetch("/api/me");
+  },
+
+  updateMyProfile: async (profileData) => {
+    return apiFetch("/api/me", {
+      method: "PUT",
+      body: JSON.stringify(profileData),
+    });
+  },
+
+  getMySubscription: async () => {
+    return apiFetch("/api/me/subscription");
+  },
+
+  getMySubscriptions: async () => {
+    return apiFetch("/api/me/subscriptions");
+  },
+
+  getMySessions: async () => {
+    return apiFetch("/api/me/sessions");
+  },
+
+  getMyPayments: async () => {
+    return apiFetch("/api/me/payments");
+  },
+
+  getActiveSubscription: async () => {
+    return apiFetch("/api/members/active-subscription");
   },
 };
