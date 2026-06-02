@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "./Button";
 import { X } from "../../icons/index";
+import { api } from "../../services/api";
 import {
   Barbell,
   ChartPie,
@@ -30,14 +31,26 @@ const emptySession = () => ({
   description: "",
 });
 
-export default function AddProgramModal({ onClose }) {
+export default function AddProgramModal({ onClose, onCreated }) {
   const [isClosing, setIsClosing] = useState(false);
   const [selectedExercises, setSelectedExercises] = useState(mockExercises);
   const [sessions, setSessions] = useState([emptySession()]);
   const [form, setForm] = useState({
-    name: "", description: "", category: "Weight Loss", level: "Beginner",
-    duration: "4 weeks", exerciseType: "Strength", image: null,
+    name: "",
+    description: "",
+    level: "Beginner",
+    durationMinutes: "60",
+    exerciseType: "Strength",
+    startDate: "",
+    endDate: "",
+    totalPrice: "",
+    maxParticipants: "",
+    pictureUrl: "",
+    image: null,
   });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
   const handleClose = () => {
     setIsClosing(true);
@@ -60,6 +73,71 @@ export default function AddProgramModal({ onClose }) {
       case 'CORE': return 'text-orange-600 bg-orange-50';
       case 'CARDIO': return 'text-blue-600 bg-blue-50';
       default: return 'text-secondary-600 bg-secondary-100';
+    }
+  };
+
+  const handleSubmit = async () => {
+    setError("");
+    setSuccess(false);
+
+    const validSessions = sessions
+      .filter((session) => session.day && session.startTime && session.endTime)
+      .map((session) => ({
+        day: session.day,
+        startTime: session.startTime,
+        endTime: session.endTime,
+        description: session.description || null,
+      }));
+
+    const payload = {
+      name: form.name.trim(),
+      description: form.description.trim() || null,
+      level: form.level || null,
+      exerciseType: form.exerciseType || null,
+      durationMinutes: Number(form.durationMinutes),
+      startDate: form.startDate,
+      endDate: form.endDate,
+      totalPrice: Number(form.totalPrice),
+      maxParticipants: Number(form.maxParticipants),
+      pictureUrl: form.pictureUrl.trim() || null,
+      timeSlots: validSessions,
+    };
+
+    if (!payload.name || !payload.startDate || !payload.endDate) {
+      setError("Program name, start date, and end date are required.");
+      return;
+    }
+
+    if (!Number.isFinite(payload.durationMinutes) || payload.durationMinutes <= 0) {
+      setError("Duration must be a positive number of minutes.");
+      return;
+    }
+
+    if (!Number.isFinite(payload.totalPrice) || payload.totalPrice < 0) {
+      setError("Please enter a valid price.");
+      return;
+    }
+
+    if (!Number.isFinite(payload.maxParticipants) || payload.maxParticipants <= 0) {
+      setError("Maximum participants must be greater than zero.");
+      return;
+    }
+
+    if (validSessions.length === 0) {
+      setError("Add at least one complete time slot.");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await api.createProgram(payload);
+      setSuccess(true);
+      await onCreated?.();
+      setTimeout(handleClose, 650);
+    } catch (err) {
+      setError(err.message || "Failed to create program.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -99,21 +177,8 @@ export default function AddProgramModal({ onClose }) {
                 className="w-full border border-secondary-200 rounded-lg px-3 py-2.5 text-sm text-secondary-700 outline-none focus:border-primary-600 placeholder-secondary-300 resize-none transition-all" />
             </div>
 
-            {/* Category & Level */}
+            {/* Level & Exercise Type */}
             <div className="flex gap-3">
-              <div className="flex-1">
-                <label className="text-xs text-secondary-500 font-normal mb-2 block">Category</label>
-                <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
-                  <Person size={18} className="text-secondary-300 shrink-0" />
-                  <select name="category" value={form.category} onChange={handleChange}
-                    className="w-full text-sm text-secondary-700 outline-none bg-transparent">
-                    <option value="Weight Loss">Weight Loss</option>
-                    <option value="Muscle Gain">Muscle Gain</option>
-                    <option value="Endurance">Endurance</option>
-                    <option value="Flexibility">Flexibility</option>
-                  </select>
-                </div>
-              </div>
               <div className="flex-1">
                 <label className="text-xs text-secondary-500 font-normal mb-2 block">Level</label>
                 <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
@@ -126,22 +191,6 @@ export default function AddProgramModal({ onClose }) {
                   </select>
                 </div>
               </div>
-            </div>
-
-            {/* Duration & Exercise Type */}
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <label className="text-xs text-secondary-500 font-normal mb-2 block">Duration</label>
-                <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
-                  <Barbell size={18} className="text-secondary-300 shrink-0" />
-                  <select name="duration" value={form.duration} onChange={handleChange}
-                    className="w-full text-sm text-secondary-700 outline-none bg-transparent">
-                    <option value="4 weeks">4 weeks</option>
-                    <option value="8 weeks">8 weeks</option>
-                    <option value="12 weeks">12 weeks</option>
-                  </select>
-                </div>
-              </div>
               <div className="flex-1">
                 <label className="text-xs text-secondary-500 font-normal mb-2 block">Exercise Type</label>
                 <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
@@ -151,7 +200,56 @@ export default function AddProgramModal({ onClose }) {
                     <option value="Strength">Strength</option>
                     <option value="Cardio">Cardio</option>
                     <option value="Flexibility">Flexibility</option>
+                    <option value="HIIT">HIIT</option>
                   </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Dates */}
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <label className="text-xs text-secondary-500 font-normal mb-2 block">Start Date</label>
+                <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
+                  <CalendarBlank size={18} className="text-secondary-300 shrink-0" />
+                  <input name="startDate" type="date" value={form.startDate} onChange={handleChange}
+                    className="w-full text-sm text-secondary-700 outline-none bg-transparent" />
+                </div>
+              </div>
+              <div className="flex-1">
+                <label className="text-xs text-secondary-500 font-normal mb-2 block">End Date</label>
+                <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
+                  <CalendarBlank size={18} className="text-secondary-300 shrink-0" />
+                  <input name="endDate" type="date" value={form.endDate} onChange={handleChange}
+                    className="w-full text-sm text-secondary-700 outline-none bg-transparent" />
+                </div>
+              </div>
+            </div>
+
+            {/* Numbers */}
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="text-xs text-secondary-500 font-normal mb-2 block">Minutes</label>
+                <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
+                  <Clock size={18} className="text-secondary-300 shrink-0" />
+                  <input name="durationMinutes" type="number" min="1" value={form.durationMinutes} onChange={handleChange}
+                    className="w-full text-sm text-secondary-700 outline-none bg-transparent" />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs text-secondary-500 font-normal mb-2 block">Price</label>
+                <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
+                  <ChartPie size={18} className="text-secondary-300 shrink-0" />
+                  <input name="totalPrice" type="number" min="0" step="0.01" placeholder="49" value={form.totalPrice} onChange={handleChange}
+                    className="w-full text-sm text-secondary-700 outline-none bg-transparent placeholder-secondary-300" />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs text-secondary-500 font-normal mb-2 block">Capacity</label>
+                <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
+                  <Person size={18} className="text-secondary-300 shrink-0" />
+                  <input name="maxParticipants" type="number" min="1" placeholder="20" value={form.maxParticipants} onChange={handleChange}
+                    className="w-full text-sm text-secondary-700 outline-none bg-transparent placeholder-secondary-300" />
                 </div>
               </div>
             </div>
@@ -170,6 +268,8 @@ export default function AddProgramModal({ onClose }) {
                     <span className="border border-secondary-300 text-secondary-600 text-xs px-4 py-1.5 rounded-lg hover:bg-secondary-100 transition">Brows Image</span>
                     <input type="file" accept=".jpeg,.jpg,.png" onChange={handleFileChange} className="hidden" />
                   </label>
+                  <input name="pictureUrl" placeholder="Or paste hosted image URL" value={form.pictureUrl} onChange={handleChange}
+                    className="mt-3 h-9 w-full rounded-lg border border-secondary-200 px-3 text-xs text-secondary-700 outline-none transition-all placeholder-secondary-300 focus:border-primary-600" />
                 </div>
               </div>
             </div>
@@ -285,13 +385,17 @@ export default function AddProgramModal({ onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-secondary-200">
-          <Button onClick={handleClose} className="border border-secondary-300 text-secondary-600 text-sm px-6 py-2.5 rounded-xl hover:bg-secondary-100 transition-all">
+        <div className="flex flex-col gap-3 px-6 py-4 border-t border-secondary-200">
+          {error && <p className="rounded-lg border border-error/15 bg-error-bg px-3 py-2 text-center text-xs font-semibold text-error">{error}</p>}
+          {success && <p className="rounded-lg border border-success/20 bg-success-bg px-3 py-2 text-center text-xs font-semibold text-success">Program submitted for admin review.</p>}
+          <div className="flex items-center justify-end gap-3">
+          <Button onClick={handleClose} disabled={submitting} className="border border-secondary-300 text-secondary-600 text-sm px-6 py-2.5 rounded-xl hover:bg-secondary-100 transition-all disabled:cursor-not-allowed disabled:opacity-60">
             Cancel
           </Button>
-          <Button onClick={() => { console.log(form, sessions); handleClose(); }} className="bg-primary-600 text-white text-base font-medium px-6 py-2.5 rounded-xl hover:bg-primary-900 transition-all">
-            Add Program
+          <Button onClick={handleSubmit} disabled={submitting || success} className="bg-primary-600 text-white text-base font-medium px-6 py-2.5 rounded-xl hover:bg-primary-900 transition-all disabled:cursor-not-allowed disabled:opacity-60">
+            {submitting ? "Submitting..." : success ? "Submitted" : "Add Program"}
           </Button>
+          </div>
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
-import { useState } from "react";
+ import { useState } from "react";
 import { Button } from "./Button";
 import { X } from "../../icons/index";
+import { api } from "../../services/api";
 import {
   MoneyWavy,
   ListNumbers,
@@ -11,7 +12,13 @@ import {
   TextT,
 } from "@phosphor-icons/react";
 
-export default function AddPlanModal({ onClose }) {
+const ACCESS_RULE_LABELS = {
+  weekly: "Weekly access",
+  monthly: "Monthly access",
+  annual: "Annual access",
+};
+
+export default function AddPlanModal({ onClose, onCreated }) {
   const [isClosing, setIsClosing] = useState(false);
   const [form, setForm] = useState({
     planName: "",
@@ -29,6 +36,9 @@ export default function AddPlanModal({ onClose }) {
     monthly: false,
     annual: true,
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
   const handleClose = () => {
     setIsClosing(true);
@@ -41,6 +51,58 @@ export default function AddPlanModal({ onClose }) {
   const toggleAccess = (key) =>
     setAccess((prev) => ({ ...prev, [key]: !prev[key] }));
 
+  const handleSubmit = async () => {
+    setError("");
+    setSuccess(false);
+
+    const price = Number(form.price);
+    const durationValue = form.durationValue === "" ? null : Number(form.durationValue);
+    const sessionCount = form.sessionCount === "" ? null : Number(form.sessionCount);
+
+    if (!form.planName.trim()) {
+      setError("Plan name is required.");
+      return;
+    }
+    if (!Number.isFinite(price) || price < 0) {
+      setError("Please enter a valid plan price.");
+      return;
+    }
+    if (durationValue !== null && (!Number.isInteger(durationValue) || durationValue <= 0)) {
+      setError("Duration must be a positive whole number.");
+      return;
+    }
+    if (sessionCount !== null && (!Number.isInteger(sessionCount) || sessionCount < 0)) {
+      setError("Session count must be zero or a positive whole number.");
+      return;
+    }
+
+    const accessRules = Object.entries(access)
+      .filter(([, enabled]) => enabled)
+      .map(([key]) => ACCESS_RULE_LABELS[key]);
+
+    setLoading(true);
+    try {
+      await api.createPlan({
+        name: form.planName.trim(),
+        description: form.description.trim() || null,
+        price,
+        durationValue,
+        durationUnit: form.unit,
+        sessionCount,
+        accessRules,
+      });
+      setSuccess(true);
+      onCreated?.();
+      setTimeout(handleClose, 700);
+    } catch (err) {
+      console.error("Failed to create plan:", err);
+      setError(err.message || "Failed to create plan. Please check the backend response.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-end p-4">
       <div
@@ -99,8 +161,7 @@ export default function AddPlanModal({ onClose }) {
                 className="w-full border border-secondary-200 rounded-lg px-3 py-2.5 text-sm text-secondary-700 outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-50 placeholder-secondary-300 resize-none transition-all bg-secondary-100"
               />
             </div>
-
-            {/* Price & Session Count */}
+{/* Price & Session Count */}
             <div className="flex gap-3">
               <div className="flex-1">
                 <label className="text-xs text-secondary-500 font-normal mb-2 block">
@@ -152,8 +213,7 @@ export default function AddPlanModal({ onClose }) {
                 />
               </div>
             </div>
-
-            {/* Start Date & Calculated End Date */}
+ {/* Start Date & Calculated End Date */}
             <div className="flex gap-3">
               <div className="flex-1">
                 <label className="text-xs text-secondary-500 font-normal mb-2 block">
@@ -224,8 +284,7 @@ export default function AddPlanModal({ onClose }) {
                 </div>
               </div>
             </div>
-
-            {/* Access Rule */}
+{/* Access Rule */}
             <div>
               <label className="text-xs text-secondary-500 font-normal mb-2 block">
                 Access Rule 1
@@ -267,19 +326,33 @@ export default function AddPlanModal({ onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-secondary-200">
+        <div className="flex flex-col gap-3 px-6 py-4 border-t border-secondary-200">
+          {error && (
+            <p className="rounded-lg border border-rose-100 bg-rose-50 px-3 py-2 text-center text-xs font-semibold text-rose-600">
+              {error}
+            </p>
+          )}
+          {success && (
+            <p className="rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-2 text-center text-xs font-semibold text-emerald-600">
+              Plan created successfully.
+            </p>
+          )}
+          <div className="flex items-center justify-end gap-3">
           <Button
             onClick={handleClose}
+            disabled={loading}
             className="border border-secondary-300 text-secondary-600 text-sm px-6 py-2.5 rounded-xl hover:bg-secondary-100 transition-all"
           >
             Cancel
           </Button>
           <Button
-            onClick={() => { console.log(form, access); handleClose(); }}
-            className="bg-primary-600 text-white text-sm px-6 py-2.5 rounded-xl hover:bg-primary-900 transition-all font-medium"
+            onClick={handleSubmit}
+            disabled={loading || success}
+            className="bg-primary-600 text-white text-sm px-6 py-2.5 rounded-xl hover:bg-primary-900 transition-all font-medium disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Add Plan
+            {loading ? "Saving..." : success ? "Saved" : "Add Plan"}
           </Button>
+          </div>
         </div>
       </div>
     </div>

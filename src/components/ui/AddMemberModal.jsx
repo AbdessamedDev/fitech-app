@@ -12,8 +12,10 @@ export default function AddMemberModal({ onClose }) {
   const [useSavedPlan, setUseSavedPlan] = useState(true);
   const [form, setForm] = useState({
     firstName: "", lastName: "", email: "", phone: "",
-    gender: "Male", birthDate: "", medicalCertificate: null,
+    gender: "Male", birthDate: "", medicalCertificate: null, profilePicture: null,
     plan: "", startDate: "", priceOverride: "",
+    customPlanName: "", customPlanDescription: "", customPlanPrice: "",
+    customSessionCount: "", customDurationValue: "1", customDurationUnit: "Months",
   });
 
   const [plans, setPlans] = useState([]);
@@ -52,34 +54,72 @@ export default function AddMemberModal({ onClose }) {
   };
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-  const handleFileChange = (e) => setForm({ ...form, medicalCertificate: e.target.files[0] });
+  const handleFileChange = (field) => (e) => setForm({ ...form, [field]: e.target.files?.[0] || null });
 
   const handleSubmit = async () => {
     setError("");
     setSuccess(false);
 
-    if (!form.firstName || !form.lastName || !form.email) {
-      setError("Please fill out all required fields (First Name, Last Name, and Email).");
+    if (!form.firstName.trim() || !form.lastName.trim() || !form.email.trim()) {
+      setError("Please fill out First Name, Last Name, and Email.");
       return;
     }
 
     setLoading(true);
 
     try {
-      // 1. Create Member
+      let planId = form.plan;
+
+      if (!useSavedPlan) {
+        const customPrice = Number(form.customPlanPrice);
+        const customDuration = Number(form.customDurationValue);
+        const customSessions = form.customSessionCount === "" ? null : Number(form.customSessionCount);
+
+        if (!form.customPlanName.trim()) {
+          throw new Error("Custom plan name is required.");
+        }
+        if (!Number.isFinite(customPrice) || customPrice < 0) {
+          throw new Error("Please enter a valid custom plan price.");
+        }
+        if (!Number.isInteger(customDuration) || customDuration <= 0) {
+          throw new Error("Custom plan duration must be a positive whole number.");
+        }
+        if (customSessions !== null && (!Number.isInteger(customSessions) || customSessions < 0)) {
+          throw new Error("Custom plan sessions must be zero or a positive whole number.");
+        }
+
+        const planResponse = await api.createPlan({
+          name: form.customPlanName.trim(),
+          description: form.customPlanDescription.trim() || null,
+          price: customPrice,
+          durationValue: customDuration,
+          durationUnit: form.customDurationUnit,
+          sessionCount: customSessions,
+          accessRules: ["Custom access"],
+        });
+        planId = planResponse?.planId || planResponse?.id || planResponse?.data?.planId || planResponse?.Data?.planId;
+      }
+
+      if (!planId) {
+        throw new Error(loadingPlans ? "Plans are still loading. Please try again in a moment." : "Please select a subscription plan.");
+      }
+
       const formData = new FormData();
-      formData.append("FirstName", form.firstName);
-      formData.append("LastName", form.lastName);
-      formData.append("Email", form.email);
-      formData.append("PhoneNumber", form.phone || "");
-      formData.append("Gender", form.gender);
-      formData.append("DateOfBirth", form.birthDate ? new Date(form.birthDate).toISOString() : new Date().toISOString());
-      formData.append("Objectives", "Lose weight, build muscle");
-      formData.append("MedicalRestrictions", "None");
-      formData.append("Status", "Active");
+      formData.append("firstName", form.firstName.trim());
+      formData.append("lastName", form.lastName.trim());
+      formData.append("email", form.email.trim());
+      formData.append("phoneNumber", form.phone.trim());
+      formData.append("gender", form.gender);
+      formData.append("planId", planId);
+      if (form.birthDate) {
+        formData.append("dateOfBirth", form.birthDate);
+      }
 
       if (form.medicalCertificate) {
-        formData.append("ProfilePicture", form.medicalCertificate);
+        formData.append("medicalCertificate", form.medicalCertificate);
+      }
+      if (form.profilePicture) {
+        formData.append("profilePicture", form.profilePicture);
       }
 
       const memberResponse = await api.createMember(formData);
@@ -87,34 +127,6 @@ export default function AddMemberModal({ onClose }) {
 
       if (!memberId) {
         throw new Error("Member was created, but no Member ID was returned from backend.");
-      }
-
-      // 2. Add Subscription (if requested)
-      if (activeTab === "Subscription" && form.plan) {
-        const selectedPlanObj = plans.find(p => (p.id || p.planId) === form.plan);
-        const planId = selectedPlanObj ? (selectedPlanObj.id || selectedPlanObj.planId) : form.plan;
-
-        const subResponse = await api.createSubscription({
-          memberId,
-          planId,
-          paymentMethod: "Cash",
-          notes: "Initial membership subscription created via Admin portal."
-        });
-
-        const subscriptionId = subResponse?.subscriptionId || subResponse?.Data?.subscriptionId || subResponse?.data?.subscriptionId;
-
-        // 3. Auto Confirm Payment if Cash Method
-        if (subscriptionId) {
-          const planPrice = selectedPlanObj ? (selectedPlanObj.price || selectedPlanObj.amount || 0) : 0;
-          const finalAmount = parseFloat(form.priceOverride) || planPrice;
-
-          await api.confirmCashPayment({
-            subscriptionId,
-            amountReceived: finalAmount,
-            paymentMethod: "Cash",
-            notes: "Cash payment received at counter during member creation."
-          });
-        }
       }
 
       setSuccess(true);
@@ -230,9 +242,33 @@ export default function AddMemberModal({ onClose }) {
                     </div>
                     <p className="text-xs text-secondary-500">choose a file or drag an drop it here.</p>
                     <p className="text-xs text-secondary-300">PDF, JPEG, Max up to 20MB</p>
+                    {form.medicalCertificate && (
+                      <p className="max-w-full truncate text-xs font-semibold text-primary-600">{form.medicalCertificate.name}</p>
+                    )}
                     <label className="mt-1 cursor-pointer">
                       <span className="border border-secondary-300 text-secondary-600 text-xs px-4 py-1.5 rounded-lg hover:bg-secondary-100 transition">Browse File</span>
-                      <input type="file" accept=".pdf,.jpeg,.jpg" onChange={handleFileChange} className="hidden" />
+                      <input type="file" accept=".pdf,.jpeg,.jpg" onChange={handleFileChange("medicalCertificate")} className="hidden" />
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Profile Picture */}
+              <div>
+                <label className="text-xs text-secondary-500 font-normal mb-2 block">Upload member's Profile Picture</label>
+                <div className="border-2 border-dashed border-secondary-200 rounded-xl p-6 text-center hover:border-primary-600 transition-colors cursor-pointer">
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-secondary-100 flex items-center justify-center">
+                      <span className="text-secondary-400 text-lg">☁</span>
+                    </div>
+                    <p className="text-xs text-secondary-500">choose an image or drag an drop it here.</p>
+                    <p className="text-xs text-secondary-300">JPEG, PNG, Max up to 20MB</p>
+                    {form.profilePicture && (
+                      <p className="max-w-full truncate text-xs font-semibold text-primary-600">{form.profilePicture.name}</p>
+                    )}
+                    <label className="mt-1 cursor-pointer">
+                      <span className="border border-secondary-300 text-secondary-600 text-xs px-4 py-1.5 rounded-lg hover:bg-secondary-100 transition">Browse Image</span>
+                      <input type="file" accept=".jpeg,.jpg,.png" onChange={handleFileChange("profilePicture")} className="hidden" />
                     </label>
                   </div>
                 </div>
@@ -355,14 +391,23 @@ export default function AddMemberModal({ onClose }) {
                     <label className="text-xs text-secondary-500 font-normal mb-2 block">Plan Name</label>
                     <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
                       <span className="text-secondary-300 text-sm">eg.</span>
-                      <input placeholder="Personal Training Bundle"
+                      <input
+                        name="customPlanName"
+                        placeholder="Personal Training Bundle"
+                        value={form.customPlanName}
+                        onChange={handleChange}
                         className="w-full text-sm text-secondary-700 outline-none bg-transparent placeholder-secondary-300" />
                     </div>
                   </div>
 
                   <div>
                     <label className="text-xs text-secondary-500 font-normal mb-2 block">Description</label>
-                    <textarea placeholder="Provide details about sessions, inclusions, and benefits." rows={3}
+                    <textarea
+                      name="customPlanDescription"
+                      placeholder="Provide details about sessions, inclusions, and benefits."
+                      value={form.customPlanDescription}
+                      onChange={handleChange}
+                      rows={3}
                       className="w-full border border-secondary-200 rounded-lg px-3 py-2.5 text-sm text-secondary-700 outline-none focus:border-primary-600 placeholder-secondary-300 resize-none transition-all" />
                   </div>
 
@@ -370,59 +415,75 @@ export default function AddMemberModal({ onClose }) {
                     <div className="flex-1">
                       <label className="text-xs text-secondary-500 font-normal mb-2 block">Price ($)</label>
                       <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
-                        <MoneyWavy size={16} className="text-secondary-300 shrink-0" />
-                        <input placeholder="4.00" className="w-full text-sm text-secondary-700 outline-none bg-transparent placeholder-secondary-300" />
+                          <MoneyWavy size={16} className="text-secondary-300 shrink-0" />
+                          <input
+                            name="customPlanPrice"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="4500"
+                            value={form.customPlanPrice}
+                            onChange={handleChange}
+                            className="w-full text-sm text-secondary-700 outline-none bg-transparent placeholder-secondary-300" />
+                        </div>
                       </div>
-                    </div>
                     <div className="flex-1">
                       <label className="text-xs text-secondary-500 font-normal mb-2 block">Session Count</label>
                       <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
-                        <ListNumbers size={16} className="text-secondary-300 shrink-0" />
-                        <input placeholder="13" className="w-full text-sm text-secondary-700 outline-none bg-transparent placeholder-secondary-300" />
+                          <ListNumbers size={16} className="text-secondary-300 shrink-0" />
+                          <input
+                            name="customSessionCount"
+                            type="number"
+                            min="0"
+                            placeholder="13"
+                            value={form.customSessionCount}
+                            onChange={handleChange}
+                            className="w-full text-sm text-secondary-700 outline-none bg-transparent placeholder-secondary-300" />
+                        </div>
                       </div>
                     </div>
-                  </div>
-
-                  <div>
-                    <label className="text-xs text-secondary-500 font-normal mb-2 block">Plan Name</label>
-                    <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
-                      <span className="text-secondary-300 text-sm">eg.</span>
-                      <input placeholder="Personal Training Bundle"
-                        className="w-full text-sm text-secondary-700 outline-none bg-transparent placeholder-secondary-300" />
-                    </div>
-                  </div>
 
                   <div className="flex gap-3">
                     <div className="flex-1">
                       <label className="text-xs text-secondary-500 font-normal mb-2 block">Start Date</label>
                       <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
-                        <CalendarDots size={16} className="text-secondary-300 shrink-0" />
-                        <input type="date" className="w-full text-sm text-secondary-700 outline-none bg-transparent" />
-                      </div>
-                    </div>
+                            <CalendarDots size={16} className="text-secondary-300 shrink-0" />
+                            <input name="startDate" type="date" value={form.startDate} onChange={handleChange} className="w-full text-sm text-secondary-700 outline-none bg-transparent" />
+                          </div>
+                        </div>
                     <div className="flex-1">
                       <label className="text-xs text-secondary-500 font-normal mb-2 block">Calculate End Date</label>
-                      <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
-                        <CalendarDots size={16} className="text-secondary-300 shrink-0" />
-                        <input type="date" className="w-full text-sm text-secondary-700 outline-none bg-transparent" />
+                        <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
+                          <CalendarDots size={16} className="text-secondary-300 shrink-0" />
+                          <input type="date" value="" readOnly className="w-full text-sm text-secondary-700 outline-none bg-transparent" />
+                        </div>
                       </div>
-                    </div>
                   </div>
 
                   <div className="flex gap-3">
                     <div className="flex-1">
                       <label className="text-xs text-secondary-500 font-normal mb-2 block">Duration Value</label>
                       <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
-                        <HourglassSimple size={16} className="text-secondary-300 shrink-0" />
-                        <input placeholder="1" className="w-full text-sm text-secondary-700 outline-none bg-transparent placeholder-secondary-300" />
+                          <HourglassSimple size={16} className="text-secondary-300 shrink-0" />
+                          <input
+                            name="customDurationValue"
+                            type="number"
+                            min="1"
+                            placeholder="1"
+                            value={form.customDurationValue}
+                            onChange={handleChange}
+                            className="w-full text-sm text-secondary-700 outline-none bg-transparent placeholder-secondary-300" />
+                        </div>
                       </div>
-                    </div>
                     <div className="flex-1">
                       <label className="text-xs text-secondary-500 font-normal mb-2 block">Unit</label>
-                      <select className="w-full border border-secondary-200 rounded-lg px-3 h-10 text-sm text-secondary-700 outline-none focus:border-primary-600 transition-all bg-transparent">
-                        <option>Month</option>
-                        <option>Week</option>
-                        <option>Year</option>
+                      <select
+                        name="customDurationUnit"
+                        value={form.customDurationUnit}
+                        onChange={handleChange}
+                        className="w-full border border-secondary-200 rounded-lg px-3 h-10 text-sm text-secondary-700 outline-none focus:border-primary-600 transition-all bg-transparent">
+                        <option value="Months">Month(s)</option>
+                        <option value="Days">Day(s)</option>
                       </select>
                     </div>
                   </div>

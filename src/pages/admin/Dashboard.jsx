@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import {
   AreaChart, Area, XAxis, Tooltip as RechartsTooltip, ResponsiveContainer,
   PieChart, Pie, Cell
 } from 'recharts';
 import {
-  Users, UserCircleCheck, PiggyBankIcon,BarbellIcon, IdentificationCard, TrendUp, TrendDown,
+  Users, UserCircleCheck, PiggyBankIcon, BarbellIcon, IdentificationCard, TrendUp, TrendDown,
   UserPlus, CreditCard, BoxingGloveIcon, Megaphone, CaretDown, CaretLeft, CaretRight
 } from '../../icons/index';
+import { api } from '../../services/api';
 
-const growthData = [
+const defaultGrowthData = [
   { name: 'JAN', members: 400 },
   { name: 'FEB', members: 450 },
   { name: 'MAR', members: 430 },
@@ -18,20 +20,17 @@ const growthData = [
   { name: 'JUN', members: 1248 },
 ];
 
-const plansData = [
+const defaultPlansData = [
   { name: 'Premium Elite', value: 58, color: '#6942FF' },
   { name: 'Basic Standard', value: 32, color: '#A88BFF' },
   { name: 'Custom Corporate', value: 10, color: '#E2E8F0' },
 ];
 
-const sessionsData = [
+const defaultSessionsData = [
   { id: 1, type: "HIIT", time: "08:00 AM", title: "Morning Burnout", avatar: "https://i.pravatar.cc/150?u=sarah", instructor: "Sarah Miller", enrolled: "18/20" },
   { id: 2, type: "Yoga", time: "10:30 AM", title: "Flow & Focus", avatar: "https://i.pravatar.cc/150?u=david", instructor: "David Chen", enrolled: "12/15" },
   { id: 3, type: "Power", time: "02:00 PM", title: "Strength 101", avatar: "https://i.pravatar.cc/150?u=mike", instructor: "Mike Rourke", enrolled: "8/10" },
   { id: 4, type: "BJJ", time: "05:00 PM", title: "Grappling Fundamentals", avatar: "https://i.pravatar.cc/150?u=carlos", instructor: "Carlos Silva", enrolled: "22/25" },
-  { id: 5, type: "Pilates", time: "06:30 PM", title: "Core & Stretch", avatar: "https://i.pravatar.cc/150?u=emma", instructor: "Emma Davis", enrolled: "10/12" },
-  { id: 6, type: "Boxing", time: "07:30 PM", title: "Boxing Basics", avatar: "https://i.pravatar.cc/150?u=jake", instructor: "Jake Paul", enrolled: "15/15" },
-  { id: 7, type: "Cycle", time: "08:30 PM", title: "Spin to Win", avatar: "https://i.pravatar.cc/150?u=liam", instructor: "Liam Novak", enrolled: "20/20" },
 ];
 
 const sessionTypeStyles = {
@@ -45,7 +44,6 @@ const sessionTypeStyles = {
   "default": { text: "text-secondary-600", bg: "bg-secondary-100" }
 };
 
-// Helper hook for staggered entry animation
 function useEntranceAnimation() {
   const [isReady, setIsReady] = useState(false);
   useEffect(() => {
@@ -56,18 +54,87 @@ function useEntranceAnimation() {
 
 export default function Dashboard() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const isAnimated = useEntranceAnimation();
   const [currentSessionIndex, setCurrentSessionIndex] = useState(0);
 
+  // Dynamic backend integration states
+  const [dashboardData, setDashboardData] = useState(null);
+  const [todaySessions, setTodaySessions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const loadData = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const [adminStats, sessions] = await Promise.all([
+        api.getAdminDashboard(),
+        api.getSessionsToday().catch(() => [])
+      ]);
+      setDashboardData(adminStats);
+
+      if (Array.isArray(sessions) && sessions.length > 0) {
+        const mapped = sessions.map((s) => ({
+          id: s.sessionId || s.id,
+          type: s.exerciseType || s.type || "Workout",
+          time: s.startTime ? new Date(s.startTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : s.time || "08:00 AM",
+          title: s.name || s.title || "Daily Training Session",
+          avatar: s.coachPhotoUrl || s.avatar || "https://i.pravatar.cc/150?u=coach",
+          instructor: s.coachName || s.instructor || "Coach",
+          enrolled: `${s.enrolledCount || 0}/${s.capacity || 20}`
+        }));
+        setTodaySessions(mapped);
+      } else {
+        setTodaySessions(defaultSessionsData);
+      }
+    } catch (err) {
+      console.error("Dashboard failed to retrieve live C# api metrics:", err);
+      setError(err.message || 'Connecting to backend microservices failed.');
+      setTodaySessions(defaultSessionsData);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
   const handleNextSession = () => {
-    setCurrentSessionIndex((prev) => (prev + 1) % sessionsData.length);
+    const listLength = todaySessions.length > 0 ? todaySessions.length : 1;
+    setCurrentSessionIndex((prev) => (prev + 1) % listLength);
   };
 
   const handlePrevSession = () => {
-    setCurrentSessionIndex((prev) => (prev - 1 + sessionsData.length) % sessionsData.length);
+    const listLength = todaySessions.length > 0 ? todaySessions.length : 1;
+    setCurrentSessionIndex((prev) => (prev - 1 + listLength) % listLength);
   };
 
-  const extendedSessions = [...sessionsData, ...sessionsData];
+  const extendedSessions = todaySessions.length > 0 ? [...todaySessions, ...todaySessions] : [];
+
+  // Mapped metrics from backend response
+  const membersCount = dashboardData?.totalMembers !== undefined ? dashboardData.totalMembers.toLocaleString() : "1,248";
+  const checkinsCount = dashboardData?.todayCheckIns !== undefined ? dashboardData.todayCheckIns.toLocaleString() : "156";
+  const revenueAmount = dashboardData?.monthlyRevenue !== undefined ? `$${Number(dashboardData.monthlyRevenue).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : "$45,200";
+  const activeSubsCount = dashboardData?.activeSubscriptions !== undefined ? dashboardData.activeSubscriptions.toLocaleString() : "942";
+
+  // Mapped growth data
+  const growthData = dashboardData?.membershipGrowth && dashboardData.membershipGrowth.length > 0
+    ? dashboardData.membershipGrowth.map(p => ({ name: String(p.month).toUpperCase(), members: p.count }))
+    : defaultGrowthData;
+
+  // Mapped plans breakdown
+  const planColors = ['#6942FF', '#A88BFF', '#20C997', '#FA5252', '#339AF0'];
+  const plansData = dashboardData?.plansBreakdown && dashboardData.plansBreakdown.length > 0
+    ? dashboardData.plansBreakdown.map((p, idx) => ({
+        name: p.planName,
+        value: Number(p.percentage),
+        color: planColors[idx % planColors.length]
+      }))
+    : defaultPlansData;
+
+  const totalActivePlans = dashboardData?.activeSubscriptions !== undefined ? dashboardData.activeSubscriptions.toLocaleString() : "1.1k";
 
   return (
     <div className="bg-secondary-100 min-h-screen py-8 px-4 sm:px-8 flex justify-center text-sm font-sans w-full overflow-hidden">
@@ -107,13 +174,25 @@ export default function Dashboard() {
       </style>
 
       <div className="w-full max-w-350 flex flex-col gap-6">
+        
+        {/* Error notification banner */}
+        {error && (
+          <div className="rounded-xl border border-error/20 bg-error-bg p-4 flex items-center justify-between shadow-sm animate-fade-up">
+            <p className="text-sm font-semibold text-error">
+              {t("Error connecting to live server dashboard details. Displaying offline simulator placeholders.")}
+            </p>
+            <button onClick={loadData} className="px-3 py-1.5 bg-error text-white text-xs font-bold rounded-lg hover:bg-error/90 cursor-pointer">
+              {t("Retry Connection")}
+            </button>
+          </div>
+        )}
 
         {/* Row 1: Top Metrics */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="animate-fade-up" style={{ animationDelay: '0ms' }}>
             <MetricCard
               title={t('Total Members')}
-              value="1,248"
+              value={membersCount}
               icon={<Users size={26} weight="regular" color="#6942FF" />}
               trend="+12%"
               isPositive={true}
@@ -122,7 +201,7 @@ export default function Dashboard() {
           <div className="animate-fade-up" style={{ animationDelay: '100ms' }}>
             <MetricCard
               title={t("Today's Check-ins")}
-              value="156"
+              value={checkinsCount}
               icon={<UserCircleCheck size={26} weight="regular" color="#6942FF" />}
               trend="-2%"
               isPositive={false}
@@ -131,7 +210,7 @@ export default function Dashboard() {
           <div className="animate-fade-up" style={{ animationDelay: '200ms' }}>
             <MetricCard
               title={t('Monthly Revenue')}
-              value="$45,200"
+              value={revenueAmount}
               icon={<PiggyBankIcon size={26} weight="regular" color="#6942FF" />}
               trend="+18%"
               isPositive={true}
@@ -140,7 +219,7 @@ export default function Dashboard() {
           <div className="animate-fade-up" style={{ animationDelay: '300ms' }}>
             <MetricCard
               title={t('Active Subs')}
-              value="942"
+              value={activeSubsCount}
               icon={<IdentificationCard size={26} weight="regular" color="#6942FF" />}
               trend="+5%"
               isPositive={true}
@@ -232,7 +311,7 @@ export default function Dashboard() {
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-1">
-                <span className="text-[30px] font-black text-secondary-800 tracking-tight">1.1k</span>
+                <span className="text-[30px] font-black text-secondary-800 tracking-tight">{totalActivePlans}</span>
                 <span className="text-[10px] font-bold text-secondary-700 tracking-widest mt-1 uppercase">{t('TOTAL ACTIVE')}</span>
               </div>
             </div>
@@ -244,7 +323,7 @@ export default function Dashboard() {
                     <div className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: plan.color }}></div>
                     <span className="text-[14px] text-secondary-800 font-medium">{plan.name}</span>
                   </div>
-                  <span className="font-bold text-secondary-800 text-[14px]">{plan.value}%</span>
+                  <span className="font-bold text-secondary-800 text-[14px]">{plan.value.toFixed(1)}%</span>
                 </div>
               ))}
             </div>
@@ -292,6 +371,9 @@ export default function Dashboard() {
                     </div>
                   );
                 })}
+                {extendedSessions.length === 0 && (
+                  <p className="w-full text-center text-secondary-400 font-semibold py-8">{t("No sessions scheduled for today.")}</p>
+                )}
               </div>
             </div>
           </div>
@@ -300,10 +382,18 @@ export default function Dashboard() {
           <div className="lg:col-span-4 p-8 bg-secondary-50 border border-secondary-300 rounded-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-start animate-fade-up hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-300" style={{ animationDelay: '700ms' }}>
             <h3 className="text-xl font-bold text-secondary-800 mb-6 font-sans tracking-tight">{t('Quick Actions')}</h3>
             <div className="grid grid-cols-2 gap-4 flex-1 items-center">
-              <QuickAction icon={<UserPlus size={26} weight="regular" color="#6942FF" />} title={t('Add Member')} />
-              <QuickAction icon={<CreditCard size={26} weight="regular" color="#6942FF" />} title={t('New Subscription')} />
-              <QuickAction icon={<BoxingGloveIcon size={26} weight="regular" color="#6942FF" />} title={t('Add a Coach')} />
-              <QuickAction icon={<Megaphone size={26} weight="regular" color="#6942FF" />} title={t('Broadcast')} />
+              <div onClick={() => navigate('/admin/members')} className="w-full h-full">
+                <QuickAction icon={<UserPlus size={26} weight="regular" color="#6942FF" />} title={t('Add Member')} />
+              </div>
+              <div onClick={() => navigate('/admin/subscriptions')} className="w-full h-full">
+                <QuickAction icon={<CreditCard size={26} weight="regular" color="#6942FF" />} title={t('New Subscription')} />
+              </div>
+              <div onClick={() => navigate('/admin/settings')} className="w-full h-full">
+                <QuickAction icon={<BoxingGloveIcon size={26} weight="regular" color="#6942FF" />} title={t('Add a Coach')} />
+              </div>
+              <div onClick={() => navigate('/admin/requests')} className="w-full h-full">
+                <QuickAction icon={<Megaphone size={26} weight="regular" color="#6942FF" />} title={t('Review Requests')} />
+              </div>
             </div>
           </div>
 

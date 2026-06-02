@@ -25,6 +25,7 @@ import { FilterDropdown } from '../../components/shared/FilterDropdown'
 import { Pagination } from '../../components/shared/Pagination'
 import { SearchInput } from '../../components/shared/SearchInput'
 import { api } from '../../services/api'
+import AddPlanModal from '../../components/ui/AddPlanModal' // ← adjust path if needed
 
 const sortOptions = [
   { label: 'Sort by', value: 'All' },
@@ -160,12 +161,8 @@ export default function Subscriptions() {
   const [currentPage, setCurrentPage] = useState(1)
   const [loading, setLoading] = useState(false)
 
-  // Modals state
+  // Modal state — only showPlanModal is needed now (AddPlanModal owns its own form)
   const [showPlanModal, setShowPlanModal] = useState(false)
-  const [editingPlan, setEditingPlan] = useState(null)
-  const [planForm, setPlanForm] = useState({
-    name: "", price: "", sessionCount: "", duration: "1 Month"
-  })
 
   // Operations dropdown
   const [activeMenuId, setActiveMenuId] = useState(null)
@@ -183,7 +180,6 @@ export default function Subscriptions() {
       }
     } catch (err) {
       console.error("Failed to load plans:", err);
-      // Offline fallback
       setPlans(mockPlans);
     } finally {
       setLoading(false)
@@ -210,7 +206,6 @@ export default function Subscriptions() {
     if (sortBy === 'price-asc') {
       nextPlans = [...nextPlans].sort((a, b) => Number(a.price) - Number(b.price))
     }
-
     if (sortBy === 'price-desc') {
       nextPlans = [...nextPlans].sort((a, b) => Number(b.price) - Number(a.price))
     }
@@ -225,7 +220,6 @@ export default function Subscriptions() {
     if (totalPages > 0 && currentPage > totalPages) setCurrentPage(totalPages)
   }, [currentPage, totalPages])
 
-  // Calculated Stats
   const stats = useMemo(() => {
     const totalCount = plans.length;
     const activeCount = plans.filter(p => p.status === 'Active' || p.status === 'ACTIVE').length;
@@ -260,52 +254,6 @@ export default function Subscriptions() {
     document.getElementById('global-search-input')?.focus()
   }
 
-  const handleOpenCreateModal = () => {
-    setEditingPlan(null);
-    setPlanForm({ name: "", price: "", sessionCount: "", duration: "1 Month" });
-    setShowPlanModal(true);
-  };
-
-  const handleOpenEditModal = (plan) => {
-    setActiveMenuId(null);
-    setEditingPlan(plan);
-    setPlanForm({
-      name: plan.name,
-      price: String(plan.price),
-      sessionCount: String(plan.sessionCount || plan.sessions || ""),
-      duration: plan.duration || "1 Month"
-    });
-    setShowPlanModal(true);
-  };
-
-  const handleSavePlan = async () => {
-    if (!planForm.name || !planForm.price) {
-      alert("Name and Price are required.");
-      return;
-    }
-
-    try {
-      const payload = {
-        name: planForm.name,
-        price: parseFloat(planForm.price) || 0,
-        sessionCount: parseInt(planForm.sessionCount) || null,
-        duration: planForm.duration,
-        status: "Active"
-      };
-
-      if (editingPlan) {
-        await api.updatePlan(editingPlan.id || editingPlan.planId, payload);
-      } else {
-        await api.createPlan(payload);
-      }
-
-      setShowPlanModal(false);
-      loadPlans();
-    } catch (err) {
-      alert(`Error saving plan: ${err.message}`);
-    }
-  };
-
   const handleDeletePlan = async (plan) => {
     setActiveMenuId(null);
     if (!confirm(`Are you sure you want to soft-delete the "${plan.name}" plan?`)) return;
@@ -338,46 +286,42 @@ export default function Subscriptions() {
           .dark .subscription-stat-card--neutral .subscription-stat-glow {
             opacity: 0;
           }
-
           .dark .subscription-stat-card--purple:hover .subscription-stat-glow {
             opacity: 0.95;
             transform: scale(1.12) translate(8px, 8px);
           }
-
           .dark .subscription-stat-icon {
             background: #1e1f29;
             color: #6942ff;
           }
-
           .dark .subscription-stat-badge {
             background: rgba(51, 109, 59, 0.42);
             color: #7dde85;
           }
-
           .dark .subscription-stat-label {
             color: #8368ff;
           }
-
           .dark .subscription-stat-value {
             color: #f4f4fb;
           }
-
           .dark .subscription-revenue-card {
             background: linear-gradient(135deg, #281673 0%, #2e1a77 52%, #3a2182 100%);
             box-shadow: 0 18px 38px rgba(27, 12, 77, 0.36);
           }
-
           .dark .subscription-revenue-card:hover {
             box-shadow: 0 26px 58px rgba(27, 12, 77, 0.52);
           }
         `}
       </style>
+
       <div className="mx-auto flex w-full max-w-380 flex-col overflow-visible">
+        {/* Stat Cards */}
         <div className="grid grid-cols-1 gap-7 lg:grid-cols-[1fr_1fr_1fr_1fr]">
           {stats.map((stat) => <StatCard key={stat.label} stat={stat} />)}
           <RevenueCard />
         </div>
 
+        {/* Filters & Actions Bar */}
         <div className="mt-[38px] flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
           <div className="flex w-full flex-col gap-3 lg:flex-row lg:items-center xl:w-auto">
             <SearchInput
@@ -407,12 +351,17 @@ export default function Subscriptions() {
             </button>
           </div>
 
-          <button onClick={handleOpenCreateModal} className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-[10px] bg-primary-600 px-5 text-[14px] font-bold text-white shadow-[0_8px_18px_rgba(105,66,255,0.26)] transition-all duration-200 ease-out hover:bg-primary-700 active:scale-[0.98]">
+          {/* ✅ "Add Plan" button — opens AddPlanModal */}
+          <button
+            onClick={() => setShowPlanModal(true)}
+            className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-[10px] bg-primary-600 px-5 text-[14px] font-bold text-white shadow-[0_8px_18px_rgba(105,66,255,0.26)] transition-all duration-200 ease-out hover:bg-primary-700 active:scale-[0.98]"
+          >
             <PlusCircle size={20} weight="bold" />
             {t('Add Plan')}
           </button>
         </div>
 
+        {/* Table */}
         {loading && plans.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <div className="w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
@@ -445,7 +394,11 @@ export default function Subscriptions() {
                 const planId = plan.id || plan.planId;
                 const formattedPrice = typeof plan.price === 'number' ? `$${plan.price.toFixed(2)}` : plan.price;
                 const sessions = plan.sessionCount || plan.sessions || "Unlimited";
-                const creationDate = plan.createdAt ? (plan.createdAt.includes('PM') || plan.createdAt.includes('AM') ? plan.createdAt : new Date(plan.createdAt).toLocaleDateString()) : "Counter Registration";
+                const creationDate = plan.createdAt
+                  ? (plan.createdAt.includes('PM') || plan.createdAt.includes('AM')
+                    ? plan.createdAt
+                    : new Date(plan.createdAt).toLocaleDateString())
+                  : "Counter Registration";
 
                 return (
                   <TableRow key={planId} className="border-b border-secondary-200 bg-secondary-50 last:border-b-0 hover:bg-secondary-100 overflow-visible">
@@ -470,7 +423,12 @@ export default function Subscriptions() {
                           <div className="fixed inset-0 z-10" onClick={() => setActiveMenuId(null)} />
                           <div className="absolute right-8 top-0 mt-1 w-32 bg-white rounded-lg border border-secondary-200 shadow-lg z-20 py-1 text-left">
                             <button
-                              onClick={() => handleOpenEditModal(plan)}
+                              onClick={() => {
+                                setActiveMenuId(null);
+                                // If you later add edit support to AddPlanModal,
+                                // you can pass the plan as a prop here.
+                                setShowPlanModal(true);
+                              }}
                               className="w-full px-4 py-2 text-xs font-semibold text-secondary-600 hover:bg-secondary-100 flex items-center gap-2 cursor-pointer"
                             >
                               <Edit2 size={12} />
@@ -499,103 +457,12 @@ export default function Subscriptions() {
         </div>
       </div>
 
-      {/* Plan Add/Edit Modal */}
+      {/* ✅ AddPlanModal — renders when showPlanModal is true */}
       {showPlanModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-xs transition-all duration-300">
-          <div className="bg-white border border-secondary-300 rounded-2xl shadow-2xl w-full max-w-md mx-4 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-secondary-200 bg-secondary-100">
-              <h3 className="font-bold text-secondary-800 text-base flex items-center gap-2">
-                <Pulse size={20} className="text-primary-600 animate-pulse" />
-                {editingPlan ? t('Edit Plan') : t('Create Subscription Plan')}
-              </h3>
-              <button
-                onClick={() => setShowPlanModal(false)}
-                className="p-1.5 rounded-lg hover:bg-secondary-200 text-secondary-400 hover:text-secondary-700 transition-colors cursor-pointer"
-              >
-                <X size={18} />
-              </button>
-            </div>
-            {/* Modal Body */}
-            <div className="p-6 flex flex-col gap-4">
-              <div>
-                <label className="text-xs text-secondary-500 font-bold uppercase tracking-wider mb-2 block">{t('Plan Name')}</label>
-                <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
-                  <Pulse size={16} className="text-secondary-300 shrink-0" />
-                  <input
-                    value={planForm.name}
-                    onChange={(e) => setPlanForm({ ...planForm, name: e.target.value })}
-                    placeholder="e.g. Premium Monthly"
-                    className="w-full text-sm text-secondary-700 outline-none bg-transparent"
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <div className="flex-1">
-                  <label className="text-xs text-secondary-500 font-bold uppercase tracking-wider mb-2 block">{t('Price ($)')}</label>
-                  <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
-                    <Tag size={16} className="text-secondary-300 shrink-0" />
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={planForm.price}
-                      onChange={(e) => setPlanForm({ ...planForm, price: e.target.value })}
-                      placeholder="49.99"
-                      className="w-full text-sm text-secondary-700 outline-none bg-transparent"
-                    />
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <label className="text-xs text-secondary-500 font-bold uppercase tracking-wider mb-2 block">{t('Sessions')}</label>
-                  <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
-                    <CalendarBlank size={16} className="text-secondary-300 shrink-0" />
-                    <input
-                      type="number"
-                      value={planForm.sessionCount}
-                      onChange={(e) => setPlanForm({ ...planForm, sessionCount: e.target.value })}
-                      placeholder="e.g. 30"
-                      className="w-full text-sm text-secondary-700 outline-none bg-transparent"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-xs text-secondary-500 font-bold uppercase tracking-wider mb-2 block">{t('Duration')}</label>
-                <div className="flex items-center border border-secondary-200 rounded-lg px-3 gap-2 h-10 focus-within:border-primary-600 transition-all">
-                  <Clock size={16} className="text-secondary-300 shrink-0" />
-                  <select
-                    value={planForm.duration}
-                    onChange={(e) => setPlanForm({ ...planForm, duration: e.target.value })}
-                    className="w-full text-sm text-secondary-700 outline-none bg-transparent"
-                  >
-                    <option value="1 Week">1 Week</option>
-                    <option value="1 Month">1 Month</option>
-                    <option value="3 Months">3 Months</option>
-                    <option value="6 Months">6 Months</option>
-                    <option value="1 Year">1 Year</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-            {/* Modal Footer */}
-            <div className="flex justify-end gap-3 px-6 py-4 border-t border-secondary-200 bg-secondary-100 shrink-0">
-              <button
-                onClick={() => setShowPlanModal(false)}
-                className="h-10 px-5 rounded-md bg-secondary-200 hover:bg-secondary-300 text-secondary-700 hover:text-secondary-900 transition-all font-bold text-sm cursor-pointer border border-secondary-300"
-              >
-                {t('Cancel')}
-              </button>
-              <button
-                onClick={handleSavePlan}
-                className="h-10 px-5 rounded-md bg-primary-600 hover:bg-primary-700 text-white font-bold text-sm cursor-pointer transition-all shadow-md"
-              >
-                {t('Save Plan')}
-              </button>
-            </div>
-          </div>
-        </div>
+        <AddPlanModal
+          onClose={() => setShowPlanModal(false)}
+          onCreated={loadPlans}
+        />
       )}
     </div>
   )
