@@ -91,13 +91,11 @@ export const api = {
   },
 
   createMember: async (memberData) => {
-    // If memberData is not already a FormData object, and contains objects (like file) or strings, we can handle it
     let body;
     let headers = {};
 
     if (memberData instanceof FormData) {
       body = memberData;
-      // Fetch will automatically set correct boundary for FormData, do not set Content-Type manually
     } else {
       body = JSON.stringify(memberData);
     }
@@ -223,7 +221,7 @@ export const api = {
       "Credit Card": 1,
       "Online": 1,
       0: 0,
-      1: 1
+      1: 1,
     };
     const methodInt = paymentMethodMap[paymentMethod] ?? 0;
     return apiFetch("/api/subscriptions", {
@@ -239,7 +237,7 @@ export const api = {
       "Credit Card": 1,
       "Online": 1,
       0: 0,
-      1: 1
+      1: 1,
     };
     const methodInt = paymentMethodMap[paymentMethod] ?? 0;
     return apiFetch("/api/subscriptions/confirm-payment", {
@@ -260,7 +258,7 @@ export const api = {
       "Credit Card": 1,
       "Online": 1,
       0: 0,
-      1: 1
+      1: 1,
     };
     const paymentTypeMap = {
       "Subscription": 0,
@@ -270,7 +268,7 @@ export const api = {
       0: 0,
       1: 1,
       2: 2,
-      3: 3
+      3: 3,
     };
     const methodInt = paymentMethodMap[paymentMethod] ?? 0;
     const typeInt = paymentTypeMap[paymentType] ?? 0;
@@ -299,7 +297,52 @@ export const api = {
     });
   },
 
-<<<<<<< HEAD
+  rejectRenewal: async (requestId, notes = "") => {
+    return apiFetch(`/api/subscriptions/renew/${requestId}/reject`, {
+      method: "PATCH",
+      body: notes ? JSON.stringify({ notes }) : JSON.stringify({}),
+    });
+  },
+
+  onlineRenewal: async ({ subscriptionId, amount, notes = "" }) => {
+    return apiFetch("/api/subscriptions/renew/online", {
+      method: "POST",
+      body: JSON.stringify({ subscriptionId, amount, notes }),
+    });
+  },
+
+  // Member (self) endpoints
+  getMyProfile: async () => {
+    return apiFetch("/api/me");
+  },
+
+  updateMyProfile: async (profileData) => {
+    return apiFetch("/api/me", {
+      method: "PUT",
+      body: JSON.stringify(profileData),
+    });
+  },
+
+  getMySubscription: async () => {
+    return apiFetch("/api/me/subscription");
+  },
+
+  getMySubscriptions: async () => {
+    return apiFetch("/api/me/subscriptions");
+  },
+
+  getMySessions: async () => {
+    return apiFetch("/api/me/sessions");
+  },
+
+  getMyPayments: async () => {
+    return apiFetch("/api/me/payments");
+  },
+
+  getActiveSubscription: async () => {
+    return apiFetch("/api/members/active-subscription");
+  },
+
   // Courses / Programs
   createProgram: async (programData) => {
     return apiFetch("/api/programs", {
@@ -473,51 +516,5 @@ export const api = {
 
   downloadExcelReport: async () => {
     return downloadFetch("/api/reports/excel", {}, AGGREGATION_BASE_URL);
-=======
-  rejectRenewal: async (requestId, notes = "") => {
-    return apiFetch(`/api/subscriptions/renew/${requestId}/reject`, {
-      method: "PATCH",
-      body: notes ? JSON.stringify({ notes }) : JSON.stringify({}),
-    });
-  },
-
-  onlineRenewal: async ({ subscriptionId, amount, notes = "" }) => {
-    return apiFetch("/api/subscriptions/renew/online", {
-      method: "POST",
-      body: JSON.stringify({ subscriptionId, amount, notes }),
-    });
-  },
-
-  // Member endpoints
-  getMyProfile: async () => {
-    return apiFetch("/api/me");
-  },
-
-  updateMyProfile: async (profileData) => {
-    return apiFetch("/api/me", {
-      method: "PUT",
-      body: JSON.stringify(profileData),
-    });
-  },
-
-  getMySubscription: async () => {
-    return apiFetch("/api/me/subscription");
-  },
-
-  getMySubscriptions: async () => {
-    return apiFetch("/api/me/subscriptions");
-  },
-
-  getMySessions: async () => {
-    return apiFetch("/api/me/sessions");
-  },
-
-  getMyPayments: async () => {
-    return apiFetch("/api/me/payments");
-  },
-
-  getActiveSubscription: async () => {
-    return apiFetch("/api/members/active-subscription");
->>>>>>> a1e0208993aee333a8297e22d84586e11ae270ba
   },
 };
