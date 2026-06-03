@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "./Button";
-import { User, EnvelopeSimple, Phone, X, IdentificationCard, PencilSimple } from "../../icons/index";
+import { User, EnvelopeSimple, Phone, X, IdentificationCard, PencilSimple, CreditCard } from "../../icons/index";
 import { GenderIntersex, CalendarDots, MoneyWavy, ListNumbers, HourglassSimple, CalendarBlank } from "@phosphor-icons/react";
 import { api } from "../../services/api";
 
@@ -12,6 +12,7 @@ export default function AddMemberModal({ onClose }) {
   const [useSavedPlan, setUseSavedPlan] = useState(true);
   const [form, setForm] = useState({
     firstName: "", lastName: "", email: "", phone: "",
+    cardCode: "",                          // ← NEW
     gender: "Male", birthDate: "", medicalCertificate: null, profilePicture: null,
     plan: "", startDate: "", priceOverride: "",
     customPlanName: "", customPlanDescription: "", customPlanPrice: "",
@@ -23,6 +24,18 @@ export default function AddMemberModal({ onClose }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+
+  // ── NFC / card-reader state ──────────────────────────────────────────────
+  const [cardFocused, setCardFocused] = useState(false);
+  const cardInputRef = useRef(null);
+
+  // Auto-focus the card input 300 ms after the modal opens so the USB reader
+  // can type straight into it without the user having to click first.
+  useEffect(() => {
+    const t = setTimeout(() => cardInputRef.current?.focus(), 300);
+    return () => clearTimeout(t);
+  }, []);
+  // ────────────────────────────────────────────────────────────────────────
 
   // Fetch plans on mount
   useEffect(() => {
@@ -109,12 +122,16 @@ export default function AddMemberModal({ onClose }) {
       formData.append("lastName", form.lastName.trim());
       formData.append("email", form.email.trim());
       formData.append("phoneNumber", form.phone.trim());
+      // ── send card code if provided ──────────────────────────────────────
+      if (form.cardCode.trim()) {
+        formData.append("cardCode", form.cardCode.trim());
+      }
+      // ───────────────────────────────────────────────────────────────────
       formData.append("gender", form.gender);
       formData.append("planId", planId);
       if (form.birthDate) {
         formData.append("dateOfBirth", form.birthDate);
       }
-
       if (form.medicalCertificate) {
         formData.append("medicalCertificate", form.medicalCertificate);
       }
@@ -209,6 +226,71 @@ export default function AddMemberModal({ onClose }) {
                 </div>
               </div>
 
+              {/* ── Card Code / NFC Reader ────────────────────────────────────────── */}
+              <div>
+                <label className="text-xs text-secondary-500 font-normal mb-2 block">
+                  Scan the member's Card Code
+                </label>
+                <div
+                  className={`flex items-center border rounded-lg px-3 gap-2 h-10 transition-all
+                    ${cardFocused
+                      ? "border-primary-600 ring-2 ring-primary-50 bg-primary-50/30"
+                      : form.cardCode
+                      ? "border-green-400 bg-green-50/30"
+                      : "border-secondary-200"}`}
+                >
+                  <CreditCard
+                    size={16}
+                    className={
+                      cardFocused
+                        ? "text-primary-600 shrink-0"
+                        : form.cardCode
+                        ? "text-green-500 shrink-0"
+                        : "text-secondary-300 shrink-0"
+                    }
+                  />
+                  <input
+                    ref={cardInputRef}
+                    name="cardCode"
+                    placeholder={cardFocused ? "⚡ Ready — tap card on reader..." : "Card Code"}
+                    value={form.cardCode}
+                    onChange={handleChange}
+                    onFocus={() => setCardFocused(true)}
+                    onBlur={() => setCardFocused(false)}
+                    className="w-full text-sm outline-none text-secondary-700 placeholder-secondary-400 bg-transparent"
+                  />
+                  {form.cardCode && (
+                    <span className="text-xs text-green-600 font-semibold shrink-0 flex items-center gap-1">
+                      ✓ Scanned
+                    </span>
+                  )}
+                  {!form.cardCode && (
+                    <button
+                      type="button"
+                      onClick={() => cardInputRef.current?.focus()}
+                      className="text-xs text-primary-600 font-medium shrink-0 hover:text-primary-800 cursor-pointer whitespace-nowrap"
+                    >
+                      Click to scan
+                    </button>
+                  )}
+                </div>
+
+                {/* Status messages below the field */}
+                {cardFocused && (
+                  <p className="text-xs text-primary-600 mt-1.5 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary-600 animate-pulse inline-block" />
+                    Place card on the NFC reader now...
+                  </p>
+                )}
+                {form.cardCode && !cardFocused && (
+                  <p className="text-xs text-green-600 mt-1.5 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
+                    Card scanned: <span className="font-mono font-bold ml-1">{form.cardCode}</span>
+                  </p>
+                )}
+              </div>
+              {/* ─────────────────────────────────────────────────────────────────── */}
+
               {/* Gender */}
               <div>
                 <label className="text-xs text-secondary-500 font-normal mb-2 block">Select member's Gender</label>
@@ -291,6 +373,7 @@ export default function AddMemberModal({ onClose }) {
                   <PencilSimple size={16} /> Create Custom Plan
                 </button>
               </div>
+
               {useSavedPlan ? (
                 (() => {
                   const selectedPlanObj = plans.find(p => (p.id || p.planId) === form.plan) || plans[0] || { name: "Loading plans...", price: 0, sessionCount: 0, duration: "N/A" };
@@ -573,6 +656,7 @@ export default function AddMemberModal({ onClose }) {
             </Button>
           </div>
         </div>
+
       </div>
     </div>
   );

@@ -19,6 +19,7 @@ import Schedule from '../pages/coach/Schedule'
 import Messaging from '../pages/coach/Messaging'
 import LoginPage from '../pages/auth/LoginPage'
 import VerifyEmailPage from '../pages/auth/VerifyEmailPage'
+// ❌ REMOVE THIS LINE: import ScanPage from '../pages/ScanPage'
 import { useTranslation } from 'react-i18next'
 import { getDefaultRouteForRole, getToken, getUserRole, normalizeRole } from '../features/auth/utils/authHelpers'
 
@@ -188,5 +189,5 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <StartRoute />,
-  }
+  },
 ])
