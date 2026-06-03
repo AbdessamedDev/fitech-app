@@ -511,7 +511,7 @@ export const api = {
   },
 
   getFinanceDashboard: async () => {
-    return apiFetch("/api/dashboard/finance", {}, AGGREGATION_BASE_URL);
+    return apiFetch("/api/payments", {}, AGGREGATION_BASE_URL);
   },
 
   downloadExcelReport: async () => {

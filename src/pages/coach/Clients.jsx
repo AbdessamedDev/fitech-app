@@ -82,31 +82,34 @@ export default function Clients() {
   const [activeProgramsClientId, setActiveProgramsClientId] = useState(null)
 
   const loadClients = async () => {
-    if (!coachId) {
-      setError('Coach identity session identifier not found.')
-      setClients(mapSeeds(clientSeeds))
-      setLoading(false)
-      return
-    }
-
-    setLoading(true)
-    setError('')
-    try {
-      const data = await api.getCoachClients(coachId)
-      if (Array.isArray(data) && data.length > 0) {
-        setClients(mapSeeds(data))
-      } else {
-        setClients(mapSeeds(clientSeeds))
-      }
-    } catch (err) {
-      console.error('Failed to load coach clients:', err)
-      setError(err.message || 'Connecting to backend microservice failed.')
-      setClients(mapSeeds(clientSeeds))
-    } finally {
-      setLoading(false)
-    }
+  if (!coachId) {
+    setError('Coach identity session identifier not found.')
+    setClients(mapSeeds(clientSeeds))   // keep fallback for missing coachId (shouldn't happen)
+    setLoading(false)
+    return
   }
 
+  setLoading(true)
+  setError('')
+  try {
+    const data = await api.getCoachClients(coachId)
+    // ✅ Use the data directly (empty array is fine)
+    // Only fall back to seeds if data is not an array (e.g., null, object)
+    if (Array.isArray(data)) {
+      setClients(mapSeeds(data))
+    } else {
+      // Unexpected response format – treat as empty
+      setClients([])
+      setError('Unexpected response format from server.')
+    }
+  } catch (err) {
+    console.error('Failed to load coach clients:', err)
+    setError(err.message || 'Connecting to backend microservice failed.')
+    setClients(mapSeeds(clientSeeds))   // fallback only on error
+  } finally {
+    setLoading(false)
+  }
+}
   const mapSeeds = (list) => {
     return list.map((c, index) => ({
       id: c.memberId || index,

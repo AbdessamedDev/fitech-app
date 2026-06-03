@@ -293,22 +293,25 @@ export default function Finance() {
   const [financeStats, setFinanceStats] = useState(null)
 
   const loadPayments = async () => {
-    setLoading(true)
-    try {
-      const [paymentsData, statsData] = await Promise.all([
-        api.listPayments().catch(() => []),
-        api.getFinanceDashboard().catch(() => null)
-      ])
-      
-      setPayments(Array.isArray(paymentsData) && paymentsData.length > 0 ? paymentsData.map(mapPaymentRow) : financeRows.map(normalizeFinanceRow))
-      setFinanceStats(statsData)
-    } catch (err) {
-      console.error('Failed to load payments:', err)
-      setPayments(financeRows.map(normalizeFinanceRow))
-    } finally {
-      setLoading(false)
-    }
+  setLoading(true)
+  try {
+    const [paymentsData, statsData] = await Promise.all([
+      api.listPayments(),
+      api.getFinanceDashboard().catch(() => null)
+    ])
+    
+    
+    const mappedPayments = Array.isArray(paymentsData) ? paymentsData.map(mapPaymentRow) : []
+    setPayments(mappedPayments)
+    setFinanceStats(statsData)
+  } catch (err) {
+    console.error('Failed to load payments:', err)
+   
+    setPayments(financeRows.map(normalizeFinanceRow))
+  } finally {
+    setLoading(false)
   }
+}
 
   useEffect(() => {
     loadPayments()
@@ -432,13 +435,7 @@ export default function Finance() {
             style={{ height: 44 }}
             className="w-full"
           />
-          <button
-            onClick={() => setShowPaymentModal(true)}
-            className="flex h-11 cursor-pointer items-center justify-center gap-2 rounded-[10px] bg-primary-600 px-5 text-[14px] font-bold text-white shadow-[0_8px_18px_rgba(105,66,255,0.26)] transition-all duration-200 ease-out hover:bg-primary-700 active:scale-[0.98]"
-          >
-            <PlusCircle size={20} weight="bold" />
-            {t('Add Payment')}
-          </button>
+      
         </div>
 
         {/* Table */}
