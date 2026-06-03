@@ -5,6 +5,8 @@ const COURSES_BASE_URL = GATEWAY_URL;
 const ACTIVITY_BASE_URL = GATEWAY_URL;
 const AGGREGATION_BASE_URL = GATEWAY_URL;
 const CHAT_BASE_URL = GATEWAY_URL;
+const SHOP_BASE_URL = GATEWAY_URL;
+const EQUIPMENT_BASE_URL = GATEWAY_URL;
 
 function toQueryString(params = {}) {
   const query = new URLSearchParams();
@@ -356,8 +358,8 @@ scanCard: async (cardUid) => {
     }, COURSES_BASE_URL);
   },
 
-  getCoachPrograms: async (coachId) => {
-    return apiFetch(`/api/coaches/${coachId}/programs`, {}, COURSES_BASE_URL);
+  getCoachPrograms: async () => {
+    return apiFetch(`/api/coaches/me/programs`, {}, COURSES_BASE_URL);
   },
 
   getCoachProfile: async (coachId) => {
@@ -457,6 +459,30 @@ scanCard: async (cardUid) => {
     }, COURSES_BASE_URL);
   },
 
+  // Coach self endpoints (using /me)
+  getMyCoachProfile: async () => {
+    return apiFetch("/api/coaches/me", {}, COURSES_BASE_URL);
+  },
+
+  getMyCoachPrograms: async () => {
+    return apiFetch("/api/coaches/me/programs", {}, COURSES_BASE_URL);
+  },
+
+  getMyCoachSessions: async ({ from, to } = {}) => {
+    return apiFetch(`/api/coaches/me/sessions${toQueryString({ from, to })}`, {}, COURSES_BASE_URL);
+  },
+
+  updateMyCoachProfile: async (data) => {
+    return apiFetch("/api/coaches/me", {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }, COURSES_BASE_URL);
+  },
+
+  getMyCoachPurchaseRequests: async () => {
+    return apiFetch("/api/coaches/me/purchase-requests", {}, COURSES_BASE_URL);
+  },
+
   // Chat
   listConversations: async () => {
     return apiFetch("/api/conversations", {}, CHAT_BASE_URL);
@@ -521,5 +547,75 @@ scanCard: async (cardUid) => {
 
   downloadExcelReport: async () => {
     return downloadFetch("/api/reports/excel", {}, AGGREGATION_BASE_URL);
+  },
+
+  // Shop / Products
+  listProducts: async () => {
+    return apiFetch("/api/products", {}, SHOP_BASE_URL);
+  },
+
+  getProduct: async (id) => {
+    return apiFetch(`/api/products/${id}`, {}, SHOP_BASE_URL);
+  },
+
+  createProduct: async (formData) => {
+    return apiFetch("/api/products", {
+      method: "POST",
+      body: formData,
+    }, SHOP_BASE_URL);
+  },
+
+  updateProduct: async (id, formData) => {
+    return apiFetch(`/api/products/${id}`, {
+      method: "PUT",
+      body: formData,
+    }, SHOP_BASE_URL);
+  },
+
+  deleteProduct: async (id) => {
+    return apiFetch(`/api/products/${id}`, {
+      method: "DELETE",
+    }, SHOP_BASE_URL);
+  },
+
+  // Equipment
+  listEquipment: async () => {
+    return apiFetch("/api/equipments", {}, EQUIPMENT_BASE_URL);
+  },
+
+  getEquipment: async (id) => {
+    return apiFetch(`/api/equipments/${id}`, {}, EQUIPMENT_BASE_URL);
+  },
+
+  createEquipment: async (formData) => {
+    return apiFetch("/api/equipments", {
+      method: "POST",
+      body: formData,
+    }, EQUIPMENT_BASE_URL);
+  },
+
+  updateEquipment: async (id, formData) => {
+    return apiFetch(`/api/equipments/${id}`, {
+      method: "PUT",
+      body: formData,
+    }, EQUIPMENT_BASE_URL);
+  },
+
+  deleteEquipment: async (id) => {
+    return apiFetch(`/api/equipments/${id}`, {
+      method: "DELETE",
+    }, EQUIPMENT_BASE_URL);
+  },
+
+  // Equipment Issues
+  listIssues: async () => {
+    return apiFetch("/api/issues", {}, EQUIPMENT_BASE_URL);
+  },
+
+  updateIssueStatus: async (issueId, status) => {
+    return apiFetch(`/api/issues/${issueId}/status`, {
+      method: "PATCH",
+      body: JSON.stringify({ status }),
+    }, EQUIPMENT_BASE_URL);
   },
 };

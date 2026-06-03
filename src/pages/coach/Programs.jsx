@@ -7,7 +7,7 @@ import { PrimaryButton } from '../../components/shared/PrimaryButton'
 import { SearchInput } from '../../components/shared/SearchInput'
 import AddProgramModal from '../../components/ui/AddProgramModal'
 import { api } from '../../services/api'
-import { formatDate, formatTime, getCurrentUserId, toNumber } from '../../utilities/backendData'
+import { formatDate, formatTime, toNumber } from '../../utilities/backendData'
 import {
   BarbellIcon,
   ClockIcon,
@@ -278,7 +278,6 @@ export function ProgramDetails() {
 export default function Programs() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const coachId = getCurrentUserId()
   const [programs, setPrograms] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -290,16 +289,10 @@ export default function Programs() {
   const [showAddProgramModal, setShowAddProgramModal] = useState(false)
 
   const loadPrograms = async () => {
-    if (!coachId) {
-      setError('Coach identity was not found in the current session.')
-      setLoading(false)
-      return
-    }
-
     setLoading(true)
     setError('')
     try {
-      const data = await api.getCoachPrograms(coachId)
+      const data = await api.getCoachPrograms()
       setPrograms(Array.isArray(data) ? data.map(mapProgram) : [])
     } catch (err) {
       setError(err.message || 'Failed to load programs.')
@@ -311,7 +304,7 @@ export default function Programs() {
 
   useEffect(() => {
     loadPrograms()
-  }, [coachId])
+  }, [])
 
   const filteredPrograms = useMemo(() => {
     const query = search.trim().toLowerCase()
@@ -329,7 +322,7 @@ export default function Programs() {
 
       return matchesSearch && matchesEquipment && matchesLevel && matchesStatus
     })
-  }, [equipmentFilter, levelFilter, search, statusFilter])
+  }, [equipmentFilter, levelFilter, search, statusFilter, programs])
 
   const totalPages = Math.ceil(filteredPrograms.length / PROGRAMS_PER_PAGE)
   const safePage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1
@@ -345,7 +338,6 @@ export default function Programs() {
 
   return (
     <div className="min-h-full w-full bg-secondary-100 px-4 py-6 text-sm text-secondary-700 sm:px-6 lg:px-8">
-      {showAddProgramModal && <AddProgramModal onClose={() => setShowAddProgramModal(false)} />}
 
       <div className="mx-auto flex w-full max-w-380 flex-col">
         <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
