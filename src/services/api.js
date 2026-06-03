@@ -359,8 +359,8 @@ export const api = {
     return apiFetch(`/api/coaches/${coachId}`, {}, COURSES_BASE_URL);
   },
 
-  getCoachClients: async (coachId) => {
-    return apiFetch(`/api/coaches/${coachId}/clients`, {}, COURSES_BASE_URL);
+  getCoachClients: async () => {
+   return apiFetch(`/api/coaches/me/clients`, {}, COURSES_BASE_URL);
   },
 
   getCoachClientProfile: async (coachId, memberId) => {
