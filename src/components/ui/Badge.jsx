@@ -1,10 +1,11 @@
 import { Check, X, Clock } from 'lucide-react'
 
 export function Badge({ status, variant, className = '' }) {
-  const currentStatus = status || variant || 'default'
-  
+  const raw = status || variant || 'default'
+  const currentStatus = typeof raw === 'string' ? raw : String(raw ?? 'default')
+
   const getVariantStyles = (v) => {
-    switch(v?.toLowerCase()) {
+    switch (v.toLowerCase()) {
       case 'active':
         return {
           classes: 'bg-success-bg text-success border-success/40',
